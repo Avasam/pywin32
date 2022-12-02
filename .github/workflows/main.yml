@@ -36,7 +36,7 @@ jobs:
         python setup.py --skip-verstamp install --user
 
     - name: Type-check with mypy
-      run: mypy . --python-version=${{ matrix.python-version }}
+      run: mypy . --python-version=${{ matrix.python-version }} --explicit-package-bases
 
     - name: Type-check with Pyright
       uses: jakebailey/pyright-action@v1
@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pip install isort pycln
+      - run: pip install isort pycln pyopengl
       - run: pycln . --diff --config=pycln.toml
       - run: isort . --diff --check-only
 
