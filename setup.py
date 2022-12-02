@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing_extensions import TypeAlias
-
 build_id = "305.1"  # may optionally include a ".{patchno}" suffix.
 
 __doc__ = """This is a distutils setup-script for the pywin32 extensions.
@@ -993,10 +991,10 @@ from distutils._msvccompiler import MSVCCompiler
 orig_new_compiler = ccompiler.new_compiler
 ccompiler.new_compiler = my_new_compiler
 
-base_compiler: TypeAlias = MSVCCompiler
+base_compiler = MSVCCompiler
 
 
-class my_compiler(base_compiler):
+class my_compiler(base_compiler):  # type: ignore[misc,valid-type]  # Not explicitely marking base_compiler as type alias to avoid importing typing_extensions
     # Just one GUIDS.CPP and it gives trouble on mainwin too. Maybe I
     # should just rename the file, but a case-only rename is likely to be
     # worse!  This can probably go away once we kill the VS project files
