@@ -1,7 +1,7 @@
 # cmdline - command line utilities.
-import sys
-import string
 import os
+import string
+import sys
 
 
 def ParseArgs(str):

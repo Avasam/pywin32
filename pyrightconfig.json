@@ -22,7 +22,7 @@
     "**/samples/",
     "**/examples/",
     // Axdebug isn't even built right now
-    "**/axdebug"
+    "**/axdebug/"
   ],
   "typeCheckingMode": "basic",
   // Not all dependencies are going to be py.typed or have stubs
