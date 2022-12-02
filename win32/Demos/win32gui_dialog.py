@@ -20,13 +20,17 @@ if "--noxp" in sys.argv:
     import win32gui
 else:
     import winxpgui as win32gui
-import win32gui_struct
-import win32api
-import win32con, winerror
-import struct, array
-import commctrl
-import queue
+
+import array
 import os
+import queue
+import struct
+
+import commctrl
+import win32api
+import win32con
+import win32gui_struct
+import winerror
 
 IDC_SEARCHTEXT = 1024
 IDC_BUTTON_SEARCH = 1025
@@ -142,12 +146,12 @@ class DemoWindowBase:
         wc.cbWndExtra = win32con.DLGWINDOWEXTRA + struct.calcsize("Pi")
         icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
 
-        ## py.ico went away in python 2.5, load from executable instead
+        # load .ico from executable
         this_app = win32api.GetModuleHandle(None)
         try:
-            wc.hIcon = win32gui.LoadIcon(this_app, 1)  ## python.exe and pythonw.exe
+            wc.hIcon = win32gui.LoadIcon(this_app, 1)  # python.exe and pythonw.exe
         except win32gui.error:
-            wc.hIcon = win32gui.LoadIcon(this_app, 135)  ## pythonwin's icon
+            wc.hIcon = win32gui.LoadIcon(this_app, 135)  # pythonwin's icon
         try:
             classAtom = win32gui.RegisterClass(wc)
         except win32gui.error as err_info:
@@ -178,7 +182,7 @@ class DemoWindowBase:
                 (8, "MS Sans Serif"),
                 None,
                 dlgClassName,
-            ],
+            ]
         ]
 
         # ID label and text box
@@ -203,8 +207,8 @@ class DemoWindowBase:
 
         # List control.
         # Can't make this work :(
-        ##        s = cs | win32con.WS_TABSTOP
-        ##        dlg.append(['SysListView32', "Title", IDC_LISTBOX, (5, 505, 200, 200), s])
+        #        s = cs | win32con.WS_TABSTOP
+        #        dlg.append(['SysListView32', "Title", IDC_LISTBOX, (5, 505, 200, 200), s])
 
         return dlg
 

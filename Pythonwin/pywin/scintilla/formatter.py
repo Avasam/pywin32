@@ -1,10 +1,11 @@
 # Does Python source formatting for Scintilla controls.
-import win32ui
+import array
+import string
+
 import win32api
 import win32con
-import winerror
-import string
-import array
+import win32ui
+
 from . import scintillacon
 
 WM_KICKIDLE = 0x036A
@@ -16,7 +17,9 @@ debugging = 0
 if debugging:
     # Output must go to another process else the result of
     # the printing itself will trigger again trigger a trace.
-    import sys, win32traceutil, win32trace
+
+    import win32trace
+    import win32traceutil
 
     def trace(*args):
         win32trace.write(" ".join(map(str, args)) + "\n")
@@ -33,7 +36,7 @@ class Style:
         # Default background for each style is only used when there are no
         # saved settings (generally on first startup)
         self.background = self.default_background = background
-        if type(format) == type(""):
+        if isinstance(format, str):
             self.aliased = format
             self.format = None
         else:
@@ -123,19 +126,19 @@ class FormatterBase:
 
     # Update the control with the new style format.
     def _ReformatStyle(self, style):
-        ## Selection (background only for now)
-        ## Passing False for WPARAM to SCI_SETSELBACK is documented as resetting to scintilla default,
-        ## but does not work - selection background is not visible at all.
-        ## Default value in SPECIAL_STYLES taken from scintilla source.
+        # Selection (background only for now)
+        # Passing False for WPARAM to SCI_SETSELBACK is documented as resetting to scintilla default,
+        # but does not work - selection background is not visible at all.
+        # Default value in SPECIAL_STYLES taken from scintilla source.
         if style.name == STYLE_SELECTION:
             clr = style.background
             self.scintilla.SendScintilla(scintillacon.SCI_SETSELBACK, True, clr)
 
-            ## Can't change font for selection, but could set color
-            ## However, the font color dropbox has no option for default, and thus would
-            ## always override syntax coloring
-            ## clr = style.format[4]
-            ## self.scintilla.SendScintilla(scintillacon.SCI_SETSELFORE, clr != CLR_INVALID, clr)
+            # Can't change font for selection, but could set color
+            # However, the font color dropbox has no option for default, and thus would
+            # always override syntax coloring
+            # clr = style.format[4]
+            # self.scintilla.SendScintilla(scintillacon.SCI_SETSELFORE, clr != CLR_INVALID, clr)
             return
 
         assert style.stylenum is not None, "Unregistered style."
@@ -163,7 +166,7 @@ class FormatterBase:
         scintilla.SCIStyleSetSize(stylenum, int(baseFormat[2] / 20))
         scintilla.SCIStyleSetEOLFilled(stylenum, 1)  # Only needed for unclosed strings.
 
-        ## Default style background to whitespace background if set,
+        # Default style background to whitespace background if set,
         ##	otherwise use system window color
         bg = style.background
         if bg == CLR_INVALID:
@@ -417,7 +420,7 @@ SPECIAL_STYLES = [
         CLR_INVALID,
         scintillacon.STYLE_INDENTGUIDE,
     ),
-    ## Not actually a style; requires special handling to send appropriate messages to scintilla
+    # Not actually a style; requires special handling to send appropriate messages to scintilla
     (
         STYLE_SELECTION,
         (0, 0, 200, 0, CLR_INVALID),

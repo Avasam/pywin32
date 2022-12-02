@@ -16,16 +16,12 @@
 # an example.  If this sample is run on IIS5 or earlier it simply ignores
 # any excludes.
 
-from isapi import isapicon, threaded_extension
 import sys
-import traceback
+from urllib.request import urlopen
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    # py3k spelling...
-    from urllib.request import urlopen
 import win32api
+
+from isapi import isapicon, threaded_extension
 
 # sys.isapidllhandle will exist when we are loaded by the IIS framework.
 # In this case we redirect our output to the win32traceutil collector.
@@ -45,7 +41,15 @@ def io_callback(ecb, url, cbIO, errcode):
     httpstatus, substatus, win32 = ecb.GetExecURLStatus()
     print(
         "ExecURL of %r finished with http status %d.%d, win32 status %d (%s)"
-        % (url, httpstatus, substatus, win32, win32api.FormatMessage(win32).strip())
+        % (
+            url,
+            httpstatus,
+            substatus,
+            win32,
+            win32api.FormatMessage(
+                win32
+            ).strip(),  # pyright: ignore[reportGeneralTypeIssues] typeshed issue
+        )
     )
     # nothing more to do!
     ecb.DoneWithSession()
@@ -83,14 +87,10 @@ class Extension(threaded_extension.ThreadPoolExtension):
         fp = urlopen(new_url)
         headers = fp.info()
         # subtle py3k breakage: in py3k, str(headers) has normalized \r\n
-        # back to \n and also stuck an extra \n term.  py2k leaves the
-        # \r\n from the server in tact and finishes with a single term.
-        if sys.version_info < (3, 0):
-            header_text = str(headers) + "\r\n"
-        else:
-            # take *all* trailing \n off, replace remaining with
-            # \r\n, then add the 2 trailing \r\n.
-            header_text = str(headers).rstrip("\n").replace("\n", "\r\n") + "\r\n\r\n"
+        # back to \n and also stuck an extra \n term.
+        # take *all* trailing \n off, replace remaining with
+        # \r\n, then add the 2 trailing \r\n.
+        header_text = str(headers).rstrip("\n").replace("\n", "\r\n") + "\r\n\r\n"
         ecb.SendResponseHeaders("200 OK", header_text, False)
         ecb.WriteClient(fp.read())
         ecb.DoneWithSession()

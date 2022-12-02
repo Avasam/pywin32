@@ -1,4 +1,8 @@
-import win32print, pywintypes, win32con, win32gui, win32api
+import pywintypes
+import win32api
+import win32con
+import win32gui
+import win32print
 
 pname = win32print.GetDefaultPrinter()
 print(pname)
@@ -10,7 +14,7 @@ dmsize = win32print.DocumentProperties(0, p, pname, None, None, 0)
 ## dmDriverExtra should be total size - fixed size
 driverextra = (
     dmsize - pywintypes.DEVMODEType().Size
-)  ## need a better way to get DEVMODE.dmSize
+)  # need a better way to get DEVMODE.dmSize
 dm = pywintypes.DEVMODEType(driverextra)
 dm.Fields = dm.Fields | win32con.DM_ORIENTATION | win32con.DM_COPIES
 dm.Orientation = win32con.DMORIENT_LANDSCAPE

@@ -21,13 +21,12 @@
     Updates by Vernon Cole
 """
 
-import unittest
-import sys
+import copy
 import datetime
 import decimal
-import copy
 import random
 import string
+import unittest
 
 try:
     import win32com.client
@@ -45,7 +44,6 @@ import tryconnection
 import adodbapi
 import adodbapi.apibase as api
 
-
 try:
     import adodbapi.ado_consts as ado_consts
 except ImportError:  # we are doing a shortcut import as a module -- so
@@ -53,11 +51,6 @@ except ImportError:  # we are doing a shortcut import as a module -- so
         import ado_consts
     except ImportError:
         from adodbapi import ado_consts
-
-
-def str2bytes(sval):
-    return sval.encode("latin1")
-
 
 long = int
 
@@ -163,7 +156,7 @@ class CommonDBTests(unittest.TestCase):
         ), "Setting errorhandler to none  should bring back the standard error handler"
 
     def testUserDefinedConversions(self):
-        if self.remote:  ## Todo: should be a "skip"
+        if self.remote:  # Todo: should be a "skip"
             return
         try:
             duplicatingConverter = lambda aStringField: aStringField * 2
@@ -216,49 +209,6 @@ class CommonDBTests(unittest.TestCase):
             except:
                 pass
             self.helpRollbackTblTemp()
-
-    def testUserDefinedConversionForExactNumericTypes(self):
-        # variantConversions is a dictionary of conversion functions
-        # held internally in adodbapi.apibase
-        #
-        # !!! this test intentionally alters the value of what should be constant in the module
-        # !!! no new code should use this example, to is only a test to see that the
-        # !!! deprecated way of doing this still works.  (use connection.variantConversions)
-        #
-        if not self.remote and sys.version_info < (3, 0):  ### Py3 need different test
-            oldconverter = adodbapi.variantConversions[
-                ado_consts.adNumeric
-            ]  # keep old function to restore later
-            # By default decimal and "numbers" are returned as decimals.
-            # Instead, make numbers return as  floats
-            try:
-                adodbapi.variantConversions[ado_consts.adNumeric] = adodbapi.cvtFloat
-                self.helpTestDataType(
-                    "decimal(18,2)", "NUMBER", 3.45, compareAlmostEqual=1
-                )
-                self.helpTestDataType(
-                    "numeric(18,2)", "NUMBER", 3.45, compareAlmostEqual=1
-                )
-                # now return strings
-                adodbapi.variantConversions[ado_consts.adNumeric] = adodbapi.cvtString
-                self.helpTestDataType("numeric(18,2)", "NUMBER", "3.45")
-                # now a completly weird user defined convertion
-                adodbapi.variantConversions[ado_consts.adNumeric] = (
-                    lambda x: "!!This function returns a funny unicode string %s!!" % x
-                )
-                self.helpTestDataType(
-                    "numeric(18,2)",
-                    "NUMBER",
-                    "3.45",
-                    allowedReturnValues=[
-                        "!!This function returns a funny unicode string 3.45!!"
-                    ],
-                )
-            finally:
-                # now reset the converter to its original function
-                adodbapi.variantConversions[
-                    ado_consts.adNumeric
-                ] = oldconverter  # Restore the original convertion function
 
     def helpTestDataType(
         self,
@@ -520,7 +470,7 @@ class CommonDBTests(unittest.TestCase):
             )
 
     def testDataTypeBinary(self):
-        binfld = str2bytes("\x07\x00\xE2\x40*")
+        binfld = b"\x07\x00\xE2\x40*"
         arv = [binfld, adodbapi.Binary(binfld), bytes(binfld)]
         if self.getEngine() == "PostgreSQL":
             self.helpTestDataType(
@@ -1030,7 +980,7 @@ class CommonDBTests(unittest.TestCase):
         self.conn.rollback()
         crsr.execute(selectSql)
         assert (
-            crsr.fetchone() == None
+            crsr.fetchone() is None
         ), "cursor.fetchone should return None if a query retrieves no rows"
         crsr.execute("SELECT fldData from xx_%s" % config.tmp)
         rs = crsr.fetchall()
@@ -1087,7 +1037,7 @@ class CommonDBTests(unittest.TestCase):
             row = crsr.fetchone()
         except api.DatabaseError:
             row = None  # if the entire table disappeared the rollback was perfect and the test passed
-        assert row == None, (
+        assert row is None, (
             "cursor.fetchone should return None if a query retrieves no rows. Got %s"
             % repr(row)
         )
@@ -1262,7 +1212,7 @@ class TestADOwithSQLServer(CommonDBTests):
         assert crsr.nextset() == True, "third set should be present"
         rowdesc = crsr.fetchall()
         self.assertEqual(rowdesc[0][0], 8)
-        assert crsr.nextset() == None, "No more return sets, should return None"
+        assert crsr.nextset() is None, "No more return sets, should return None"
 
         self.helpRollbackTblTemp()
 
@@ -1353,7 +1303,7 @@ class TestADOwithAccessDB(CommonDBTests):
 
     def testOkConnect(self):
         c = self.db(*config.connStrAccess[0], **config.connStrAccess[1])
-        assert c != None
+        assert c is not None
         c.close()
 
 
@@ -1389,7 +1339,7 @@ class TestADOwithMySql(CommonDBTests):
 
     def testOkConnect(self):
         c = self.db(*config.connStrMySql[0], **config.connStrMySql[1])
-        assert c != None
+        assert c is not None
 
     # def testStoredProcedure(self):
     #     crsr=self.conn.cursor()
@@ -1455,7 +1405,7 @@ class TestADOwithPostgres(CommonDBTests):
 
     def testOkConnect(self):
         c = self.db(*config.connStrPostgres[0], **config.connStrPostgres[1])
-        assert c != None
+        assert c is not None
 
     # def testStoredProcedure(self):
     #     crsr=self.conn.cursor()
@@ -1659,7 +1609,7 @@ if config.doPostgresTest:
     suites.append(unittest.makeSuite(TestADOwithPostgres, "test"))
 
 
-class cleanup_manager(object):
+class cleanup_manager:
     def __enter__(self):
         pass
 

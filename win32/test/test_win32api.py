@@ -1,12 +1,16 @@
 # General test module for win32api - please add some :)
 
-import unittest
-from pywin32_testutil import str2bytes, TestSkipped
-
-import win32api, win32con, win32event, winerror
-import sys, os
-import tempfile
 import datetime
+import os
+import sys
+import tempfile
+import unittest
+
+import win32api
+import win32con
+import win32event
+import winerror
+from pywin32_testutil import TestSkipped
 
 
 class CurrentUserTestCase(unittest.TestCase):
@@ -74,12 +78,12 @@ class Registry(unittest.TestCase):
 
     def testValues(self):
         key_name = r"PythonTestHarness\win32api"
-        ## tuples containing value name, value type, data
+        # tuples containing value name, value type, data
         values = (
             (None, win32con.REG_SZ, "This is default unnamed value"),
             ("REG_SZ", win32con.REG_SZ, "REG_SZ text data"),
             ("REG_EXPAND_SZ", win32con.REG_EXPAND_SZ, "%systemdir%"),
-            ## REG_MULTI_SZ value needs to be a list since strings are returned as a list
+            # REG_MULTI_SZ value needs to be a list since strings are returned as a list
             (
                 "REG_MULTI_SZ",
                 win32con.REG_MULTI_SZ,
@@ -92,7 +96,7 @@ class Registry(unittest.TestCase):
             (
                 "REG_BINARY",
                 win32con.REG_BINARY,
-                str2bytes("\x00\x01\x02\x03\x04\x05\x06\x07\x08\x01\x00"),
+                b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x01\x00",
             ),
         )
 
@@ -114,10 +118,10 @@ class Registry(unittest.TestCase):
                 win32api.RegDeleteKey(win32con.HKEY_CURRENT_USER, self.key_name)
 
         evt = win32event.CreateEvent(None, 0, 0, None)
-        ## REG_NOTIFY_CHANGE_LAST_SET - values
-        ## REG_CHANGE_NOTIFY_NAME - keys
-        ## REG_NOTIFY_CHANGE_SECURITY - security descriptor
-        ## REG_NOTIFY_CHANGE_ATTRIBUTES
+        # REG_NOTIFY_CHANGE_LAST_SET - values
+        # REG_CHANGE_NOTIFY_NAME - keys
+        # REG_NOTIFY_CHANGE_SECURITY - security descriptor
+        # REG_NOTIFY_CHANGE_ATTRIBUTES
         win32api.RegNotifyChangeKeyValue(
             win32con.HKEY_CURRENT_USER,
             1,
@@ -150,7 +154,7 @@ class FileNames(unittest.TestCase):
         self.assertEqual(long_name, win32api.GetLongPathNameW(short_name).lower())
         long_name = win32api.GetLongPathNameW(short_name).lower()
         self.assertTrue(
-            type(long_name) == str,
+            isinstance(long_name, str),
             "GetLongPathNameW returned type '%s'" % (type(long_name),),
         )
         self.assertTrue(
@@ -175,7 +179,7 @@ class FileNames(unittest.TestCase):
         self.assertEqual(long_name, win32api.GetLongPathNameW(short_name).lower())
         long_name = win32api.GetLongPathNameW(short_name).lower()
         self.assertTrue(
-            type(long_name) == str,
+            isinstance(long_name, str),
             "GetLongPathNameW returned type '%s'" % (type(long_name),),
         )
         self.assertTrue(
@@ -222,12 +226,8 @@ class FormatMessage(unittest.TestCase):
         msg = "Hello %1, how are you %2?"
         inserts = ["Mark", "today"]
         result = win32api.FormatMessage(
-            win32con.FORMAT_MESSAGE_FROM_STRING,
-            msg,  # source
-            0,  # ID
-            0,  # LangID
-            inserts,
-        )
+            win32con.FORMAT_MESSAGE_FROM_STRING, msg, 0, 0, inserts
+        )  # source  # ID  # LangID
         self.assertEqual(result, "Hello Mark, how are you today?")
 
 

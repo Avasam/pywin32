@@ -24,7 +24,7 @@ class object_template(docview.DocTemplate):
         doc = object_document(self, object)
         frame = self.CreateNewFrame(doc)
         doc.OnNewDocument()
-        doc.SetTitle(str(object))
+        doc.SetTitle(str)
         self.InitialUpdateFrame(frame, doc)
         return doc
 

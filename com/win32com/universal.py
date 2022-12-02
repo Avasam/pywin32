@@ -1,9 +1,9 @@
 # Code that packs and unpacks the Univgw structures.
 
 # See if we have a special directory for the binaries (for developers)
-import types
 import pythoncom
 from win32com.client import gencache
+from win32com.server.policy import MappedWrapPolicy
 
 com_error = pythoncom.com_error
 _univgw = pythoncom._univgw
@@ -188,7 +188,7 @@ class Definition:
 
     def dispatch(
         self,
-        ob,
+        ob: MappedWrapPolicy,
         index,
         argPtr,
         ReadFromInTuple=_univgw.ReadFromInTuple,
@@ -206,7 +206,7 @@ class Definition:
         retVal = ob._InvokeEx_(meth.dispid, 0, meth.invkind, args, None, None)
         # None is an allowed return value stating that
         # the code doesn't want to touch any output arguments.
-        if type(retVal) == tuple:  # Like pythoncom, we special case a tuple.
+        if isinstance(retVal, tuple):  # Like pythoncom, we special case a tuple.
             # However, if they want to return a specific HRESULT,
             # then they have to return all of the out arguments
             # AND the HRESULT.

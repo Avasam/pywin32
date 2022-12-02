@@ -27,33 +27,32 @@ This module source should run correctly in CPython versions 2.7 and later,
 or IronPython version 2.7 and later,
 or, after running through 2to3.py, CPython 3.4 or later.
 """
+# XXX: Missing the Connector type
+# pyright: reportOptionalMemberAccess=false
+from __future__ import annotations
 
-__version__ = "2.6.2.0"
-version = "adodbapi v" + __version__
-
-import sys
 import copy
 import decimal
 import os
+import sys
 import weakref
+from collections.abc import Mapping
 
-from . import process_connect_string
-from . import ado_consts as adc
-from . import apibase as api
-
-try:
-    verbose = int(os.environ["ADODBAPI_VERBOSE"])
-except:
-    verbose = False
-if verbose:
-    print(version)
+from . import ado_consts as adc, apibase as api, process_connect_string
 
 # --- define objects to smooth out IronPython <-> CPython differences
 onWin32 = False  # assume the worst
-if api.onIronPython:
-    from System import Activator, Type, DBNull, DateTime, Array, Byte
-    from System import Decimal as SystemDecimal
+if sys.platform == "cli":
     from clr import Reference
+    from System import (
+        Activator,
+        Array,
+        Byte,
+        DateTime,
+        DBNull,
+        Decimal as SystemDecimal,
+        Type,
+    )
 
     def Dispatch(dispatch):
         type = Type.GetTypeFromProgID(dispatch)
@@ -64,9 +63,9 @@ if api.onIronPython:
 
 else:  # try pywin32
     try:
-        import win32com.client
         import pythoncom
         import pywintypes
+        import win32com.client
 
         onWin32 = True
 
@@ -84,12 +83,16 @@ else:  # try pywin32
         return obj(index)
 
 
-from collections.abc import Mapping
+__version__ = "2.6.2.0"
+version = "adodbapi v" + __version__
 
-# --- define objects to smooth out Python3000 <-> Python 2.x differences
-unicodeType = str
-longType = int
-StringTypes = str
+try:
+    verbose = int(os.environ["ADODBAPI_VERBOSE"])
+except:
+    verbose = False
+if verbose:
+    print(version)
+
 maxint = sys.maxsize
 
 # -----------------  The .connect method -----------------
@@ -192,7 +195,7 @@ def _configure_parameter(p, value, adotype, settings_known):
         p.Size = len(value)
         p.AppendChunk(value)
 
-    elif isinstance(value, StringTypes):  # v2.1 Jevon
+    elif isinstance(value, str):  # v2.1 Jevon
         L = len(value)
         if adotype in api.adoStringTypes:  # v2.2.1 Cole
             if settings_known:
@@ -204,7 +207,7 @@ def _configure_parameter(p, value, adotype, settings_known):
             p.Size = L  # v2.1 Jevon
 
     elif isinstance(value, decimal.Decimal):
-        if api.onIronPython:
+        if sys.platform == "cli":
             s = str(value)
             p.Value = s
             p.Size = len(s)
@@ -232,7 +235,7 @@ def _configure_parameter(p, value, adotype, settings_known):
             p.Value = s
             p.Size = len(s)
 
-    elif api.onIronPython and isinstance(value, longType):  # Iron Python Long
+    elif sys.platform == "cli" and isinstance(value, int):  # Iron Python Long
         s = str(value)  # feature workaround for IPy 2.0
         p.Value = s
 
@@ -248,7 +251,7 @@ def _configure_parameter(p, value, adotype, settings_known):
 
 
 # # # # # ----- the Class that defines a connection ----- # # # # #
-class Connection(object):
+class Connection:
     # include connection attributes as class attributes required by api definition.
     Warning = api.Warning
     Error = api.Error
@@ -559,31 +562,31 @@ class Connection(object):
 
 
 # # # # # ----- the Class that defines a cursor ----- # # # # #
-class Cursor(object):
-    ## ** api required attributes:
-    ## description...
-    ##    This read-only attribute is a sequence of 7-item sequences.
-    ##    Each of these sequences contains information describing one result column:
-    ##        (name, type_code, display_size, internal_size, precision, scale, null_ok).
-    ##    This attribute will be None for operations that do not return rows or if the
-    ##    cursor has not had an operation invoked via the executeXXX() method yet.
-    ##    The type_code can be interpreted by comparing it to the Type Objects specified in the section below.
-    ## rowcount...
-    ##    This read-only attribute specifies the number of rows that the last executeXXX() produced
-    ##    (for DQL statements like select) or affected (for DML statements like update or insert).
-    ##    The attribute is -1 in case no executeXXX() has been performed on the cursor or
-    ##    the rowcount of the last operation is not determinable by the interface.[7]
-    ## arraysize...
-    ##    This read/write attribute specifies the number of rows to fetch at a time with fetchmany().
-    ##    It defaults to 1 meaning to fetch a single row at a time.
-    ##    Implementations must observe this value with respect to the fetchmany() method,
-    ##    but are free to interact with the database a single row at a time.
-    ##    It may also be used in the implementation of executemany().
-    ## ** extension attributes:
-    ## paramstyle...
-    ##   allows the programmer to override the connection's default paramstyle
-    ## errorhandler...
-    ##   allows the programmer to override the connection's default error handler
+class Cursor:
+    # ** api required attributes:
+    # description...
+    #    This read-only attribute is a sequence of 7-item sequences.
+    #    Each of these sequences contains information describing one result column:
+    #        (name, type_code, display_size, internal_size, precision, scale, null_ok).
+    #    This attribute will be None for operations that do not return rows or if the
+    #    cursor has not had an operation invoked via the executeXXX() method yet.
+    #    The type_code can be interpreted by comparing it to the Type Objects specified in the section below.
+    # rowcount...
+    #    This read-only attribute specifies the number of rows that the last executeXXX() produced
+    #    (for DQL statements like select) or affected (for DML statements like update or insert).
+    #    The attribute is -1 in case no executeXXX() has been performed on the cursor or
+    #    the rowcount of the last operation is not determinable by the interface.[7]
+    # arraysize...
+    #    This read/write attribute specifies the number of rows to fetch at a time with fetchmany().
+    #    It defaults to 1 meaning to fetch a single row at a time.
+    #    Implementations must observe this value with respect to the fetchmany() method,
+    #    but are free to interact with the database a single row at a time.
+    #    It may also be used in the implementation of executemany().
+    # ** extension attributes:
+    # paramstyle...
+    #   allows the programmer to override the connection's default paramstyle
+    # errorhandler...
+    #   allows the programmer to override the connection's default error handler
 
     def __init__(self, connection):
         self.command = None
@@ -647,7 +650,7 @@ class Cursor(object):
             self.numberOfColumns = 0
             return
         self.rs = recordset  # v2.1.1 bkline
-        self.recordset_format = api.RS_ARRAY if api.onIronPython else api.RS_WIN_32
+        self.recordset_format = api.RS_ARRAY if sys.platform == "cli" else api.RS_WIN_32
         self.numberOfColumns = recordset.Fields.Count
         try:
             varCon = self.connection.variantConversions
@@ -693,17 +696,11 @@ class Cursor(object):
             )
         self._description = desc
 
-    def get_description(self):
+    @property
+    def description(self):
         if not self._description:
             self._makeDescriptionFromRS()
-        return self._description
-
-    def __getattr__(self, item):
-        if item == "description":
-            return self.get_description()
-        object.__getattribute__(
-            self, item
-        )  # may get here on Remote attribute calls for existing attributes
+        return self._description or []
 
     def format_description(self, d):
         """Format db_api description tuple for printing."""
@@ -784,7 +781,7 @@ class Cursor(object):
             print('Executing command="%s"' % self.commandText)
         try:
             # ----- the actual SQL is executed here ---
-            if api.onIronPython:
+            if sys.platform == "cli":
                 ra = Reference[int]()
                 recordset = self.cmd.Execute(ra)
                 count = ra.Value
@@ -906,7 +903,6 @@ class Cursor(object):
             except api.Error:
                 if verbose:
                     print("ADO Parameter Refresh failed")
-                pass
             else:
                 if len(parameters) != self.cmd.Parameters.Count - 1:
                     raise api.ProgrammingError(
@@ -1069,7 +1065,7 @@ class Cursor(object):
 
             Return values are not defined.
         """
-        self.messages = list()
+        self.messages = []
         total_recordcount = 0
 
         self.prepare(operation)
@@ -1081,7 +1077,7 @@ class Cursor(object):
                 total_recordcount += self.rowcount
         self.rowcount = total_recordcount
 
-    def _fetch(self, limit=None):
+    def _fetch(self, limit=None) -> list[api.SQLrow] | api.SQLrows:
         """Fetch rows from the current recordset.
 
         limit -- Number of rows to fetch, or None (default) to fetch all rows.
@@ -1090,10 +1086,10 @@ class Cursor(object):
             self._raiseCursorError(
                 api.FetchFailedError, "fetch() on closed connection or empty query set"
             )
-            return
+            return []
 
         if self.rs.State == adc.adStateClosed or self.rs.BOF or self.rs.EOF:
-            return list()
+            return []
         if limit:  # limit number of rows retrieved
             ado_results = self.rs.GetRows(limit)
         else:  # get all rows
@@ -1121,6 +1117,7 @@ class Cursor(object):
         self.messages = []
         result = self._fetch(1)
         if result:  # return record (not list of records)
+            test = result[0]
             return result[0]
         return None
 
@@ -1173,8 +1170,8 @@ class Cursor(object):
                 ("nextset() on closed connection or empty query set"),
             )
             return None
-
-        if api.onIronPython:
+        recordset = None
+        if sys.platform == "cli":
             try:
                 recordset = self.rs.NextRecordset()
             except TypeError:
@@ -1182,6 +1179,7 @@ class Cursor(object):
             except api.Error as exc:
                 self._raiseCursorError(api.NotSupportedError, exc.args)
         else:  # pywin32
+            rsTuple = ()
             try:  # [begin 2.1 ekelund]
                 rsTuple = self.rs.NextRecordset()  #
             except pywintypes.com_error as exc:  # return appropriate error
@@ -1202,7 +1200,7 @@ class Cursor(object):
 
     def _last_query(self):  # let the programmer see what query we actually used
         try:
-            if self.parameters == None:
+            if self.parameters is None:
                 ret = self.commandText
             else:
                 ret = "%s,parameters=%s" % (self.commandText, repr(self.parameters))

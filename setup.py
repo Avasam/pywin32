@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing_extensions import TypeAlias
+
 build_id = "305.1"  # may optionally include a ".{patchno}" suffix.
 
 __doc__ = """This is a distutils setup-script for the pywin32 extensions.
@@ -22,38 +26,35 @@ instead of a failing, it will report what was skipped, and why. See also
 build_env.md, which is getting out of date but might help getting everything
 required for an official build - see README.md for that process.
 """
+import distutils.util
+import glob
+
 # Originally by Thomas Heller, started in 2000 or so.
 import os
-import sys
-import glob
-import re
-from tempfile import gettempdir
 import platform
+import re
 import shutil
 import subprocess
-
+import sys
 import winreg
+from distutils import log
+from distutils.command.build import build
+from distutils.command.install import install
+from distutils.command.install_data import install_data
+from distutils.command.install_lib import install_lib
+from distutils.dep_util import newer_group
+from distutils.filelist import FileList
+from tempfile import gettempdir
+from typing import TYPE_CHECKING, Optional, cast
 
 # The rest of our imports.
 from setuptools import setup
-from distutils.core import Extension
-from distutils.command.install import install
-from distutils.command.install_lib import install_lib
 from setuptools.command.build_ext import build_ext
-from distutils.command.build import build
-from distutils.command.install_data import install_data
-
-from distutils import log
-
+from setuptools.extension import Extension
 
 # some modules need a static CRT to avoid problems caused by them having a
 # manifest.
 static_crt_modules = ["winxpgui"]
-
-
-from distutils.dep_util import newer_group
-from distutils.filelist import FileList
-import distutils.util
 
 build_id_patch = build_id
 if not "." in build_id_patch:
@@ -103,7 +104,7 @@ class WinExt(Extension):
         libraries="",
         runtime_library_dirs=None,
         extra_objects=None,
-        extra_compile_args=None,
+        extra_compile_args: list[str] | None = None,
         extra_link_args=None,
         export_symbols=None,
         export_symbol_file=None,
@@ -879,6 +880,7 @@ class my_build_ext(build_ext):
                         # A class deriving from other than the default
                         swig_cmd.extend(["-com_interface_parent", interface_parent])
 
+            # TODO
             # This 'newer' check helps python 2.2 builds, which otherwise
             # *always* regenerate the .cpp files, meaning every future
             # build for any platform sees these as dirty.
@@ -965,10 +967,23 @@ class my_install_lib(install_lib):
         return outfiles
 
 
-def my_new_compiler(**kw):
-    if "compiler" in kw and kw["compiler"] in (None, "msvc"):
-        return my_compiler()
-    return orig_new_compiler(**kw)
+if TYPE_CHECKING:
+
+    def my_new_compiler(
+        plat: str | None = ...,
+        compiler: str | None = ...,
+        verbose: int = ...,
+        dry_run: int = ...,
+        force: int = ...,
+    ) -> my_compiler | ccompiler.CCompiler:
+        ...
+
+else:
+
+    def my_new_compiler(**kw):
+        if kw.get("compiler") in {None, "msvc"}:
+            return my_compiler()
+        return orig_new_compiler(**kw)
 
 
 # No way to cleanly wedge our compiler sub-class in.
@@ -978,7 +993,7 @@ from distutils._msvccompiler import MSVCCompiler
 orig_new_compiler = ccompiler.new_compiler
 ccompiler.new_compiler = my_new_compiler
 
-base_compiler = MSVCCompiler
+base_compiler: TypeAlias = MSVCCompiler
 
 
 class my_compiler(base_compiler):
@@ -1151,7 +1166,7 @@ pywintypes = WinExt_system32(
     pch_header="PyWinTypes.h",
 )
 
-win32_extensions = [pywintypes]
+win32_extensions: list[Extension] = [pywintypes]
 
 win32_extensions.append(
     WinExt_win32(
@@ -1294,11 +1309,10 @@ for info in (
         windows_h_ver = info[2]
     if len(info) > 3:
         sources = info[3].split()
-    extra_compile_args = []
     ext = WinExt_win32(
         name,
         libraries=lib_names,
-        extra_compile_args=extra_compile_args,
+        extra_compile_args=None,
         windows_h_version=windows_h_ver,
         sources=sources,
     )
@@ -1476,7 +1490,7 @@ pythoncom = WinExt_system32(
     base_address=dll_base_address,
 )
 dll_base_address += 0x80000  # pythoncom is large!
-com_extensions = [pythoncom]
+com_extensions: list[Extension] = [pythoncom]
 com_extensions += [
     WinExt_win32com(
         "adsi",
@@ -2404,28 +2418,30 @@ dist = setup(
 )
 
 # If we did any extension building, and report if we skipped any.
-if "build_ext" in dist.command_obj:
+build_ext_command_obj = cast(
+    Optional[my_build_ext], dist.get_command_obj("build_ext", False)
+)
+if build_ext_command_obj:
     what_string = "built"
-    if "install" in dist.command_obj:  # just to be purdy
+    if "install" in dist.command_obj:  # type: ignore[attr-defined] # until next typeshed sync  # just to be purdy
         what_string += "/installed"
     # Print the list of extension modules we skipped building.
-    if "build_ext" in dist.command_obj:
-        excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
-        if excluded_extensions:
-            skip_whitelist = {"exchdapi", "exchange", "axdebug", "winxpgui"}
-            skipped_ex = []
-            print("*** NOTE: The following extensions were NOT %s:" % what_string)
-            for ext, why in excluded_extensions:
-                print(" %s: %s" % (ext.name, why))
-                if ext.name not in skip_whitelist:
-                    skipped_ex.append(ext.name)
-            print("For more details on installing the correct libraries and headers,")
-            print("please execute this script with no arguments (or see the docstring)")
-            if skipped_ex:
-                print(
-                    "*** Non-zero exit status. Missing for complete release build: %s"
-                    % skipped_ex
-                )
-                sys.exit(1000 + len(skipped_ex))
-        else:
-            print("All extension modules %s OK" % (what_string,))
+    excluded_extensions = build_ext_command_obj.excluded_extensions
+    if excluded_extensions:
+        skip_whitelist = {"exchdapi", "exchange", "axdebug", "winxpgui"}
+        skipped_ex = []
+        print("*** NOTE: The following extensions were NOT %s:" % what_string)
+        for ext, why in excluded_extensions:
+            print(" %s: %s" % (ext.name, why))
+            if ext.name not in skip_whitelist:
+                skipped_ex.append(ext.name)
+        print("For more details on installing the correct libraries and headers,")
+        print("please execute this script with no arguments (or see the docstring)")
+        if skipped_ex:
+            print(
+                "*** Non-zero exit status. Missing for complete release build: %s"
+                % skipped_ex
+            )
+            sys.exit(1000 + len(skipped_ex))
+    else:
+        print("All extension modules %s OK" % (what_string,))

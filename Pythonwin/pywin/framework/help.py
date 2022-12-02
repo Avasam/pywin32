@@ -1,11 +1,10 @@
 # help.py - help utilities for PythonWin.
+import os
+
+import regutil
 import win32api
 import win32con
 import win32ui
-import string
-import sys
-import regutil
-import string, os
 
 htmlhelp_handle = None
 
@@ -84,7 +83,7 @@ def _ListAllHelpFilesInRoot(root):
     retList = []
     try:
         key = win32api.RegOpenKey(
-            root, regutil.BuildDefaultPythonKey() + "\\Help", 0, win32con.KEY_READ
+            root, regutil.BuildDefaultPythonKey() + "\\Help", False, win32con.KEY_READ
         )
     except win32api.error as exc:
         import winerror

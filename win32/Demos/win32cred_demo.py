@@ -3,8 +3,12 @@ Demonstrates prompting for credentials, saving, and loggging on with marshalled 
 Also shows how to load user's profile
 """
 
-import win32net, win32security, win32api, win32con
-import win32profile, win32cred
+import win32api
+import win32con
+import win32cred
+import win32net
+import win32profile
+import win32security
 
 ## Prompt for a username/pwd for local computer
 uiinfo = {
@@ -56,22 +60,22 @@ try:
     print("GetUserName:", win32api.GetUserName())
     win32security.RevertToSelf()
 
-    ## Load user's profile.  (first check if user has a roaming profile)
+    # Load user's profile.  (first check if user has a roaming profile)
     username, domain = win32cred.CredUIParseUserName(target)
     user_info_4 = win32net.NetUserGetInfo(None, username, 4)
     profilepath = user_info_4["profile"]
-    ## LoadUserProfile apparently doesn't like an empty string
+    # LoadUserProfile apparently doesn't like an empty string
     if not profilepath:
         profilepath = None
 
-    ## leave Flags in since 2.3 still chokes on some types of optional keyword args
+    # leave Flags in since 2.3 still chokes on some types of optional keyword args
     hk = win32profile.LoadUserProfile(
         th, {"UserName": username, "Flags": 0, "ProfilePath": profilepath}
     )
-    ## Get user's environment variables in a form that can be passed to win32process.CreateProcessAsUser
+    # Get user's environment variables in a form that can be passed to win32process.CreateProcessAsUser
     env = win32profile.CreateEnvironmentBlock(th, False)
 
-    ## Cleanup should probably be in a finally block
+    # Cleanup should probably be in a finally block
     win32profile.UnloadUserProfile(th, hk)
     th.Close()
 except win32security.error as exc:

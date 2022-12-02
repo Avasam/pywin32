@@ -2,11 +2,14 @@
 #
 # copies PyWinTypesxx.dll and PythonCOMxx.dll into the system directory,
 # and creates a pth file
-import os
-import sys
+from __future__ import annotations
+
 import glob
+import os
 import shutil
+import sys
 import sysconfig
+from typing import TextIO
 
 try:
     import winreg as winreg
@@ -20,7 +23,7 @@ tee_f = open(os.path.join(tempfile.gettempdir(), "pywin32_postinstall.log"), "w"
 
 
 class Tee:
-    def __init__(self, file):
+    def __init__(self, file: TextIO | None):
         self.f = file
 
     def write(self, what):
@@ -47,8 +50,8 @@ class Tee:
 if sys.stdout is None:
     sys.stdout = sys.stderr
 
-sys.stderr = Tee(sys.stderr)
-sys.stdout = Tee(sys.stdout)
+sys.stderr = Tee(sys.stderr)  # type: ignore[assignment]
+sys.stdout = Tee(sys.stdout)  # type: ignore[assignment]
 
 com_modules = [
     # module_name,                      class_names
@@ -141,7 +144,8 @@ except NameError:
 
 
 def CopyTo(desc, src, dest):
-    import win32api, win32con
+    import win32api
+    import win32con
 
     while 1:
         try:
@@ -177,7 +181,8 @@ def CopyTo(desc, src, dest):
 # our pywintypes_system32 directory.
 def LoadSystemModule(lib_dir, modname):
     # See if this is a debug build.
-    import importlib.util, importlib.machinery
+    import importlib.machinery
+    import importlib.util
 
     suffix = "_d" if "_d.pyd" in importlib.machinery.EXTENSION_SUFFIXES else ""
     filename = "%s%d%d%s.dll" % (
@@ -279,7 +284,7 @@ def RegisterPythonwin(register=True, lib_dir=None):
     if lib_dir is None:
         lib_dir = sysconfig.get_paths()["platlib"]
     classes_root = get_root_hkey()
-    ## Installer executable doesn't seem to pass anything to postinstall script indicating if it's a debug build,
+    # Installer executable doesn't seem to pass anything to postinstall script indicating if it's a debug build,
     pythonwin_exe = os.path.join(lib_dir, "Pythonwin", "Pythonwin.exe")
     pythonwin_edit_command = pythonwin_exe + ' -edit "%1"'
 
@@ -304,8 +309,8 @@ def RegisterPythonwin(register=True, lib_dir=None):
     try:
         if register:
             for key, sub_key, val in keys_vals:
-                ## Since winreg only uses the character Api functions, this can fail if Python
-                ##  is installed to a path containing non-ascii characters
+                # Since winreg only uses the character Api functions, this can fail if Python
+                #  is installed to a path containing non-ascii characters
                 hkey = winreg.CreateKey(classes_root, key)
                 if sub_key:
                     hkey = winreg.CreateKey(hkey, sub_key)
@@ -377,7 +382,8 @@ def fixup_dbi():
     # We used to have a dbi.pyd with our .pyd files, but now have a .py file.
     # If the user didn't uninstall, they will find the .pyd which will cause
     # problems - so handle that.
-    import win32api, win32con
+    import win32api
+    import win32con
 
     pyd_name = os.path.join(os.path.dirname(win32api.__file__), "dbi.pyd")
     pyd_d_name = os.path.join(os.path.dirname(win32api.__file__), "dbi_d.pyd")

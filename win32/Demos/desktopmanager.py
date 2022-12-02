@@ -1,9 +1,16 @@
 # Demonstrates using a taskbar icon to create and navigate between desktops
 
-import win32api, win32con, win32gui, win32service, win32process
-import pywintypes
-import traceback, _thread, time
+import _thread
 import io
+import time
+import traceback
+
+import pywintypes
+import win32api
+import win32con
+import win32gui
+import win32process
+import win32service
 
 ## "Shell_TrayWnd" is class of system tray window, broadcasts "TaskbarCreated" when initialized
 
@@ -36,7 +43,7 @@ def get_new_desktop_name(parent_hwnd):
         | win32con.WS_VISIBLE
         | win32con.WS_CAPTION
         | win32con.WS_SYSMENU
-    )  ## |win32con.DS_SYSMODAL
+    )  # |win32con.DS_SYSMODAL
     h = win32gui.CreateDialogIndirect(
         win32api.GetModuleHandle(None),
         [
@@ -63,7 +70,7 @@ def get_new_desktop_name(parent_hwnd):
         ],
         parent_hwnd,
         msgs,
-    )  ## parent_hwnd, msgs)
+    )  # parent_hwnd, msgs)
 
     win32gui.EnableWindow(h, True)
     hcontrol = win32gui.GetDlgItem(h, 72)
@@ -76,7 +83,7 @@ def new_icon(hdesk, desktop_name):
     global id
     id = id + 1
     hdesk.SetThreadDesktop()
-    ## apparently the threads can't use same hinst, so each needs its own window class
+    # apparently the threads can't use same hinst, so each needs its own window class
     windowclassname = "PythonDesktopManager" + desktop_name
     wc = win32gui.WNDCLASS()
     wc.hInstance = win32api.GetModuleHandle(None)
@@ -111,7 +118,7 @@ def new_icon(hdesk, desktop_name):
         "Desktop Manager (%s)" % desktop_name,
     )
     window_info[hwnd] = notify_info
-    ## wait for explorer to initialize system tray for new desktop
+    # wait for explorer to initialize system tray for new desktop
     tray_found = 0
     while not tray_found:
         try:
@@ -162,7 +169,7 @@ def create_desktop(desktop_name, start_explorer=1):
 def icon_wndproc(hwnd, msg, wp, lp):
     """Window proc for the tray icons"""
     if lp == win32con.WM_LBUTTONDOWN:
-        ## popup menu won't disappear if you don't do this
+        # popup menu won't disappear if you don't do this
         win32gui.SetForegroundWindow(hwnd)
 
         curr_desktop = win32service.OpenInputDesktop(0, True, win32con.MAXIMUM_ALLOWED)
@@ -173,10 +180,10 @@ def icon_wndproc(hwnd, msg, wp, lp):
         desktops = winsta.EnumDesktops()
         m = win32gui.CreatePopupMenu()
         desktop_cnt = len(desktops)
-        ## *don't* create an item 0
+        # *don't* create an item 0
         for d in range(1, desktop_cnt + 1):
             mf_flags = win32con.MF_STRING
-            ## if you switch to winlogon yourself, there's nothing there and you're stuck
+            # if you switch to winlogon yourself, there's nothing there and you're stuck
             if desktops[d - 1].lower() in ("winlogon", "disconnect"):
                 mf_flags = mf_flags | win32con.MF_GRAYED | win32con.MF_DISABLED
             if desktops[d - 1] == curr_desktop_name:
@@ -197,9 +204,9 @@ def icon_wndproc(hwnd, msg, wp, lp):
         )
         win32gui.PumpWaitingMessages()
         win32gui.DestroyMenu(m)
-        if d == desktop_cnt + 1:  ## Create new
+        if d == desktop_cnt + 1:  # Create new
             get_new_desktop_name(hwnd)
-        elif d == desktop_cnt + 2:  ## Exit
+        elif d == desktop_cnt + 2:  # Exit
             win32gui.PostQuitMessage(0)
             win32gui.Shell_NotifyIcon(win32gui.NIM_DELETE, window_info[hwnd])
             del window_info[hwnd]
@@ -222,9 +229,9 @@ origin_desktop_name = win32service.GetUserObjectInformation(
 
 hinst = win32api.GetModuleHandle(None)
 try:
-    hicon = win32gui.LoadIcon(hinst, 1)  ## python.exe and pythonw.exe
+    hicon = win32gui.LoadIcon(hinst, 1)  # python.exe and pythonw.exe
 except win32gui.error:
-    hicon = win32gui.LoadIcon(hinst, 135)  ## pythonwin's icon
+    hicon = win32gui.LoadIcon(hinst, 135)  # pythonwin's icon
 id = 0
 
 create_desktop(str(origin_desktop_name), 0)

@@ -1,5 +1,8 @@
 # Magic utility that "redirects" to pywintypesxx.dll
-import importlib.util, importlib.machinery, sys, os
+import importlib.machinery
+import importlib.util
+import os
+import sys
 
 
 def __import_pywin32_system_module__(modname, globs):
@@ -111,7 +114,9 @@ def __import_pywin32_system_module__(modname, globs):
     loader = importlib.machinery.ExtensionFileLoader(modname, found)
     spec = importlib.machinery.ModuleSpec(name=modname, loader=loader, origin=found)
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    # TODO: Should this use loader directly?
+    if spec.loader:
+        spec.loader.exec_module(mod)
 
     # Check the sys.modules[] behaviour we describe above is true...
     assert sys.modules[modname] is mod

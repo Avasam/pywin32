@@ -7,6 +7,7 @@
 # >>> browser.Browse(your_module)
 import sys
 import types
+
 import __main__
 import win32ui
 from pywin.mfc import dialog
@@ -376,10 +377,11 @@ def ShowObject(object, title):
     dlg.DoModal()
 
 
+import commctrl
+import win32api
+
 # And some mods for a sizable dialog from Sam Rushing!
 import win32con
-import win32api
-import commctrl
 
 
 class dynamic_browser(dialog.Dialog):

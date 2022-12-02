@@ -17,11 +17,7 @@ warnings.warn(
 import datetime
 
 dbDate = dbiDate = datetime.datetime
-
-try:
-    dbRaw = dbiRaw = buffer
-except NameError:
-    dbRaw = dbiRaw = memoryview
+dbRaw = dbiRaw = memoryview
 
 # type names are still exported by odbc module
-from odbc import *
+from odbc import *  # pyright: ignore[reportWildcardImportFromLibrary]

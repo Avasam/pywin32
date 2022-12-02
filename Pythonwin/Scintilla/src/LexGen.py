@@ -16,10 +16,13 @@
 # Does not regenerate the Visual C++ 6 project files but does the VS .NET
 # project file.
 
+import glob
+import os
 import string
 import sys
-import os
-import glob
+from typing import cast
+
+from typing_extensions import Literal
 
 # EOL constants
 CR = "\r"
@@ -199,8 +202,12 @@ def FindProperties(lexFile):
     return properties
 
 
-def ciCompare(a, b):
-    return cmp(a.lower(), b.lower())
+def ciCompare(a: str, b: str):
+    a_lower = a.lower()
+    b_lower = b.lower()
+    if a_lower < b_lower:
+        return -1
+    return cast(Literal[0, 1], int(a.lower() > b.lower()))
 
 
 def RegenerateAll():

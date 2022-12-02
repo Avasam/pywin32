@@ -1,10 +1,11 @@
+import getopt
 import sys
+import traceback
+
 import win32api
 import win32net
 import win32netcon
 import win32security
-import getopt
-import traceback
 
 verbose_level = 0
 
@@ -228,7 +229,7 @@ def usage(tests):
 def main():
     tests = []
     for ob in list(globals().values()):
-        if type(ob) == type(main) and ob.__doc__:
+        if isinstance(ob, type(main)) and ob.__doc__:
             tests.append(ob)
     opts, args = getopt.getopt(sys.argv[1:], "s:hvc")
     create_user = False

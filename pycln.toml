@@ -1,0 +1,18 @@
+[tool.pycln]
+expand_stars=false
+# C wrapped modules
+skip_imports = [
+  "dde",
+  "OpenGL",
+  "odbc",
+  "win32ras",
+  "_winxptheme",
+  "win32gui",
+  "win32event",
+  "win32inet",
+  "win32file",
+  "win32clipboard",
+  "win32pipe",
+  "winxpgui",
+  "win32api",
+]

@@ -1,12 +1,18 @@
 """The glue between the Python debugger interface and the Active Debugger interface
 """
-from win32com.axdebug.util import trace, _wrap, _wrap_remove
-from win32com.server.util import unwrap
+import _thread
+import bdb
+import os
+import sys
+import traceback
+
+import pythoncom
+import win32api
 import win32com.client.connect
-from . import gateways, axdebug, stackframe
-import sys, bdb, traceback
-import win32api, pythoncom
-import _thread, os
+from win32com.axdebug.util import _wrap, _wrap_remove, trace
+from win32com.server.util import unwrap
+
+from . import axdebug, gateways, stackframe
 
 
 def fnull(*args):
@@ -112,8 +118,8 @@ class Adb(bdb.Bdb, gateways.RemoteDebugApplicationEvents):
     def stop_here(self, frame):
         traceenter("stop_here", _dumpf(frame), _dumpf(self.stopframe))
         # As per bdb.stop_here, except for logicalbotframe
-        ##              if self.stopframe is None:
-        ##                      return 1
+        #              if self.stopframe is None:
+        #                      return 1
         if frame is self.stopframe:
             return 1
 
@@ -189,7 +195,7 @@ class Adb(bdb.Bdb, gateways.RemoteDebugApplicationEvents):
             trace(
                 "dispatch_call has no document for", _dumpf(frame), "- skipping trace!"
             )
-            ##                      sys.settrace(None)
+            #                      sys.settrace(None)
             return None
         return self.trace_dispatch
 

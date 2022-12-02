@@ -1,18 +1,18 @@
 """
 Various utilities for running/importing a script
 """
+import bdb
+import linecache
+import os
 import sys
-import win32ui
+import traceback
+
+import __main__
 import win32api
 import win32con
-import __main__
+import win32ui
 from pywin.mfc import dialog
 from pywin.mfc.docview import TreeView
-import os
-import string
-import traceback
-import linecache
-import bdb
 
 from .cmdline import ParseArgs
 
@@ -28,9 +28,9 @@ Post-Mortem of unhandled exceptions""".split(
     "\n"
 )
 
-byte_cr = "\r".encode("ascii")
-byte_lf = "\n".encode("ascii")
-byte_crlf = "\r\n".encode("ascii")
+byte_cr = b"\r"
+byte_lf = b"\n"
+byte_crlf = b"\r\n"
 
 # A dialog box for the "Run Script" command.
 class DlgRunScript(dialog.Dialog):
@@ -435,12 +435,11 @@ def ImportFile():
     newPath = None
     # note that some packages (*cough* email *cough*) use "lazy importers"
     # meaning sys.modules can change as a side-effect of looking at
-    # module.__file__ - so we must take a copy (ie, items() in py2k,
-    # list(items()) in py3k)
+    # module.__file__ - so we must take a copy (ie, list(items()))
     for key, mod in list(sys.modules.items()):
         if getattr(mod, "__file__", None):
             fname = mod.__file__
-            base, ext = os.path.splitext(fname)
+            base, ext = os.path.splitext(fname or "")
             if ext.lower() in [".pyo", ".pyc"]:
                 ext = ".py"
             fname = base + ext

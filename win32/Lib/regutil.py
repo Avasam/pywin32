@@ -1,8 +1,9 @@
 # Some registry helpers.
+import os
+import sys
+
 import win32api
 import win32con
-import sys
-import os
 
 error = "Registry utility error"
 
@@ -45,9 +46,9 @@ def SetRegistryDefaultValue(subKey, value, rootkey=None):
     """A helper to set the default value for a key in the registry"""
     if rootkey is None:
         rootkey = GetRootKey()
-    if type(value) == str:
+    if isinstance(value, str):
         typeId = win32con.REG_SZ
-    elif type(value) == int:
+    elif isinstance(value, int):
         typeId = win32con.REG_DWORD
     else:
         raise TypeError("Value must be string or integer - was passed " + repr(value))
@@ -147,8 +148,6 @@ def RegisterModule(modName, modPath):
     modPath -- The full path and file name of the module.
     """
     try:
-        import os
-
         os.stat(modPath)
     except os.error:
         print("Warning: Registering non-existant module %s" % modPath)
@@ -228,7 +227,7 @@ def UnregisterHelpFile(helpFile, helpDesc=None):
     key = win32api.RegOpenKey(
         win32con.HKEY_LOCAL_MACHINE,
         "Software\\Microsoft\\Windows\\Help",
-        0,
+        False,
         win32con.KEY_ALL_ACCESS,
     )
     try:

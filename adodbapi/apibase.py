@@ -5,39 +5,28 @@ Copyright (C) 2002 Henrik Ekelund, version 2.1 by Vernon Cole
 * http://sourceforge.net/projects/adodbapi
 """
 
-import sys
-import time
 import datetime
 import decimal
 import numbers
+import sys
+import time
+from typing import List, cast
 
 # noinspection PyUnresolvedReferences
 from . import ado_consts as adc
 
 verbose = False  # debugging flag
 
-onIronPython = sys.platform == "cli"
-if onIronPython:  # we need type definitions for odd data we may need to convert
+if sys.platform == "cli":
+    # we need type definitions for odd data we may need to convert
     # noinspection PyUnresolvedReferences
-    from System import DBNull, DateTime
+    from System import DateTime, DBNull
 
     NullTypes = (type(None), DBNull)
 else:
     DateTime = type(NotImplemented)  # should never be seen on win32
-    NullTypes = type(None)
+    NullTypes = (type(None),)
 
-# --- define objects to smooth out Python3 <-> Python 2.x differences
-unicodeType = str
-longType = int
-StringTypes = str
-makeByteBuffer = bytes
-memoryViewType = memoryview
-_BaseException = Exception
-
-try:  # jdhardy -- handle bytes under IronPython & Py3
-    bytes
-except NameError:
-    bytes = str  # define it for old Pythons
 
 # ------- Error handlers ------
 def standardErrorHandler(connection, cursor, errorclass, errorvalue):
@@ -54,8 +43,7 @@ def standardErrorHandler(connection, cursor, errorclass, errorvalue):
     raise errorclass(errorvalue)
 
 
-# Note: _BaseException is defined differently between Python 2.x and 3.x
-class Error(_BaseException):
+class Error(Exception):
     pass  # Exception that is the base class of all other error
     # exceptions. You can use this to catch all errors with one
     # single 'except' statement. Warnings are not considered
@@ -64,7 +52,7 @@ class Error(_BaseException):
     # module exceptions).
 
 
-class Warning(_BaseException):
+class Warning(Exception):
     pass
 
 
@@ -161,10 +149,10 @@ class FetchFailedError(OperationalError):
 #
 # def Binary(aString):
 #     """This function constructs an object capable of holding a binary (long) string value. """
-#     b = makeByteBuffer(aString)
+#     b = bytes(aString)
 #     return b
 # -----     Time converters ----------------------------------------------
-class TimeConverter(object):  # this is a generic time converter skeleton
+class TimeConverter:  # this is a generic time converter skeleton
     def __init__(self):  # the details will be filled in by instances
         self._ordinal_1899_12_31 = datetime.date(1899, 12, 31).toordinal() - 1
         # Use cls.types to compare if an input parameter is a datetime
@@ -238,36 +226,13 @@ class TimeConverter(object):  # this is a generic time converter skeleton
         return s
 
 
-# -- Optional: if mx extensions are installed you may use mxDateTime ----
-try:
-    import mx.DateTime
+# mx extensions are not available above Python 2.7
+# This constant and fallback class are kept to avoid introducing a breaking change.
+mxDateTime = False
 
-    mxDateTime = True
-except:
-    mxDateTime = False
-if mxDateTime:
 
-    class mxDateTimeConverter(TimeConverter):  # used optionally if installed
-        def __init__(self):
-            TimeConverter.__init__(self)
-            self.types.add(type(mx.DateTime))
-
-        def DateObjectFromCOMDate(self, comDate):
-            return mx.DateTime.DateTimeFromCOMDate(comDate)
-
-        def Date(self, year, month, day):
-            return mx.DateTime.Date(year, month, day)
-
-        def Time(self, hour, minute, second):
-            return mx.DateTime.Time(hour, minute, second)
-
-        def Timestamp(self, year, month, day, hour, minute, second):
-            return mx.DateTime.Timestamp(year, month, day, hour, minute, second)
-
-else:
-
-    class mxDateTimeConverter(TimeConverter):
-        pass  # if no mx is installed
+class mxDateTimeConverter(TimeConverter):
+    pass
 
 
 class pythonDateTimeConverter(TimeConverter):  # standard since Python 2.3
@@ -288,7 +253,7 @@ class pythonDateTimeConverter(TimeConverter):  # standard since Python 2.3
         integerPart = int(fComDate)
         floatpart = fComDate - integerPart
         ##if floatpart == 0.0:
-        ##    return datetime.date.fromordinal(integerPart + self._ordinal_1899_12_31)
+        #    return datetime.date.fromordinal(integerPart + self._ordinal_1899_12_31)
         dte = datetime.datetime.fromordinal(
             integerPart + self._ordinal_1899_12_31
         ) + datetime.timedelta(milliseconds=floatpart * 86400000)
@@ -391,7 +356,7 @@ adoRemainingTypes = (
 )
 
 # this class is a trick to determine whether a type is a member of a related group of types. see PEP notes
-class DBAPITypeObject(object):
+class DBAPITypeObject:
     def __init__(self, valuesTuple):
         self.values = frozenset(valuesTuple)
 
@@ -423,7 +388,7 @@ OTHER = DBAPITypeObject(adoRemainingTypes)
 
 # ------- utilities for translating python data types to ADO data types ---------------------------------
 typeMap = {
-    memoryViewType: adc.adVarBinary,
+    memoryview: adc.adVarBinary,
     float: adc.adDouble,
     type(None): adc.adEmpty,
     str: adc.adBSTR,
@@ -446,7 +411,7 @@ def pyTypeToADOType(d):
         ):  # maybe it is one of our supported Date/Time types
             return adc.adDate
         #  otherwise, attempt to discern the type by probing the data object itself -- to handle duck typing
-        if isinstance(d, StringTypes):
+        if isinstance(d, str):
             return adc.adBSTR
         if isinstance(d, numbers.Integral):
             return adc.adBigInt
@@ -466,7 +431,7 @@ def variantConvertDate(v):
 
 
 def cvtString(variant):  # use to get old action of adodbapi v1 if desired
-    if onIronPython:
+    if sys.platform == "cli":
         try:
             return variant.ToString()
         except:
@@ -522,8 +487,8 @@ def cvtUnusual(variant):
         sys.stderr.write("Conversion called for Unusual data=%s\n" % repr(variant))
     if isinstance(variant, DateTime):  # COMdate or System.Date
         from .adodbapi import (
-            dateconverter,
-        )  # this will only be called when adodbapi is in use, and very rarely
+            dateconverter,  # this will only be called when adodbapi is in use, and very rarely
+        )
 
         return dateconverter.DateObjectFromCOMDate(variant)
     return variant  # cannot find conversion function -- just give the data to the user
@@ -575,7 +540,7 @@ variantConversions = MultiMap(
 RS_WIN_32, RS_ARRAY, RS_REMOTE = list(range(1, 4))
 
 
-class SQLrow(object):  # a single database row
+class SQLrow:  # a single database row
     # class to emulate a sequence, so that a column may be retrieved by either number or name
     def __init__(self, rows, index):  # "rows" is an _SQLrows object, index is which row
         self.rows = rows  # parent 'fetch' container object
@@ -619,9 +584,10 @@ class SQLrow(object):  # a single database row
             )  # extension row[columnName] designation
         except (KeyError, TypeError):
             er, st, tr = sys.exc_info()
-            raise er(
-                'No such key as "%s" in %s' % (repr(key), self.__repr__())
-            ).with_traceback(tr)
+            if er:
+                raise er(
+                    'No such key as "%s" in %s' % (repr(key), self.__repr__())
+                ).with_traceback(tr)
 
     def __iter__(self):
         return iter(self.__next__())
@@ -651,9 +617,9 @@ class SQLrow(object):  # a single database row
     # # # #
 
 
-class SQLrows(object):
+class SQLrows:
     # class to emulate a sequence for multiple rows using a container object
-    def __init__(self, ado_results, numberOfRows, cursor):
+    def __init__(self, ado_results: list, numberOfRows, cursor):
         self.ado_results = ado_results  # raw result of SQL get
         try:
             self.recordset_format = cursor.recordset_format
@@ -672,7 +638,7 @@ class SQLrows(object):
 
     def __getitem__(self, item):  # used for row or row,column access
         if not self.ado_results:
-            return []
+            return cast(List[SQLrow], [])
         if isinstance(item, slice):  # will return a list of row objects
             indices = item.indices(self.numberOfRows)
             return [SQLrow(self, k) for k in range(*indices)]
@@ -684,7 +650,9 @@ class SQLrows(object):
                     j = self.columnNames[j.lower()]  # convert named column to numeric
                 except KeyError:
                     raise KeyError('adodbapi: no such column name as "%s"' % repr(j))
-            if self.recordset_format == RS_ARRAY:  # retrieve from two-dimensional array
+            if (
+                self.recordset_format == RS_ARRAY and sys.platform == "cli"
+            ):  # retrieve from two-dimensional array
                 v = self.ado_results[j, i]
             elif self.recordset_format == RS_REMOTE:
                 v = self.ado_results[i][j]

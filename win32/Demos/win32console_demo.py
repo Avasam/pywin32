@@ -1,5 +1,7 @@
-import win32console, win32con
-import traceback, time
+import time
+
+import win32con
+import win32console
 
 virtual_keys = {}
 for k, v in list(win32con.__dict__.items()):
@@ -12,7 +14,7 @@ try:
 except win32console.error as exc:
     if exc.winerror != 5:
         raise
-    ## only free console if one was created successfully
+    # only free console if one was created successfully
     free_console = False
 
 stdout = win32console.GetStdHandle(win32console.STD_OUTPUT_HANDLE)
@@ -89,8 +91,8 @@ while not breakout:
                     breakout = True
                     break
         elif input_record.EventType == win32console.MOUSE_EVENT:
-            if input_record.EventFlags == 0:  ## 0 indicates a button event
-                if input_record.ButtonState != 0:  ## exclude button releases
+            if input_record.EventFlags == 0:  # 0 indicates a button event
+                if input_record.ButtonState != 0:  # exclude button releases
                     pos = input_record.MousePosition
                     # switch the foreground and background colors of the character that was clicked
                     attr = newbuffer.ReadConsoleOutputAttribute(

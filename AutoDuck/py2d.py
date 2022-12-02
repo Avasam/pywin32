@@ -1,6 +1,6 @@
+import re
 import sys
 import types
-import re
 
 
 def ad_escape(s):
@@ -106,9 +106,9 @@ def build_module(fp, mod_name):
             continue
         if hasattr(ob, "__module__") and ob.__module__ != mod_name:
             continue
-        if type(ob) in [type, type]:
+        if isinstance(ob, (type)):
             classes.append(BuildInfo(name, ob))
-        elif type(ob) == types.FunctionType:
+        elif isinstance(ob, types.FunctionType):
             functions.append(BuildInfo(name, ob))
         elif name.upper() == name and type(ob) in (int, str):
             constants.append((name, ob))

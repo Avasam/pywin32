@@ -3,7 +3,9 @@
 # be on different machines (here they are in the same process, but the same
 # concepts apply)
 import sspi
-import win32security, sspicon, win32api
+import sspicon
+import win32api
+import win32security
 
 
 def lookup_ret_code(err):
@@ -14,9 +16,9 @@ def lookup_ret_code(err):
 
 """
 pkg_name='Kerberos'
-sspiclient=SSPIClient(pkg_name, win32api.GetUserName(),  ## target spn is ourself
-    None, None,   ## use none for client name and authentication information for current context
-    ## u'username', (u'username',u'domain.com',u'passwd'),
+sspiclient=SSPIClient(pkg_name, win32api.GetUserName(),  # target spn is ourself
+    None, None,   # use none for client name and authentication information for current context
+    # u'username', (u'username',u'domain.com',u'passwd'),
     sspicon.ISC_REQ_INTEGRITY|sspicon.ISC_REQ_SEQUENCE_DETECT|sspicon.ISC_REQ_REPLAY_DETECT|    \
         sspicon.ISC_REQ_DELEGATE|sspicon.ISC_REQ_CONFIDENTIALITY|sspicon.ISC_REQ_USE_SESSION_KEY)
 sspiserver=SSPIServer(pkg_name, None,

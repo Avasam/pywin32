@@ -1,6 +1,7 @@
-from win32com.shell import shell, shellcon
-import pythoncom
 import time
+
+import pythoncom
+from win32com.shell import shell, shellcon
 
 website = "https://github.com/mhammond/pywin32/"
 iad = pythoncom.CoCreateInstance(
@@ -17,7 +18,7 @@ if not (opts["ActiveDesktop"] and opts["EnableComponents"]):
     iad.SetDesktopItemOptions(opts)
     iad.ApplyChanges(0xFFFF)
     iad = None
-    ## apparently takes a short while for it to become active
+    # apparently takes a short while for it to become active
     time.sleep(2)
     iad = pythoncom.CoCreateInstance(
         shell.CLSID_ActiveDesktop,
@@ -38,7 +39,7 @@ component = {
     "SubscribedURL": website,
     "Source": website,
     "FriendlyName": "Pywin32 on SF",
-    "Checked": True,  ## this controls whether item is currently displayed
+    "Checked": True,  # this controls whether item is currently displayed
     "NoScroll": False,
     "Dirty": False,
     "Pos": {
@@ -79,4 +80,4 @@ else:
     iad.ApplyChanges(0xFFFF)
 
 iad.AddDesktopItem(component)
-iad.ApplyChanges(0xFFFF)  ## need to check which AD_APPLY constants are actually needed
+iad.ApplyChanges(0xFFFF)  # need to check which AD_APPLY constants are actually needed

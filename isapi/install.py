@@ -1,15 +1,19 @@
 """Installation utilities for Python ISAPI filters and extensions."""
+from __future__ import annotations
 
 # this code adapted from "Tomcat JK2 ISAPI redirector", part of Apache
 # Created July 2004, Mark Hammond.
-import sys, os, imp, shutil, stat
-import operator
-from win32com.client import GetObject, Dispatch
-from win32com.client.gencache import EnsureModule, EnsureDispatch
-import win32api
-import pythoncom
-import winerror
+import imp
+import os
+import shutil
+import stat
+import sys
 import traceback
+
+import pythoncom
+import win32api
+import winerror
+from win32com.client import GetObject
 
 _APP_INPROC = 0
 _APP_OUTPROC = 1
@@ -72,7 +76,7 @@ class VirtualDirParameters:
     EnableDirBrowsing = _DEFAULT_ENABLE_DIR_BROWSING
     EnableDefaultDoc = _DEFAULT_ENABLE_DEFAULT_DOC
     DefaultDoc = None  # Only set in IIS if not None
-    ScriptMaps = []
+    ScriptMaps: list[ScriptMapParams] = []
     ScriptMapUpdate = "end"  # can be 'start', 'end', 'replace'
     Server = None
 
@@ -116,8 +120,8 @@ class ScriptMapParams:
 class ISAPIParameters:
     ServerName = _DEFAULT_SERVER_NAME
     # Description = None
-    Filters = []
-    VirtualDirs = []
+    Filters: list[FilterParameters] = []
+    VirtualDirs: list[VirtualDirParameters] = []
 
     def __init__(self, **kw):
         self.__dict__.update(kw)
@@ -207,8 +211,8 @@ def LoadWebServer(path):
         server = GetObject(path)
     except pythoncom.com_error as details:
         msg = details.strerror
-        if exc.excepinfo and exc.excepinfo[2]:
-            msg = exc.excepinfo[2]
+        if details.excepinfo and details.excepinfo[2]:
+            msg = details.excepinfo[2]
         msg = "WebServer %s: %s" % (path, msg)
         raise ItemNotFound(msg)
     return server
@@ -760,6 +764,7 @@ def HandleCommandLine(
         # own options all setup.
         parser = opt_parser
 
+    all_handlers = {}
     # build a usage string if we don't have one.
     if not parser.get_usage():
         all_handlers = standard_arguments.copy()
@@ -799,6 +804,7 @@ def HandleCommandLine(
     verbose = options.verbose
     if not args:
         args = [default_arg]
+    arg = ""
     try:
         for arg in args:
             handler = all_handlers[arg]

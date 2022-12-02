@@ -1,8 +1,12 @@
 ## demonstrates using BackupSeek to enumerate data streams for a file
-import win32file, win32api, win32con
+import struct
+
+import pythoncom
+import pywintypes
+import win32api
+import win32con
+import win32file
 from win32com import storagecon
-import pythoncom, pywintypes
-import struct, traceback
 
 stream_types = {
     win32con.BACKUP_DATA: "Standard data",
@@ -89,7 +93,7 @@ def parse_stream_header(h, ctxt, data):
         stream_name_size,
     )
     if stream_name_size > 0:
-        ## ??? sdk says this size is in characters, but it appears to be number of bytes ???
+        # ??? sdk says this size is in characters, but it appears to be number of bytes ???
         bytes_read, stream_name_buf, ctxt = win32file.BackupRead(
             h, stream_name_size, None, False, True, ctxt
         )
@@ -108,9 +112,7 @@ def parse_stream_header(h, ctxt, data):
 
 
 ctxt = 0
-win32_stream_id_buf = (
-    None  ## gets rebound to a writable buffer on first call and reused
-)
+win32_stream_id_buf = None  # gets rebound to a writable buffer on first call and reused
 while 1:
     bytes_read, win32_stream_id_buf, ctxt = win32file.BackupRead(
         h, win32_stream_id_size, win32_stream_id_buf, False, True, ctxt

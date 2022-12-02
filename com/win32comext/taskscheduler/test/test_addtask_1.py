@@ -1,4 +1,7 @@
-import pythoncom, time, win32api
+import time
+
+import pythoncom
+import win32api
 from win32com.taskscheduler import taskscheduler
 
 test_task_name = "test_addtask_1.job"
@@ -23,7 +26,7 @@ new_task = pythoncom.CoCreateInstance(
     pythoncom.CLSCTX_INPROC_SERVER,
     taskscheduler.IID_ITask,
 )
-ts.AddWorkItem(test_task_name, new_task)  ## task object is modified in place
+ts.AddWorkItem(test_task_name, new_task)  # task object is modified in place
 
 new_task.SetFlags(
     taskscheduler.TASK_FLAG_INTERACTIVE | taskscheduler.TASK_FLAG_RUN_ONLY_IF_LOGGED_ON

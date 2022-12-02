@@ -66,9 +66,12 @@ Examples:
 
 """
 
-import sys, os, importlib, pythoncom
-from win32com.client import genpy, selecttlb, gencache
-from win32com.client import Dispatch
+import importlib
+import os
+import sys
+
+import pythoncom
+from win32com.client import Dispatch, gencache, genpy, selecttlb
 
 bForDemandDefault = 0  # Default value of bForDemand - toggle this to change the world - see also gencache.py
 
@@ -152,7 +155,7 @@ class SimpleProgress(genpy.GeneratorProgress):
 class GUIProgress(SimpleProgress):
     def __init__(self, verboseLevel):
         # Import some modules we need to we can trap failure now.
-        import win32ui, pywin
+        import win32ui
 
         SimpleProgress.__init__(self, verboseLevel)
         self.dialog = None
@@ -341,10 +344,9 @@ def GenerateChildFromTypeLibSpec(
 ):
     assert bUnicodeToString is None, "this is deprecated and will go away"
     if verboseLevel is None:
-        verboseLevel = (
-            0  # By default, we use no gui, and no verbose level for the children.
-        )
-    if type(typelibInfo) == type(()):
+        # By default, we use no gui, and no verbose level for the children.
+        verboseLevel = 0
+    if isinstance(typelibInfo, tuple):
         typelibCLSID, lcid, major, minor = typelibInfo
         tlb = pythoncom.LoadRegTypeLib(typelibCLSID, major, minor, lcid)
     else:
@@ -426,12 +428,7 @@ def main():
         path = os.path.dirname(outputName)
         if path != "" and not os.path.exists(path):
             os.makedirs(path)
-        if sys.version_info > (3, 0):
-            f = open(outputName, "wt", encoding="mbcs")
-        else:
-            import codecs  # not available in py3k.
-
-            f = codecs.open(outputName, "w", "mbcs")
+        f = open(outputName, "wt", encoding="mbcs")
     else:
         f = None
 

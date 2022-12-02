@@ -1,37 +1,35 @@
 # Color Editor originally by Neil Hodgson, but restructured by mh to integrate
 # even tighter into Pythonwin.
-import win32ui
-import win32con
-import win32api
-import sys
 
 import pywin.scintilla.keycodes
-from pywin.scintilla import bindings
-
+import win32api
+import win32con
+import win32ui
 from pywin.framework.editor import (
-    GetEditorOption,
-    SetEditorOption,
     GetEditorFontOption,
+    GetEditorOption,
     SetEditorFontOption,
+    SetEditorOption,
     defaultCharacterFormat,
 )
+from pywin.scintilla import bindings
 
 # from pywin.framework.editor import EditorPropertyPage
 
 MSG_CHECK_EXTERNAL_FILE = (
     win32con.WM_USER + 1999
-)  ## WARNING: Duplicated in document.py and editor.py
+)  # WARNING: Duplicated in document.py and editor.py
 
 # Define a few common markers
 MARKER_BOOKMARK = 0
 MARKER_BREAKPOINT = 1
 MARKER_CURRENT = 2
 
+import pywin.scintilla.view
 from pywin.debugger import dbgcon
-from pywin.scintilla.document import CScintillaDocument
 from pywin.framework.editor.document import EditorDocumentBase
 from pywin.scintilla import scintillacon  # For the marker definitions
-import pywin.scintilla.view
+from pywin.scintilla.document import CScintillaDocument
 
 
 class SyntEditDocument(EditorDocumentBase):
@@ -490,11 +488,11 @@ class SyntEditView(SyntEditViewParent):
         if not self.bFolding:
             return 1
         win32ui.DoWaitCursor(1)
-        ## I think this is needed since Scintilla may not have
-        ## already formatted parts of file outside visible window.
+        # I think this is needed since Scintilla may not have
+        # already formatted parts of file outside visible window.
         self.Colorize()
         levels = [scintillacon.SC_FOLDLEVELBASE]
-        ## Scintilla's level number is based on amount of whitespace indentation
+        # Scintilla's level number is based on amount of whitespace indentation
         for lineno in range(self.GetLineCount()):
             level = self.SCIGetFoldLevel(lineno)
             if not level & scintillacon.SC_FOLDLEVELHEADERFLAG:
@@ -505,7 +503,7 @@ class SyntEditView(SyntEditViewParent):
             try:
                 level_ind = levels.index(curr_level)
             except ValueError:
-                ## probably syntax error in source file, bail
+                # probably syntax error in source file, bail
                 break
             levels = levels[: level_ind + 1]
             if level_ind == 1 and not self.SCIGetFoldExpanded(lineno):
@@ -516,11 +514,11 @@ class SyntEditView(SyntEditViewParent):
         if not self.bFolding:
             return 1
         win32ui.DoWaitCursor(1)
-        ## I think this is needed since Scintilla may not have
-        ## already formatted parts of file outside visible window.
+        # I think this is needed since Scintilla may not have
+        # already formatted parts of file outside visible window.
         self.Colorize()
         levels = [scintillacon.SC_FOLDLEVELBASE]
-        ## Scintilla's level number is based on amount of whitespace indentation
+        # Scintilla's level number is based on amount of whitespace indentation
         for lineno in range(self.GetLineCount()):
             level = self.SCIGetFoldLevel(lineno)
             if not level & scintillacon.SC_FOLDLEVELHEADERFLAG:
@@ -531,7 +529,7 @@ class SyntEditView(SyntEditViewParent):
             try:
                 level_ind = levels.index(curr_level)
             except ValueError:
-                ## probably syntax error in source file, bail
+                # probably syntax error in source file, bail
                 break
             levels = levels[: level_ind + 1]
             if level_ind == 1 and self.SCIGetFoldExpanded(lineno):

@@ -5,14 +5,14 @@
  this yet, so it is not well tested!
 """
 
-import winerror
 import types
-from win32com.server.exception import COMException
+
+import pythoncom
 import win32com.server.policy
 import win32com.server.util
+import winerror
 from win32com.client import Dispatch
-import pythoncom
-from win32com.axscript import axscript
+from win32com.server.exception import COMException
 
 debugging = 0
 
@@ -43,7 +43,7 @@ class ScriptDispatch:
                     raise AttributeError(name)  # Not a function.
                 realArgs = []
                 for arg in args:
-                    if type(arg) == PyIDispatchType:
+                    if isinstance(arg, PyIDispatchType):
                         realArgs.append(Dispatch(arg))
                     else:
                         realArgs.append(arg)

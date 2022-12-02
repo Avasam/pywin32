@@ -1,14 +1,14 @@
 # We no longer support the old, non-colour editor!
 
-from pywin.mfc import docview, object
-from pywin.framework.editor import GetEditorOption
-import win32ui
 import os
-import win32con
-import string
-import traceback
-import win32api
 import shutil
+import traceback
+
+import win32api
+import win32con
+import win32ui
+from pywin.framework.editor import GetEditorOption
+from pywin.mfc import docview, object
 
 BAK_NONE = 0
 BAK_DOT_BAK = 1
@@ -17,7 +17,7 @@ BAK_DOT_BAK_BAK_DIR = 3
 
 MSG_CHECK_EXTERNAL_FILE = (
     win32con.WM_USER + 1999
-)  ## WARNING: Duplicated in editor.py and coloreditor.py
+)  # WARNING: Duplicated in editor.py and coloreditor.py
 
 import pywin.scintilla.document
 

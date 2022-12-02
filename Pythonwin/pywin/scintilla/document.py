@@ -1,19 +1,20 @@
-import win32ui
-from pywin.mfc import docview
-from pywin import default_scintilla_encoding
-from . import scintillacon
-import win32con
-import string
-import os
 import codecs
 import re
+import string
 
-crlf_bytes = "\r\n".encode("ascii")
-lf_bytes = "\n".encode("ascii")
+import win32con
+import win32ui
+from pywin import default_scintilla_encoding
+from pywin.mfc import docview
+
+from . import scintillacon
+
+crlf_bytes = b"\r\n"
+lf_bytes = b"\n"
 
 # re from pep263 - but we use it both on bytes and strings.
-re_encoding_bytes = re.compile("coding[:=]\s*([-\w.]+)".encode("ascii"))
-re_encoding_text = re.compile("coding[:=]\s*([-\w.]+)")
+re_encoding_bytes = re.compile(rb"coding[:=]\s*([-\w.]+)")
+re_encoding_text = re.compile(r"coding[:=]\s*([-\w.]+)")
 
 ParentScintillaDocument = docview.Document
 
@@ -178,7 +179,7 @@ class CScintillaDocument(ParentScintillaDocument):
             if source_encoding is None:
                 source_encoding = "utf-8"
 
-        ## encode data before opening file so script is not lost if encoding fails
+        # encode data before opening file so script is not lost if encoding fails
         file_contents = s.encode(source_encoding)
         # Open in binary mode as scintilla itself ensures the
         # line endings are already appropriate

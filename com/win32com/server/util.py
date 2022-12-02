@@ -1,8 +1,9 @@
-""" General Server side utilities 
+""" General Server side utilities
 """
 import pythoncom
-from . import policy
 import winerror
+
+from . import policy
 from .exception import COMException
 
 
@@ -216,7 +217,7 @@ class FileStream:
     def CopyTo(self, dest, cb):
         data = self.file.read(cb)
         cbread = len(data)
-        dest.Write(data)  ## ??? Write does not currently return the length ???
+        dest.Write(data)  # ??? Write does not currently return the length ???
         return cbread, cbread
 
     def Seek(self, offset, origin):

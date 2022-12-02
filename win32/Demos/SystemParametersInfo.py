@@ -1,15 +1,21 @@
-import win32gui, win32con, win32api, time, os, glob
+import glob
+import os
+import time
+
+import win32api
+import win32con
+import win32gui
 
 ## some of these tests will fail for systems prior to XP
 
 for pname in (
-    ## Set actions all take an unsigned int in pvParam
+    # Set actions all take an unsigned int in pvParam
     "SPI_GETMOUSESPEED",
     "SPI_GETACTIVEWNDTRKTIMEOUT",
     "SPI_GETCARETWIDTH",
     "SPI_GETFOREGROUNDFLASHCOUNT",
     "SPI_GETFOREGROUNDLOCKTIMEOUT",
-    ## Set actions all take an unsigned int in uiParam
+    # Set actions all take an unsigned int in uiParam
     "SPI_GETWHEELSCROLLLINES",
     "SPI_GETKEYBOARDDELAY",
     "SPI_GETKEYBOARDSPEED",
@@ -21,7 +27,7 @@ for pname in (
     "SPI_GETLOWPOWERTIMEOUT",
     "SPI_GETPOWEROFFTIMEOUT",
     "SPI_GETBORDER",
-    ## below are winxp only:
+    # below are winxp only:
     "SPI_GETFONTSMOOTHINGCONTRAST",
     "SPI_GETFONTSMOOTHINGTYPE",
     "SPI_GETFOCUSBORDERHEIGHT",

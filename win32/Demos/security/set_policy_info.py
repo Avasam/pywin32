@@ -1,4 +1,6 @@
-import win32security, win32file, win32api, ntsecuritycon, win32con
+import win32api
+import win32file
+import win32security
 
 policy_handle = win32security.GetPolicyHandle("rupole", win32security.POLICY_ALL_ACCESS)
 

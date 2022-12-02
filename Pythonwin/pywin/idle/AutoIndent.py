@@ -1,17 +1,13 @@
-import sys
-import string, tokenize
-from . import PyParse
+import tokenize
+
 from pywin import default_scintilla_encoding
 
-if sys.version_info < (3,):
-    # in py2k, tokenize() takes a 'token eater' callback, while
-    # generate_tokens is a generator that works with str objects.
-    token_generator = tokenize.generate_tokens
-else:
-    # in py3k tokenize() is the generator working with 'byte' objects, and
-    # token_generator is the 'undocumented b/w compat' function that
-    # theoretically works with str objects - but actually seems to fail)
-    token_generator = tokenize.tokenize
+from . import PyParse
+
+# in py3k tokenize() is the generator working with 'byte' objects, and
+# token_generator is the 'undocumented b/w compat' function that
+# theoretically works with str objects - but actually seems to fail)
+token_generator = tokenize.tokenize
 
 
 class AutoIndent:
@@ -30,7 +26,7 @@ class AutoIndent:
                 ("Toggle tabs", "<<toggle-tabs>>"),
                 ("New indent width", "<<change-indentwidth>>"),
             ],
-        ),
+        )
     ]
 
     keydefs = {

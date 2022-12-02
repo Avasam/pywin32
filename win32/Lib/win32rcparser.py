@@ -7,13 +7,19 @@
 This is a parser for Windows .rc files, which are text files which define
 dialogs and other Windows UI resources.
 """
+from __future__ import annotations
+
+import os
+import pprint
+import shlex
+import stat
+import sys
+
+import commctrl
+import win32con
+
 __author__ = "Adam Walker"
 __version__ = "0.11"
-
-import sys, os, shlex, stat
-import pprint
-import win32con
-import commctrl
 
 _controlMap = {
     "DEFPUSHBUTTON": 0x80,
@@ -76,15 +82,14 @@ class DialogDef:
         # print "dialog def for ",self.name, self.id
 
     def createDialogTemplate(self):
-        t = None
         self.template = [
-            [
+            (
                 self.caption,
                 (self.x, self.y, self.w, self.h),
                 self.style,
                 self.styleEx,
                 (self.fontSize, self.font),
-            ]
+            )
         ]
         # Add the controls
         for control in self.controls:
@@ -93,7 +98,7 @@ class DialogDef:
 
 
 class ControlDef:
-    id = ""
+    id: int | str = ""
     controlType = ""
     subType = ""
     idNum = 0
@@ -112,7 +117,7 @@ class ControlDef:
     def toString(self):
         s = (
             "<Control id:"
-            + self.id
+            + str(self.id)
             + " controlType:"
             + self.controlType
             + " subType:"
@@ -167,8 +172,10 @@ class StringDef:
 
 class RCParser:
     next_id = 1001
-    dialogs = {}
-    _dialogs = {}
+    dialogs: dict[
+        str, list[tuple[str, tuple[int, int, int, int], int, None, tuple[int, str]]]
+    ] = {}
+    _dialogs: dict[str, DialogDef] = {}
     debugEnabled = False
     token = ""
 
@@ -216,17 +223,17 @@ class RCParser:
         if self.token == "-":
             mult = -1
             self.getToken()
-        return int(self.token) * mult
+        return int(self.token or 0) * mult
 
     # Return the *current* token as a string literal (ie, self.token will be a
     # quote.  consumes all tokens until the end of the string
     def currentQuotedString(self):
         # Handle quoted strings - pity shlex doesn't handle it.
-        assert self.token.startswith('"'), self.token
+        assert self.token is not None and self.token.startswith('"'), self.token
         bits = [self.token]
         while 1:
             tok = self.getToken()
-            if not tok.startswith('"'):
+            if tok is None or not tok.startswith('"'):
                 self.ungetToken()
                 break
             bits.append(tok)
@@ -246,7 +253,7 @@ class RCParser:
         """
         self.open(rcstream)
         self.getToken()
-        while self.token != None:
+        while self.token is not None:
             self.parse()
             self.getToken()
 
@@ -294,7 +301,7 @@ class RCParser:
         }
         deep = 0
         base_token = self.token
-        rp = noid_parsers.get(base_token)
+        rp = noid_parsers.get(str(base_token))
         if rp is not None:
             rp()
         else:
@@ -347,7 +354,7 @@ class RCParser:
         return id
 
     def lang(self):
-        while (
+        while self.token and (
             self.token[0:4] == "LANG"
             or self.token[0:7] == "SUBLANG"
             or self.token == ","
@@ -382,8 +389,10 @@ class RCParser:
 
     def parse_bitmap_or_icon(self, name, dic):
         self.getToken()
-        while not self.token.startswith('"'):
+        while self.token is not None and not self.token.startswith('"'):
             self.getToken()
+        if not self.token:
+            return
         bmf = self.token[1:-1]  # quotes
         dic[name] = bmf
 
@@ -393,22 +402,22 @@ class RCParser:
         self._dialogs[name] = dlg
         extras = []
         self.getToken()
-        while not self.token.isdigit():
+        while self.token and not self.token.isdigit():
             self.debug("extra", self.token)
             extras.append(self.token)
             self.getToken()
-        dlg.x = int(self.token)
+        dlg.x = int(self.token or 0)
         self.getCommaToken()
         self.getToken()  # number
-        dlg.y = int(self.token)
+        dlg.y = int(self.token or 0)
         self.getCommaToken()
         self.getToken()  # number
-        dlg.w = int(self.token)
+        dlg.w = int(self.token or 0)
         self.getCommaToken()
         self.getToken()  # number
-        dlg.h = int(self.token)
+        dlg.h = int(self.token or 0)
         self.getToken()
-        while not (self.token == None or self.token == "" or self.token == "END"):
+        while not (self.token is None or self.token == "" or self.token == "END"):
             if self.token == "STYLE":
                 self.dialogStyle(dlg)
             elif self.token == "EXSTYLE":
@@ -440,7 +449,7 @@ class RCParser:
         Not = False
         while (
             (i % 2 == 1 and ("|" == self.token or "NOT" == self.token)) or (i % 2 == 0)
-        ) and not self.token == None:
+        ) and not self.token is None:
             Not = False
             if "NOT" == self.token:
                 Not = True
@@ -470,7 +479,8 @@ class RCParser:
     def dialogCaption(self, dlg):
         if "CAPTION" == self.token:
             self.getToken()
-        self.token = self.token[1:-1]
+        if self.token is not None:
+            self.token = self.token[1:-1]
         self.debug("Caption is:", self.token)
         dlg.caption = self.token
         self.getToken()
@@ -478,10 +488,11 @@ class RCParser:
     def dialogFont(self, dlg):
         if "FONT" == self.token:
             self.getToken()
-        dlg.fontSize = int(self.token)
+        dlg.fontSize = int(self.token or 0)
         self.getCommaToken()
         self.getToken()  # Font name
-        dlg.font = self.token[1:-1]  # it's quoted
+        if self.token is not None:
+            dlg.font = self.token[1:-1]  # it's quoted
         self.getToken()
         while "BEGIN" != self.token:
             self.getToken()
@@ -495,7 +506,7 @@ class RCParser:
         # CHECKBOX, COMBOBOX, CONTROL, CTEXT, DEFPUSHBUTTON, EDITTEXT, GROUPBOX,
         # ICON, LISTBOX, LTEXT, PUSHBUTTON, RADIOBUTTON, RTEXT, SCROLLBAR
         without_text = ["EDITTEXT", "COMBOBOX", "LISTBOX", "SCROLLBAR"]
-        while self.token != "END":
+        while self.token != "END" and self.token is not None:
             control = ControlDef()
             control.controlType = self.token
             self.getToken()
@@ -539,14 +550,14 @@ class RCParser:
                 # incase no style is specified.
                 control.style = thisDefaultStyle
             # Rect
-            control.x = int(self.getToken())
+            control.x = int(self.getToken() or 0)
             self.getCommaToken()
-            control.y = int(self.getToken())
+            control.y = int(self.getToken() or 0)
             self.getCommaToken()
-            control.w = int(self.getToken())
+            control.w = int(self.getToken() or 0)
             self.getCommaToken()
             self.getToken()
-            control.h = int(self.token)
+            control.h = int(self.token or 0)
             self.getToken()
             if self.token == ",":
                 self.getToken()
@@ -601,7 +612,6 @@ def Parse(rc_name, h_name=None):
         if h_file is not None:
             h_file.close()
         rc_file.close()
-    return rcp
 
 
 def GenerateFrozenResource(rc_name, output_name, h_name=None):
@@ -655,7 +665,7 @@ if __name__ == "__main__":
 
         filename = sys.argv[1]
         if "-v" in sys.argv:
-            RCParser.debugEnabled = 1
+            RCParser.debugEnabled = True
         print("Dumping all resources in '%s'" % filename)
         resources = Parse(filename)
         for id, ddef in resources.dialogs.items():

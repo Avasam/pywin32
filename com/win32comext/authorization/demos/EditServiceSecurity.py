@@ -5,9 +5,13 @@ or as a remote service of the form \\machinename\service
 """
 
 import os
+
+import pythoncom
+import win32api
 import win32com.server.policy
-import win32security, ntsecuritycon, win32con
-import pythoncom, win32api, win32service
+import win32con
+import win32security
+import win32service
 from win32com.authorization import authorization
 
 SERVICE_GENERIC_EXECUTE = (
@@ -25,38 +29,22 @@ SERVICE_GENERIC_READ = (
 SERVICE_GENERIC_WRITE = win32service.SERVICE_CHANGE_CONFIG
 
 from ntsecuritycon import (
-    STANDARD_RIGHTS_READ,
-    STANDARD_RIGHTS_WRITE,
-    STANDARD_RIGHTS_EXECUTE,
-    WRITE_OWNER,
-    WRITE_DAC,
     READ_CONTROL,
+    SI_ACCESS_GENERAL,
+    SI_ACCESS_SPECIFIC,
     SI_ADVANCED,
-    SI_EDIT_AUDITS,
-    SI_EDIT_PROPERTIES,
     SI_EDIT_ALL,
     SI_PAGE_TITLE,
     SI_RESET,
-    SI_ACCESS_SPECIFIC,
-    SI_ACCESS_GENERAL,
-    SI_ACCESS_CONTAINER,
-    SI_ACCESS_PROPERTY,
-    OBJECT_INHERIT_ACE,
-    CONTAINER_INHERIT_ACE,
-    INHERIT_ONLY_ACE,
-    SI_PAGE_PERM,
-    SI_PAGE_ADVPERM,
-    SI_PAGE_AUDIT,
-    SI_PAGE_OWNER,
-    PSPCB_SI_INITDIALOG,
-    SI_CONTAINER,
+    WRITE_DAC,
+    WRITE_OWNER,
 )
-from win32security import OBJECT_INHERIT_ACE, CONTAINER_INHERIT_ACE, INHERIT_ONLY_ACE
-from win32com.shell.shellcon import (
-    PSPCB_RELEASE,
-    PSPCB_CREATE,
-)  ## Msg parameter to PropertySheetPageCallback
 from pythoncom import IID_NULL
+from win32com.shell.shellcon import (  # Msg parameter to PropertySheetPageCallback
+    PSPCB_CREATE,
+    PSPCB_RELEASE,
+)
+from win32security import CONTAINER_INHERIT_ACE, INHERIT_ONLY_ACE, OBJECT_INHERIT_ACE
 
 
 class ServiceSecurity(win32com.server.policy.DesignatedWrapPolicy):
@@ -79,10 +67,10 @@ class ServiceSecurity(win32com.server.policy.DesignatedWrapPolicy):
         """Identifies object whose security will be modified, and determines options available
         to the end user"""
         flags = SI_ADVANCED | SI_EDIT_ALL | SI_PAGE_TITLE | SI_RESET
-        hinstance = 0  ## handle to module containing string resources
-        servername = ""  ## name of authenticating server if not local machine
+        hinstance = 0  # handle to module containing string resources
+        servername = ""  # name of authenticating server if not local machine
 
-        ## service name can contain remote machine name of the form \\Server\ServiceName
+        # service name can contain remote machine name of the form \\Server\ServiceName
         objectname = os.path.split(self.ServiceName)[1]
         pagetitle = "Service Permissions for " + self.ServiceName
         objecttype = IID_NULL
@@ -120,13 +108,13 @@ class ServiceSecurity(win32com.server.policy.DesignatedWrapPolicy):
         Flags can contain SI_ACCESS_SPECIFIC,SI_ACCESS_GENERAL,SI_ACCESS_CONTAINER,SI_ACCESS_PROPERTY,
               CONTAINER_INHERIT_ACE,INHERIT_ONLY_ACE,OBJECT_INHERIT_ACE
         """
-        ## input flags: SI_ADVANCED,SI_EDIT_AUDITS,SI_EDIT_PROPERTIES indicating which property sheet is requesting the rights
+        # input flags: SI_ADVANCED,SI_EDIT_AUDITS,SI_EDIT_PROPERTIES indicating which property sheet is requesting the rights
         if (objecttype is not None) and (objecttype != IID_NULL):
-            ## Not relevent for services
+            # Not relevent for services
             raise NotImplementedError("Object type is not supported")
 
-        ## ???? for some reason, the DACL for a service will not retain ACCESS_SYSTEM_SECURITY in an ACE ????
-        ## (IID_NULL, win32con.ACCESS_SYSTEM_SECURITY, 'View/change audit settings', SI_ACCESS_SPECIFIC),
+        # ???? for some reason, the DACL for a service will not retain ACCESS_SYSTEM_SECURITY in an ACE ????
+        # (IID_NULL, win32con.ACCESS_SYSTEM_SECURITY, 'View/change audit settings', SI_ACCESS_SPECIFIC),
 
         accessrights = [
             (
@@ -214,8 +202,8 @@ class ServiceSecurity(win32com.server.policy.DesignatedWrapPolicy):
 
     def PropertySheetPageCallback(self, hwnd, msg, pagetype):
         """Invoked each time a property sheet page is created or destroyed."""
-        ## page types from SI_PAGE_TYPE enum: SI_PAGE_PERM SI_PAGE_ADVPERM SI_PAGE_AUDIT SI_PAGE_OWNER
-        ## msg: PSPCB_CREATE, PSPCB_RELEASE, PSPCB_SI_INITDIALOG
+        # page types from SI_PAGE_TYPE enum: SI_PAGE_PERM SI_PAGE_ADVPERM SI_PAGE_AUDIT SI_PAGE_OWNER
+        # msg: PSPCB_CREATE, PSPCB_RELEASE, PSPCB_SI_INITDIALOG
         return None
 
     def EditSecurity(self, owner_hwnd=0):

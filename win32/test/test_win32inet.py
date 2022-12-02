@@ -1,11 +1,9 @@
+import unittest
+
+import winerror
+from pywin32_testutil import TestSkipped, testmain
 from win32inet import *
 from win32inetcon import *
-import winerror
-from pywin32_testutil import str2bytes  # py3k-friendly helper
-from pywin32_testutil import TestSkipped
-from pywin32_testutil import testmain
-
-import unittest
 
 
 class CookieTests(unittest.TestCase):
@@ -54,8 +52,8 @@ class TestNetwork(unittest.TestCase):
             if not chunk:
                 break
             chunks.append(chunk)
-        data = str2bytes("").join(chunks)
-        assert data.find(str2bytes("Python")) > 0, repr(
+        data = b"".join(chunks)
+        assert data.find(b"Python") > 0, repr(
             data
         )  # This must appear somewhere on the main page!
 
@@ -71,10 +69,10 @@ class TestNetwork(unittest.TestCase):
                 "ftp.gnu.org",
                 INTERNET_INVALID_PORT_NUMBER,
                 None,
-                None,  # username/password
+                None,
                 INTERNET_SERVICE_FTP,
                 0,
-                0,
+                0,  # username/password
             )
             try:
                 hftp = FtpCommand(hcon, True, FTP_TRANSFER_TYPE_ASCII, "NLST", 0)

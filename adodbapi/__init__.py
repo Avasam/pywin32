@@ -3,28 +3,31 @@
 Copyright (C) 2002 Henrik Ekelund, version 2.1 by Vernon Cole
 * http://sourceforge.net/projects/adodbapi
 """
-import sys
 import time
 
-from .apibase import apilevel, threadsafety, paramstyle
+# TODO: Are those meant to be re-exported?
+from .adodbapi import Connection, Cursor, __version__, connect, dateconverter
 from .apibase import (
-    Warning,
-    Error,
-    InterfaceError,
+    BINARY,
+    DATETIME,
+    NUMBER,
+    ROWID,
+    STRING,
     DatabaseError,
     DataError,
-    OperationalError,
-    IntegrityError,
-)
-from .apibase import (
-    InternalError,
-    ProgrammingError,
-    NotSupportedError,
+    Error,
     FetchFailedError,
+    IntegrityError,
+    InterfaceError,
+    InternalError,
+    NotSupportedError,
+    OperationalError,
+    ProgrammingError,
+    Warning,
+    apilevel,
+    paramstyle,
+    threadsafety,
 )
-from .apibase import NUMBER, STRING, BINARY, DATETIME, ROWID
-
-from .adodbapi import connect, Connection, __version__, dateconverter, Cursor
 
 
 def Binary(aString):

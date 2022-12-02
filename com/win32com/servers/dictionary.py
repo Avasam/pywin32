@@ -30,21 +30,20 @@ the dictionary's keys. This allows for the following type of VB code:
         debug.print name, ob(name)
     next
 """
+from __future__ import annotations
 
 import pythoncom
-from win32com.server import util, policy
-from win32com.server.exception import COMException
-import winerror
-import types
 import pywintypes
-
+import winerror
 from pythoncom import DISPATCH_METHOD, DISPATCH_PROPERTYGET
+from win32com.server import policy, util
+from win32com.server.exception import COMException
 from winerror import S_OK
 
 
 class DictionaryPolicy(policy.BasicWrapPolicy):
     ### BasicWrapPolicy looks for this
-    _com_interfaces_ = []
+    _com_interfaces_: list[pywintypes.IIDType] = []
 
     ### BasicWrapPolicy looks for this
     _name_to_dispid_ = {

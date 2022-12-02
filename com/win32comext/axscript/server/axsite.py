@@ -1,21 +1,36 @@
-import win32com.axscript.axscript
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, cast
+
+import pythoncom
 import winerror
 from win32com.axscript import axscript
 from win32com.server import exception, util
-import pythoncom
+from win32comext.axscript.client.framework import COMScript
+
+if TYPE_CHECKING:
+    from _win32typing import PyIUnknown
+else:
+    PyIUnknown: Any
 
 
 class AXEngine:
-    def __init__(self, site, engine):
-        self.eScript = self.eParse = self.eSafety = None
-        if type(engine) == type(""):
-            engine = pythoncom.CoCreateInstance(
+    def __init__(self, site, engine: str | PyIUnknown):
+        engine = (
+            pythoncom.CoCreateInstance(
                 engine, None, pythoncom.CLSCTX_SERVER, pythoncom.IID_IUnknown
             )
+            if isinstance(engine, str)
+            else engine
+        )
 
-        self.eScript = engine.QueryInterface(axscript.IID_IActiveScript)
-        self.eParse = engine.QueryInterface(axscript.IID_IActiveScriptParse)
-        self.eSafety = engine.QueryInterface(axscript.IID_IObjectSafety)
+        self.eScript: COMScript = cast(
+            COMScript, engine.QueryInterface(axscript.IID_IActiveScript)
+        )
+        self.eParse: COMScript = cast(
+            COMScript, engine.QueryInterface(axscript.IID_IActiveScriptParse)
+        )
+        self.eSafety: PyIUnknown = engine.QueryInterface(axscript.IID_IObjectSafety)
 
         self.eScript.SetScriptSite(site)
         self.eParse.InitNew()
@@ -72,26 +87,22 @@ class AXSite:
     _public_methods_ = IActiveScriptSite_methods
     _com_interfaces_ = [axscript.IID_IActiveScriptSite]
 
-    def __init__(self, objModel={}, engine=None, lcid=0):
+    def __init__(self, objModel={}, engine: AXEngine | None = None, lcid=0):
         self.lcid = lcid
         self.objModel = {}
         for name, object in objModel.items():
             # Gregs code did string.lower this - I think that is callers job if he wants!
             self.objModel[name] = object
+        self.engine = self.AddEngine(engine) if engine else None
 
-        self.engine = None
-        if engine:
-            self._AddEngine(engine)
-
-    def AddEngine(self, engine):
+    def AddEngine(self, engine: AXEngine | str):
         """Adds a new engine to the site.
         engine can be a string, or a fully wrapped engine object.
         """
-        if type(engine) == type(""):
+        if isinstance(engine, str):
             newEngine = AXEngine(util.wrap(self), engine)
         else:
             newEngine = engine
-        self.engine = newEngine
         flags = (
             axscript.SCRIPTITEM_ISVISIBLE
             | axscript.SCRIPTITEM_NOCODE
@@ -107,7 +118,8 @@ class AXSite:
     _AddEngine = AddEngine
 
     def _Close(self):
-        self.engine.Close()
+        if self.engine:
+            self.engine.Close()
         self.objModel = {}
 
     def GetLCID(self):

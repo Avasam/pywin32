@@ -3,14 +3,16 @@
 # This requires the PythonCOM VB Test Harness.
 #
 
-import sys
+import traceback
+
+import pythoncom
+import win32com.client
+import win32com.client.dynamic
+import win32com.client.gencache
 import winerror
-import pythoncom, win32com.client, win32com.client.dynamic, win32com.client.gencache
+from pywin32_testutil import str2memory
 from win32com.server.util import NewCollection, wrap
 from win32com.test import util
-from pywin32_testutil import str2memory
-
-import traceback
 
 # for debugging
 useDispatcher = None
@@ -420,18 +422,17 @@ def TestStructs(vbtest):
 
     # Now do some object equality tests.
     assert s == s
-    assert s != None
-    if sys.version_info > (3, 0):
-        try:
-            s < None
-            raise error("Expected type error")
-        except TypeError:
-            pass
-        try:
-            None < s
-            raise error("Expected type error")
-        except TypeError:
-            pass
+    assert s is not None
+    try:
+        s < None
+        raise error("Expected type error")
+    except TypeError:
+        pass
+    try:
+        None < s
+        raise error("Expected type error")
+    except TypeError:
+        pass
     assert s != s.sub_val
     import copy
 
@@ -521,21 +522,20 @@ def TestObjectSemantics(ob):
     assert ob._oleobj_ == ob._oleobj_.QueryInterface(pythoncom.IID_IUnknown)
     assert not ob._oleobj_ != ob._oleobj_.QueryInterface(pythoncom.IID_IUnknown)
 
-    assert ob._oleobj_ != None
+    assert ob._oleobj_ is not None
     assert None != ob._oleobj_
-    assert ob != None
+    assert ob is not None
     assert None != ob
-    if sys.version_info > (3, 0):
-        try:
-            ob < None
-            raise error("Expected type error")
-        except TypeError:
-            pass
-        try:
-            None < ob
-            raise error("Expected type error")
-        except TypeError:
-            pass
+    try:
+        ob < None
+        raise error("Expected type error")
+    except TypeError:
+        pass
+    try:
+        None < ob
+        raise error("Expected type error")
+    except TypeError:
+        pass
 
     assert ob._oleobj_.QueryInterface(pythoncom.IID_IUnknown) == ob._oleobj_
     assert not ob._oleobj_.QueryInterface(pythoncom.IID_IUnknown) != ob._oleobj_

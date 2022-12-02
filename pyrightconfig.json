@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/pyright/main/packages/vscode-pyright/schemas/pyrightconfig.schema.json",
+  "pythonPlatform": "Windows",
+  // Default to the oldest supported for IDEs
+  "pythonVersion": "3.7",
+  "include": [
+    "com/win32com",
+    "com/win32comext",
+    "win32/Lib/",
+    "isapi/",
+  ],
+  "exclude": [
+    // Tests are not public API
+    "**/test/",
+    "**/*_test*.py",
+    "**/*testall.py",
+    // Tools are not public python API
+    "AutoDuck/",
+    "Pythonwin/",
+    "**/scripts/",
+    "**/tools/",
+    "**/*install.py",
+    "**/client/",
+    "**/debugger/",
+    // Demos/samples are not public API
+    "**/demo/",
+    "**/demos/",
+    "**/samples/",
+    "**/examples/",
+    // Axdebug isn't even built right now
+    "**/axdebug"
+  ],
+  "typeCheckingMode": "basic",
+  // Not all dependencies are going to be py.typed or have stubs
+  "useLibraryCodeForTypes": true,
+  // Extra strict settings
+  "reportUnnecessaryTypeIgnoreComment": "error",
+  // Most of pywin32's code is C-Module extensions
+  "reportMissingModuleSource": "none",
+  // TODO: Fix later, after synchronizing typing update with typeshed
+  "reportGeneralTypeIssues": "none",
+}

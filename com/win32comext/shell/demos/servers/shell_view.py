@@ -46,17 +46,23 @@
 # a field sep just 'cos we can (and 'cos it can't possibly conflict with the
 # string content)
 
-import sys, os
 import _thread
+import os
 import pyclbr
-import pythoncom
-import win32gui, win32gui_struct, win32api, win32con, winerror
+import sys
+
 import commctrl
-from win32com.shell import shell, shellcon
-from win32com.server.util import wrap, NewEnum
-from win32com.server.exception import COMException
-from win32com.util import IIDToInterfaceName
+import pythoncom
+import win32api
+import win32con
+import win32gui
+import win32gui_struct
+import winerror
 from pywin.scintilla import scintillacon
+from win32com.server.exception import COMException
+from win32com.server.util import NewEnum, wrap
+from win32com.shell import shell, shellcon
+from win32com.util import IIDToInterfaceName
 
 # Set this to 1 to cause debug version to be registered and used.  A debug
 # version will spew output to win32traceutil.
@@ -373,7 +379,7 @@ class ShellFolderRoot(ShellFolderFileSystem):
         return NewEnum(items, iid=shell.IID_IEnumIDList, useDispatcher=(debug > 0))
 
     def GetDisplayNameOf(self, pidl, flags):
-        ## return full path for sys.path dirs, since they don't appear under a parent folder
+        # return full path for sys.path dirs, since they don't appear under a parent folder
         final_pidl = pidl[-1]
         display_name = final_pidl.split("\0")[-1]
         return display_name
@@ -844,7 +850,7 @@ class ScintillaShellView:
 
         self._SetupLexer()
         self._SendSci(scintillacon.SCI_ADDTEXT, len(file_data), file_data)
-        if self.lineno != None:
+        if self.lineno is not None:
             self._SendSci(scintillacon.SCI_GOTOLINE, self.lineno)
         print("Scintilla's hwnd is", self.hwnd)
 

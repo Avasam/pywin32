@@ -4,9 +4,11 @@ The format of the ColInfo stream is apparently undocumented, but
 it can be read raw from one folder and copied to another's view state.
 """
 
-from win32com.shell import shell, shellcon
+import os
+import sys
+
 import pythoncom
-import os, sys
+from win32com.shell import shell, shellcon
 
 template_folder = os.path.split(sys.executable)[0]
 print("Template folder:", template_folder)
@@ -38,13 +40,13 @@ def update_colinfo(not_used, dir_name, fnames):
                 shellcon.SHGVSPB_FOLDERNODEFAULTS,
                 pythoncom.IID_IPropertyBag,
             )
-            ## not all folders already have column info, and we're replacing it anyway
+            # not all folders already have column info, and we're replacing it anyway
             pb.Write("ColInfo", template_stream)
             iunk = pb.Read("ColInfo", pythoncom.VT_UNKNOWN)
             s = iunk.QueryInterface(pythoncom.IID_IStream)
             s.Write(template_colinfo)
             s = None
-            ## attribute names read from registry, can't find any way to enumerate IPropertyBag
+            # attribute names read from registry, can't find any way to enumerate IPropertyBag
             for attr in (
                 "Address",
                 "Buttons",

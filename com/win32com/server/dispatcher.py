@@ -2,13 +2,15 @@
 
 Please see policy.py for a discussion on dispatchers and policies
 """
-import pythoncom, traceback, win32api
+import traceback
 from sys import exc_info
+from typing import Type, no_type_check
 
-#
+import pythoncom
+import win32api
+import win32com
 from win32com.server.exception import IsCOMServerException
 from win32com.util import IIDToInterfaceName
-import win32com
 
 
 class DispatcherBase:
@@ -23,7 +25,7 @@ class DispatcherBase:
     """
 
     def __init__(self, policyClass, object):
-        self.policy = policyClass(object)
+        self.policy = policyClass
         # The logger we should dump to.  If None, we should send to the
         # default location (typically 'print')
         self.logger = getattr(win32com, "logger", None)
@@ -216,9 +218,7 @@ class DispatcherWin32trace(DispatcherTrace):
         if self.logger is None:
             # If we have no logger, setup our output.
             import win32traceutil  # Sets up everything.
-        self._trace_(
-            "Object with win32trace dispatcher created (object=%s)" % repr(object)
-        )
+        self._trace_("Object with win32trace dispatcher created (object=%s)" % repr)
 
 
 class DispatcherOutputDebugString(DispatcherTrace):
@@ -239,11 +239,12 @@ class DispatcherWin32dbg(DispatcherBase):
     Requires Pythonwin.
     """
 
+    @no_type_check  # pyright: reportUndefinedVariable=false
     def __init__(self, policyClass, ob):
         # No one uses this, and it just causes py2exe to drag all of
         # pythonwin in.
         # import pywin.debugger
-        pywin.debugger.brk()
+        # pywin.debugger.brk()
         print("The DispatcherWin32dbg dispatcher is deprecated!")
         print("Please let me know if this is a problem.")
         print("Uncomment the relevant lines in dispatcher.py to re-enable")
@@ -260,20 +261,22 @@ class DispatcherWin32dbg(DispatcherBase):
         # import pywin.debugger, pywin.debugger.dbgcon
         debug = 0
         try:
-            raise typ(val)
+            raise val if val else Exception
         except Exception:  # AARG - What is this Exception???
             # Use some inside knowledge to borrow a Debugger option which dictates if we
             # stop at "expected" exceptions.
-            debug = pywin.debugger.GetDebugger().get_option(
-                pywin.debugger.dbgcon.OPT_STOP_EXCEPTIONS
-            )
+            # debug = pywin.debugger.GetDebugger().get_option(
+            #     pywin.debugger.dbgcon.OPT_STOP_EXCEPTIONS
+            # )
+            pass
         except:
             debug = 1
         if debug:
-            try:
-                pywin.debugger.post_mortem(tb, typ, val)  # The original exception
-            except:
-                traceback.print_exc()
+            traceback.print_exc()
+            # try:
+            #     pywin.debugger.post_mortem(tb, typ, val)  # The original exception
+            # except:
+            #     traceback.print_exc()
 
         # But still raise it.
         del tb
@@ -283,6 +286,6 @@ class DispatcherWin32dbg(DispatcherBase):
 try:
     import win32trace
 
-    DefaultDebugDispatcher = DispatcherWin32trace
+    DefaultDebugDispatcher: Type[DispatcherTrace] = DispatcherWin32trace
 except ImportError:  # no win32trace module - just use a print based one.
     DefaultDebugDispatcher = DispatcherTrace

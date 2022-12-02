@@ -1,4 +1,9 @@
-import pythoncom, sys, os, time, win32api
+import os
+import sys
+import time
+
+import pythoncom
+import win32api
 from win32com.taskscheduler import taskscheduler
 
 task_name = "test_addtask.job"
@@ -51,7 +56,7 @@ tt.TriggerType = taskscheduler.TASK_TIME_TRIGGER_MONTHLYDATE
 # months can contain multiples in a bitmask, use 1<<(month_nbr-1)
 tt.MonthlyDate_Months = 1 << (
     int(time.strftime("%m", run_time)) - 1
-)  ## corresponds to TASK_JANUARY..TASK_DECEMBER constants
+)  # corresponds to TASK_JANUARY..TASK_DECEMBER constants
 # days too
 tt.MonthlyDate_Days = 1 << (int(time.strftime("%d", run_time)) - 1)
 tr.SetTrigger(tt)

@@ -15,11 +15,14 @@ try:
     from winxpgui import *
 except ImportError:
     from win32gui import *
-from win32gui_struct import *
-import win32con
-import sys, os
-import struct
+
 import array
+import os
+import struct
+import sys
+
+import win32con
+from win32gui_struct import *
 
 this_dir = os.path.split(sys.argv[0])[0]
 
@@ -312,7 +315,7 @@ class MainWindow:
     # Owner-draw related functions.  We only have 1 owner-draw item, but
     # we pretend we have more than that :)
     def OnMeasureItem(self, hwnd, msg, wparam, lparam):
-        ## Last item of MEASUREITEMSTRUCT is a ULONG_PTR
+        # Last item of MEASUREITEMSTRUCT is a ULONG_PTR
         fmt = "5iP"
         buf = PyMakeBuffer(struct.calcsize(fmt), lparam)
         data = struct.unpack(fmt, buf)
@@ -341,7 +344,7 @@ class MainWindow:
         return True
 
     def OnDrawItem(self, hwnd, msg, wparam, lparam):
-        ## lparam is a DRAWITEMSTRUCT
+        # lparam is a DRAWITEMSTRUCT
         fmt = "5i2P4iP"
         data = struct.unpack(fmt, PyGetMemory(lparam, struct.calcsize(fmt)))
         (

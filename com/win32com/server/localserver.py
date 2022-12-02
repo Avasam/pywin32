@@ -13,7 +13,7 @@
 #  wpython.exe LocalServer.py clsid [, clsid]
 import sys
 
-sys.coinit_flags = 2
+sys.coinit_flags = 2  # type: ignore[attr-defined]
 import pythoncom
 import win32api
 from win32com.server import factory

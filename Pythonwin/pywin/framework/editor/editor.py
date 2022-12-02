@@ -17,23 +17,20 @@
 # Note that it will _always_ prompt you if the file in the editor has been modified.
 
 
-import win32ui
+import re
+
+import regex
 import win32api
 import win32con
-import regex
-import re
-import string
-import sys, os
-import traceback
-from pywin.mfc import docview, dialog, afxres
-
+import win32ui
 from pywin.framework.editor import (
-    GetEditorOption,
-    SetEditorOption,
     GetEditorFontOption,
+    GetEditorOption,
     SetEditorFontOption,
+    SetEditorOption,
     defaultCharacterFormat,
 )
+from pywin.mfc import afxres, dialog, docview
 
 patImport = regex.symcomp("import \(<name>.*\)")
 patIndent = regex.compile("^\\([ \t]*[~ \t]\\)")
@@ -42,7 +39,7 @@ ID_LOCATE_FILE = 0xE200
 ID_GOTO_LINE = 0xE2001
 MSG_CHECK_EXTERNAL_FILE = (
     win32con.WM_USER + 1999
-)  ## WARNING: Duplicated in document.py and coloreditor.py
+)  # WARNING: Duplicated in document.py and coloreditor.py
 
 # Key Codes that modify the bufffer when Ctrl or Alt are NOT pressed.
 MODIFYING_VK_KEYS = [

@@ -8,11 +8,12 @@ warnings.warn(
     category=PendingDeprecationWarning,
 )
 
-import win32con
-import regutil
-import win32api
 import os
 import sys
+
+import regutil
+import win32api
+import win32con
 
 
 def CheckRegisteredExe(exename):
@@ -40,6 +41,7 @@ def CheckPythonPaths(verbose):
     # Check the core path
     if verbose:
         print("\tCore Path:", end=" ")
+    appPath = ""
     try:
         appPath = win32api.RegQueryValue(
             regutil.GetRootKey(), regutil.BuildDefaultPythonKey() + "\\PythonPath"
@@ -49,14 +51,13 @@ def CheckPythonPaths(verbose):
     problem = CheckPathString(appPath)
     if problem:
         print(problem)
-    else:
-        if verbose:
-            print(appPath)
+    elif verbose:
+        print(appPath)
 
     key = win32api.RegOpenKey(
         regutil.GetRootKey(),
         regutil.BuildDefaultPythonKey() + "\\PythonPath",
-        0,
+        False,
         win32con.KEY_READ,
     )
     try:
@@ -91,7 +92,7 @@ def CheckHelpFiles(verbose):
         key = win32api.RegOpenKey(
             regutil.GetRootKey(),
             regutil.BuildDefaultPythonKey() + "\\Help",
-            0,
+            False,
             win32con.KEY_READ,
         )
     except win32api.error as exc:

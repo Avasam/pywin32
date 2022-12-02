@@ -1,10 +1,14 @@
 ## demonstrates using BackupRead and BackupWrite to copy all of a file's data streams
 
-import win32file, win32api, win32con, win32security, ntsecuritycon
+import ntsecuritycon
+import pythoncom
+import pywintypes
+import win32api
+import win32con
+import win32file
+import win32security
+from pywin32_testutil import ob2memory
 from win32com import storagecon
-import pythoncom, pywintypes
-import struct, traceback
-from pywin32_testutil import str2bytes, ob2memory
 
 all_sd_info = (
     win32security.DACL_SECURITY_INFORMATION
@@ -98,7 +102,7 @@ while 1:
     )
     print("Written:", bytes_written, "Context:", outctxt)
 win32file.BackupRead(h, 0, buf, True, True, ctxt)
-win32file.BackupWrite(outh, 0, str2bytes(""), True, True, outctxt)
+win32file.BackupWrite(outh, 0, b"", True, True, outctxt)
 win32file.CloseHandle(h)
 win32file.CloseHandle(outh)
 

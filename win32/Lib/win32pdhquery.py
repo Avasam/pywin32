@@ -9,10 +9,10 @@ the more straightforward Query-based mechanism.
 
 The basic idea of a PDH Query is an object which can query the system
 about the status of any number of "counters."  The counters are paths
-to a particular piece of performance data.  For instance, the path 
+to a particular piece of performance data.  For instance, the path
 '\\Memory\\Available Bytes' describes just about exactly what it says
-it does, the amount of free memory on the default computer expressed 
-in Bytes.  These paths can be considerably more complex than this, 
+it does, the amount of free memory on the default computer expressed
+in Bytes.  These paths can be considerably more complex than this,
 but part of the point of this wrapper module is to hide that
 complexity from the end-user/programmer.
 
@@ -27,17 +27,17 @@ EXAMPLE: Collecting Data with a Query
 	As an example, the following code implements a logger which allows the
 	user to choose what counters they would like to log, and logs those
 	counters for 30 seconds, at two-second intervals.
-	
+
 	query = Query()
 	query.addcounterbybrowsing()
 	query.collectdatafor(30,2)
-	
+
 	The data is now stored in a list of lists as:
 	query.curresults
-	
+
 	The counters(paths) which were used to collect the data are:
 	query.curpaths
-	
+
 	You can use the win32pdh.ParseCounterPath(path) utility function
 	to turn the paths into more easily read values for your task, or
 	write the data to a file, or do whatever you want with it.
@@ -79,7 +79,7 @@ generated browser window is often hidden behind other windows.  No known
 workaround other than Alt-tabing to reach the browser window.
 
 ### Other References ###
-The win32pdhutil module (which should be in the %pythonroot%/win32/lib 
+The win32pdhutil module (which should be in the %pythonroot%/win32/lib
 directory) provides quick-and-dirty utilities for one-off access to
 variables from the PDH.  Almost everything in that module can be done
 with a Query object, but it provides task-oriented functions for a
@@ -96,7 +96,7 @@ http://msdn.microsoft.com/library/en-us/perfmon/base/using_the_pdh_interface.asp
 
 In general the Python version of the API is just a wrapper around the
 Query-based version of this API (as far as I can see), so you can learn what
-you need to from there.  From what I understand, the MSDN Online 
+you need to from there.  From what I understand, the MSDN Online
 resources are available for the price of signing up for them.  I can't
 guarantee how long that's supposed to last. (Or anything for that
 matter).
@@ -125,7 +125,12 @@ if you use it, you accept the risk of using it, etceteras.
 """
 # Feb 12, 98 - MH added "rawaddcounter" so caller can get exception details.
 
-import win32pdh, win32api, time, _thread, copy
+import _thread
+import copy
+import time
+
+import win32api
+import win32pdh
 
 
 class BaseQuery:
@@ -227,6 +232,7 @@ class BaseQuery:
             # curpaths are made accessible here because of the possibility of volatile paths
             # which may be dynamically altered by subclasses.
             self.curpaths = copy.copy(self.paths)
+            base = None
             try:
                 base = win32pdh.OpenQuery()
                 for path in self.paths:
@@ -239,10 +245,7 @@ class BaseQuery:
                 self.active = 1
                 return 0  # open succeeded
             except:  # if we encounter any errors, kill the Query
-                try:
-                    self.killbase(base)
-                except NameError:  # failed in creating query
-                    pass
+                self.killbase(base)
                 self.active = 0
                 self.curpaths = []
                 raise QueryError(self)
@@ -429,13 +432,13 @@ class Query(BaseQuery):
         # find out how many instances of this element we have...
         instances.sort()
         try:
-            cur = instances.index(object)
+            cur = instances.index
         except ValueError:
             return []  # no instances of this object
         temp = [object]
         try:
             while instances[cur + 1] == object:
-                temp.append(object)
+                temp.append
                 cur = cur + 1
         except IndexError:  # if we went over the end
             pass
@@ -554,7 +557,7 @@ class Query(BaseQuery):
         self.volatilecounters = volatilecounters
 
 
-class QueryError:
+class QueryError(Exception):
     def __init__(self, query):
         self.query = query
 

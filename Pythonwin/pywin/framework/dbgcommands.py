@@ -3,10 +3,12 @@
 # Not in the debugger package, as I always want these interfaces to be
 # available, even if the debugger has not yet been (or can not be)
 # imported
-import win32ui, win32con
-from . import scriptutils
 import warnings
+
+import win32ui
 from pywin.scintilla.control import CScintillaEditInterface
+
+from . import scriptutils
 
 IdToBarNames = {
     win32ui.IDC_DBG_STACK: ("Stack", 0),
@@ -97,12 +99,12 @@ class DebuggerCommandHandler:
     def OnAdd(self, msg, code):
         doc, view = scriptutils.GetActiveEditorDocument()
         if doc is None:
-            ## Don't do a messagebox, as this could be triggered from the app's
-            ## idle loop whenever the debug toolbar is visible, giving a never-ending
-            ## series of dialogs.  This can happen when the OnUpdate handler
-            ## for the toolbar button IDC_DBG_ADD fails, since MFC falls back to
-            ## sending a normal command if the UI update command fails.
-            ## win32ui.MessageBox('There is no active window - no breakpoint can be added')
+            # Don't do a messagebox, as this could be triggered from the app's
+            # idle loop whenever the debug toolbar is visible, giving a never-ending
+            # series of dialogs.  This can happen when the OnUpdate handler
+            # for the toolbar button IDC_DBG_ADD fails, since MFC falls back to
+            # sending a normal command if the UI update command fails.
+            # win32ui.MessageBox('There is no active window - no breakpoint can be added')
             warnings.warn("There is no active window - no breakpoint can be added")
             return None
         pathName = doc.GetPathName()

@@ -1,6 +1,12 @@
 fname = "h:\\tmp.reg"
 
-import win32api, win32con, win32security, ntsecuritycon, pywintypes, os
+import os
+
+import ntsecuritycon
+import pywintypes
+import win32api
+import win32con
+import win32security
 
 ## regsave will not overwrite a file
 if os.path.isfile(fname):
@@ -32,9 +38,9 @@ win32security.AdjustTokenPrivileges(th, 0, new_privs)
 my_sid = win32security.GetTokenInformation(th, ntsecuritycon.TokenUser)[0]
 
 hklm = win32api.RegOpenKey(
-    win32con.HKEY_LOCAL_MACHINE, None, 0, win32con.KEY_ALL_ACCESS
+    win32con.HKEY_LOCAL_MACHINE, None, False, win32con.KEY_ALL_ACCESS
 )
-skey = win32api.RegOpenKey(hklm, "SYSTEM", 0, win32con.KEY_ALL_ACCESS)
+skey = win32api.RegOpenKey(hklm, "SYSTEM", False, win32con.KEY_ALL_ACCESS)
 
 sa = pywintypes.SECURITY_ATTRIBUTES()
 sd = pywintypes.SECURITY_DESCRIPTOR()

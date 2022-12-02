@@ -1,9 +1,9 @@
 # CallTips.py - An IDLE extension that provides "Call Tips" - ie, a floating window that
 # displays parameter information as you open parens.
 
+import inspect
 import string
 import sys
-import inspect
 import traceback
 
 
@@ -141,8 +141,8 @@ def get_arg_text(ob):
                 doc = doc.strip()
                 pos = doc.find("\n")
             except AttributeError:
-                ## New style classes may have __doc__ slot without actually
-                ## having a string assigned to it
+                # New style classes may have __doc__ slot without actually
+                # having a string assigned to it
                 pass
             else:
                 if pos < 0 or pos > 70:

@@ -1,10 +1,11 @@
 import sys
-from win32com.axscript.server.error import Exception
+
+import pythoncom
+import win32com.server.policy
 from win32com.axscript import axscript
 from win32com.axscript.server import axsite
-import pythoncom
-from win32com.server import util, connect
-import win32com.server.policy
+from win32com.axscript.server.error import Exception
+from win32com.server import connect, util
 
 
 class MySite(axsite.AXSite):
@@ -78,7 +79,7 @@ prop = "Property Value"
 sub hello(arg1)
    test.echo arg1
 end sub
-  
+
 sub testcollection
    test.verbose = 1
    for each item in test.collection
@@ -86,16 +87,14 @@ sub testcollection
    next
 end sub
 """
-if sys.version_info < (3,):
-    PyScript = """print "PyScript is being parsed..."\n"""
-else:
-    PyScript = """print("PyScript is being parsed...")\n"""
-PyScript += """\
+PyScript = """\
+print("PyScript is being parsed...")
+
 prop = "Property Value"
 def hello(arg1):
    test.echo(arg1)
    pass
-   
+
 def testcollection():
    test.verbose = 1
 #   test.collection[1] = "New one"
@@ -111,9 +110,7 @@ bad code for everyone!
 
 def TestEngine(engineName, code, bShouldWork=1):
     echoer = Test()
-    model = {
-        "test": util.wrap(echoer),
-    }
+    model = {"test": util.wrap(echoer)}
 
     site = MySite(model)
     engine = site._AddEngine(engineName)

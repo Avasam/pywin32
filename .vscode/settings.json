@@ -1,0 +1,69 @@
+{
+    // Don't format on save for formatters we don't explicitely control
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": false
+    },
+    // Set file associations to support comments syntax highlight
+    "files.associations": {
+        ".flake8": "properties",
+        "stubtest_allowlist*.txt": "properties",
+        "**/stubtest_allowlists/*.txt": "properties",
+        "pytype_exclude_list.txt": "properties",
+        "pyrightconfig*.json": "jsonc"
+    },
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "editor.comments.insertSpace": true,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2,
+    "[json][jsonc][python]": {
+        "editor.tabSize": 4,
+    },
+    "[git-commit]": {
+        "editor.rulers": [
+            72
+        ]
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.rulers": [
+            88
+        ],
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": true,
+            "source.fixAll.unusedImports": true,
+            "source.fixAll.convertImportFormat": true,
+            "source.organizeImports": false
+        },
+    },
+    // Important to follow the config in pyrightconfig.json
+    "python.analysis.useLibraryCodeForTypes": false,
+    "python.linting.enabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyArgs": [
+        "--show-column-numbers",
+        "--no-pretty",
+        "--python-version=3.7"
+    ],
+    "isort.check": true,
+    "isort.importStrategy": "fromEnvironment",
+    // Not using bandit
+    "python.linting.banditEnabled": false,
+    // Using dedicated Flake8 extension
+    "python.linting.flake8Enabled": false,
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.prospectorEnabled": false,
+    "python.linting.pylamaEnabled": false,
+    // Using the dedicated black extension
+    "python.formatting.provider": "none",
+    // Use the new dedicated extensions instead (and we're not using pylint)
+    "python.linting.pylintEnabled": false,
+    "python.analysis.extraPaths": [
+        "tests"
+    ],
+    "black-formatter.importStrategy": "fromEnvironment",
+}

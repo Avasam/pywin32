@@ -1,54 +1,37 @@
 import os
-import win32com.server.policy
-import win32security, ntsecuritycon, win32con
-import pythoncom, win32api
-from win32com.authorization import authorization
 
+import pythoncom
+import win32api
+import win32com.server.policy
+import win32con
+import win32security
 from ntsecuritycon import (
-    FILE_READ_ATTRIBUTES,
-    FILE_READ_DATA,
-    FILE_READ_EA,
-    SYNCHRONIZE,
-    STANDARD_RIGHTS_READ,
-    STANDARD_RIGHTS_WRITE,
-    STANDARD_RIGHTS_EXECUTE,
+    CONTAINER_INHERIT_ACE,
+    FILE_ALL_ACCESS,
     FILE_APPEND_DATA,
-    FILE_WRITE_ATTRIBUTES,
+    FILE_GENERIC_EXECUTE,
+    FILE_GENERIC_READ,
+    FILE_GENERIC_WRITE,
     FILE_WRITE_DATA,
-    FILE_WRITE_EA,
-    WRITE_OWNER,
-    WRITE_DAC,
+    OBJECT_INHERIT_ACE,
     READ_CONTROL,
+    SI_ACCESS_GENERAL,
+    SI_ACCESS_SPECIFIC,
     SI_ADVANCED,
-    SI_EDIT_AUDITS,
-    SI_EDIT_PROPERTIES,
+    SI_CONTAINER,
     SI_EDIT_ALL,
     SI_PAGE_TITLE,
     SI_RESET,
-    SI_ACCESS_SPECIFIC,
-    SI_ACCESS_GENERAL,
-    SI_ACCESS_CONTAINER,
-    SI_ACCESS_PROPERTY,
-    FILE_ALL_ACCESS,
-    FILE_GENERIC_READ,
-    FILE_GENERIC_WRITE,
-    FILE_GENERIC_EXECUTE,
-    OBJECT_INHERIT_ACE,
-    CONTAINER_INHERIT_ACE,
-    INHERIT_ONLY_ACE,
-    SI_PAGE_PERM,
-    SI_PAGE_ADVPERM,
-    SI_PAGE_AUDIT,
-    SI_PAGE_OWNER,
-    PSPCB_SI_INITDIALOG,
-    SI_CONTAINER,
+    WRITE_DAC,
+    WRITE_OWNER,
 )
-from win32security import OBJECT_INHERIT_ACE, CONTAINER_INHERIT_ACE, INHERIT_ONLY_ACE
-from win32com.shell.shellcon import (
-    PSPCB_RELEASE,
-    PSPCB_CREATE,
-)  ## Msg parameter to PropertySheetPageCallback
 from pythoncom import IID_NULL
+from win32com.authorization import authorization
+from win32com.shell.shellcon import (  # Msg parameter to PropertySheetPageCallback
+    PSPCB_CREATE,
+    PSPCB_RELEASE,
+)
+from win32security import CONTAINER_INHERIT_ACE, INHERIT_ONLY_ACE, OBJECT_INHERIT_ACE
 
 
 class SecurityInformation(win32com.server.policy.DesignatedWrapPolicy):
@@ -73,8 +56,8 @@ class SecurityInformation(win32com.server.policy.DesignatedWrapPolicy):
         flags = SI_ADVANCED | SI_EDIT_ALL | SI_PAGE_TITLE | SI_RESET
         if os.path.isdir(self.FileName):
             flags |= SI_CONTAINER
-        hinstance = 0  ## handle to module containing string resources
-        servername = ""  ## name of authenticating server if not local machine
+        hinstance = 0  # handle to module containing string resources
+        servername = ""  # name of authenticating server if not local machine
         objectname = os.path.split(self.FileName)[1]
         pagetitle = "Python ACL Editor"
         if os.path.isdir(self.FileName):
@@ -87,12 +70,12 @@ class SecurityInformation(win32com.server.policy.DesignatedWrapPolicy):
     def GetSecurity(self, requestedinfo, bdefault):
         """Requests the existing permissions for object"""
         if bdefault:
-            ## This is invoked if the 'Default' button is pressed (only present if SI_RESET is passed
-            ## with the flags in GetObjectInfo). Passing an empty SD with a NULL Dacl
-            ##  should cause inherited ACL from parent dir or default dacl from user's token to be used
+            # This is invoked if the 'Default' button is pressed (only present if SI_RESET is passed
+            # with the flags in GetObjectInfo). Passing an empty SD with a NULL Dacl
+            #  should cause inherited ACL from parent dir or default dacl from user's token to be used
             return win32security.SECURITY_DESCRIPTOR()
         else:
-            ## GetFileSecurity sometimes fails to return flags indicating that an ACE is inherited
+            # GetFileSecurity sometimes fails to return flags indicating that an ACE is inherited
             return win32security.GetNamedSecurityInfo(
                 self.FileName, win32security.SE_FILE_OBJECT, requestedinfo
             )
@@ -112,7 +95,7 @@ class SecurityInformation(win32com.server.policy.DesignatedWrapPolicy):
             dacl,
             sacl,
         )
-        ## should also handle recursive operations here
+        # should also handle recursive operations here
 
     def GetAccessRights(self, objecttype, flags):
         """Returns a tuple of (AccessRights, DefaultAccess), where AccessRights is a sequence of tuples representing
@@ -121,10 +104,10 @@ class SecurityInformation(win32com.server.policy.DesignatedWrapPolicy):
         Flags can contain SI_ACCESS_SPECIFIC,SI_ACCESS_GENERAL,SI_ACCESS_CONTAINER,SI_ACCESS_PROPERTY,
               CONTAINER_INHERIT_ACE,INHERIT_ONLY_ACE,OBJECT_INHERIT_ACE
         """
-        ## input flags: SI_ADVANCED,SI_EDIT_AUDITS,SI_EDIT_PROPERTIES indicating which property sheet is requesting the rights
+        # input flags: SI_ADVANCED,SI_EDIT_AUDITS,SI_EDIT_PROPERTIES indicating which property sheet is requesting the rights
         if (objecttype is not None) and (objecttype != IID_NULL):
-            ## Should not be true for file objects.  Usually only used with DS objects that support security for
-            ## their properties
+            # Should not be true for file objects.  Usually only used with DS objects that support security for
+            # their properties
             raise NotImplementedError("Object type is not supported")
 
         if os.path.isdir(self.FileName):
@@ -225,8 +208,8 @@ class SecurityInformation(win32com.server.policy.DesignatedWrapPolicy):
 
     def PropertySheetPageCallback(self, hwnd, msg, pagetype):
         """Invoked each time a property sheet page is created or destroyed."""
-        ## page types from SI_PAGE_TYPE enum: SI_PAGE_PERM SI_PAGE_ADVPERM SI_PAGE_AUDIT SI_PAGE_OWNER
-        ## msg: PSPCB_CREATE, PSPCB_RELEASE, PSPCB_SI_INITDIALOG
+        # page types from SI_PAGE_TYPE enum: SI_PAGE_PERM SI_PAGE_ADVPERM SI_PAGE_AUDIT SI_PAGE_OWNER
+        # msg: PSPCB_CREATE, PSPCB_RELEASE, PSPCB_SI_INITDIALOG
         return None
 
     def EditSecurity(self, owner_hwnd=0):

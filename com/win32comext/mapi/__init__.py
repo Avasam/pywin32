@@ -1,4 +1,4 @@
-if type(__path__) == type(""):
+if isinstance(__path__, str):
     # For freeze to work!
     import sys
 
@@ -9,13 +9,13 @@ if type(__path__) == type(""):
     except ImportError:
         pass
     try:
-        import exchange
+        import exchange  # pyright: ignore[reportMissingImports]
 
         sys.modules["win32com.mapi.exchange"] = exchange
     except ImportError:
         pass
     try:
-        import exchdapi
+        import exchdapi  # pyright: ignore[reportMissingImports]
 
         sys.modules["win32com.mapi.exchdapi"] = exchdapi
     except ImportError:

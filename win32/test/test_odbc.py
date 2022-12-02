@@ -1,16 +1,16 @@
 # odbc test suite kindly contributed by Frank Millman.
-import sys
 import os
-import unittest
-import odbc
+import sys
 import tempfile
+import unittest
 
-from pywin32_testutil import str2bytes, str2memory, TestSkipped
+import odbc
+import pythoncom
+from pywin32_testutil import TestSkipped, str2memory
+from win32com.client import constants
 
 # We use the DAO ODBC driver
 from win32com.client.gencache import EnsureDispatch
-from win32com.client import constants
-import pythoncom
 
 
 class TestStuff(unittest.TestCase):
@@ -46,19 +46,19 @@ class TestStuff(unittest.TestCase):
             conn_str = "Driver={Microsoft Access Driver (*.mdb)};dbq=%s;Uid=;Pwd=;" % (
                 self.db_filename,
             )
-        ## print 'Connection string:', conn_str
+        # print 'Connection string:', conn_str
         self.conn = odbc.odbc(conn_str)
         # And we expect a 'users' table for these tests.
         self.cur = self.conn.cursor()
-        ## self.cur.setoutputsize(1000)
+        # self.cur.setoutputsize(1000)
         try:
             self.cur.execute("""drop table %s""" % self.tablename)
         except (odbc.error, odbc.progError):
             pass
 
-        ## This needs to be adjusted for sql server syntax for unicode fields
-        ##  - memo -> TEXT
-        ##  - varchar -> nvarchar
+        # This needs to be adjusted for sql server syntax for unicode fields
+        #  - memo -> TEXT
+        #  - varchar -> nvarchar
         self.assertEqual(
             self.cur.execute(
                 """create table %s (
@@ -195,9 +195,7 @@ class TestStuff(unittest.TestCase):
         self._test_val("floatfield", 1.01)
         self._test_val("floatfield", 0)
 
-    def testVarchar(
-        self,
-    ):
+    def testVarchar(self):
         self._test_val("username", "foo")
 
     def testLongVarchar(self):
@@ -209,7 +207,7 @@ class TestStuff(unittest.TestCase):
         self._test_val("longbinaryfield", str2memory("\0\1\2" * 70000))
 
     def testRaw(self):
-        ## Test binary data
+        # Test binary data
         self._test_val("rawfield", str2memory("\1\2\3\4\0\5\6\7\8"))
 
     def test_widechar(self):
@@ -244,7 +242,7 @@ class TestStuff(unittest.TestCase):
         self.assertEqual(
             self.cur.execute(
                 "insert into %s (userid,username) " "values (?,?)" % self.tablename,
-                [str2bytes("Frank"), ""],
+                [b"Frank", ""],
             ),
             1,
         )

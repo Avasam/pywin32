@@ -26,29 +26,25 @@
 # XXX - the above makes sense in terms of what is built and passed to
 # win32gui (ie, the Pack* functions) - but doesn't make as much sense for
 # the Unpack* functions, where the aim is user convenience.
+from __future__ import annotations
 
-import sys
-import win32gui
-import win32con
-import struct
 import array
+import struct
+import sys
+from collections import namedtuple
+
 import commctrl
 import pywintypes
+import win32con
+import win32gui
 
 is64bit = "64 bit" in sys.version
 
-try:
-    from collections import namedtuple
 
-    def _MakeResult(names_str, values):
-        names = names_str.split()
-        nt = namedtuple(names[0], names[1:])
-        return nt(*values)
-
-except ImportError:
-    # no namedtuple support - just return the values as a normal tuple.
-    def _MakeResult(names_str, values):
-        return values
+def _MakeResult(names_str, values):
+    names = names_str.split()
+    nt = namedtuple(names[0], names[1:])
+    return nt(*values)
 
 
 _nmhdr_fmt = "PPi"
@@ -60,25 +56,13 @@ else:
     _nmhdr_align_padding = ""
 
 # Encode a string suitable for passing in a win32gui related structure
-# If win32gui is built with UNICODE defined (ie, py3k), then functions
-# like InsertMenuItem are actually calling InsertMenuItemW etc, so all
-# strings will need to be unicode.
-if win32gui.UNICODE:
-
-    def _make_text_buffer(text):
-        # XXX - at this stage win32gui.UNICODE is only True in py3k,
-        # and in py3k is makes sense to reject bytes.
-        if not isinstance(text, str):
-            raise TypeError("MENUITEMINFO text must be unicode")
-        data = (text + "\0").encode("utf-16le")
-        return array.array("b", data)
-
-else:
-
-    def _make_text_buffer(text):
-        if isinstance(text, str):
-            text = text.encode("mbcs")
-        return array.array("b", text + "\0")
+def _make_text_buffer(text: str):
+    # Note: win32gui.UNICODE is always True in py3k,
+    # and in py3k is makes sense to reject bytes.
+    if not isinstance(text, str):
+        raise TypeError("MENUITEMINFO text must be unicode")
+    data = (text + "\0").encode("utf-16le")
+    return array.array("b", data)
 
 
 # make an 'empty' buffer, ready for filling with cch characters.
@@ -86,21 +70,12 @@ def _make_empty_text_buffer(cch):
     return _make_text_buffer("\0" * cch)
 
 
-if sys.version_info < (3, 0):
+def _make_memory(ob):
+    return bytes(memoryview(ob))
 
-    def _make_memory(ob):
-        return str(buffer(ob))
 
-    def _make_bytes(sval):
-        return sval
-
-else:
-
-    def _make_memory(ob):
-        return bytes(memoryview(ob))
-
-    def _make_bytes(sval):
-        return sval.encode("ascii")
+def _make_bytes(sval):
+    return sval.encode("ascii")
 
 
 # Generic WM_NOTIFY unpacking
@@ -354,13 +329,13 @@ def PackMENUINFO(
     # Create the struct.
     item = struct.pack(
         _menuinfo_fmt,
-        struct.calcsize(_menuinfo_fmt),  # cbSize
+        struct.calcsize(_menuinfo_fmt),
         fMask,
         dwStyle,
         cyMax,
         hbrBack,
         dwContextHelpID,
-        dwMenuData,
+        dwMenuData,  # cbSize
     )
     return array.array("b", item)
 
@@ -467,12 +442,12 @@ def PackTVITEM(hitem, state, stateMask, text, image, selimage, citems, param):
         state,
         stateMask,
         text_addr,
-        text_len,  # text
+        text_len,
         image,
         selimage,
         citems,
         param,
-    )
+    )  # text
     return array.array("b", buf), extra
 
 
@@ -496,8 +471,8 @@ def EmptyTVITEM(hitem, mask=None, text_buf_size=512):
     else:
         text_addr = text_buf_size = 0
     buf = struct.pack(
-        _tvitem_fmt, mask, hitem, 0, 0, text_addr, text_buf_size, 0, 0, 0, 0  # text
-    )
+        _tvitem_fmt, mask, hitem, 0, 0, text_addr, text_buf_size, 0, 0, 0, 0
+    )  # text
     return array.array("b", buf), extra
 
 
@@ -637,11 +612,11 @@ def PackLVITEM(
         state,
         stateMask,
         text_addr,
-        text_len,  # text
+        text_len,
         image,
         param,
         indent,
-    )
+    )  # text
     return array.array("b", buf), extra
 
 
@@ -755,18 +730,8 @@ def EmptyLVITEM(item, subitem, mask=None, text_buf_size=512):
     else:
         text_addr = text_buf_size = 0
     buf = struct.pack(
-        _lvitem_fmt,
-        mask,
-        item,
-        subitem,
-        0,
-        0,
-        text_addr,
-        text_buf_size,  # text
-        0,
-        0,
-        0,
-    )
+        _lvitem_fmt, mask, item, subitem, 0, 0, text_addr, text_buf_size, 0, 0, 0
+    )  # text
     return array.array("b", buf), extra
 
 
@@ -791,8 +756,8 @@ def PackLVCOLUMN(fmt=None, cx=None, text=None, subItem=None, image=None, order=N
         text_addr, _ = text_buffer.buffer_info()
         text_len = len(text)
     buf = struct.pack(
-        _lvcolumn_fmt, mask, fmt, cx, text_addr, text_len, subItem, image, order  # text
-    )
+        _lvcolumn_fmt, mask, fmt, cx, text_addr, text_len, subItem, image, order
+    )  # text
     return array.array("b", buf), extra
 
 
@@ -842,8 +807,8 @@ def EmptyLVCOLUMN(mask=None, text_buf_size=512):
     else:
         text_addr = text_buf_size = 0
     buf = struct.pack(
-        _lvcolumn_fmt, mask, 0, 0, text_addr, text_buf_size, 0, 0, 0  # text
-    )
+        _lvcolumn_fmt, mask, 0, 0, text_addr, text_buf_size, 0, 0, 0
+    )  # text
     return array.array("b", buf), extra
 
 
@@ -925,15 +890,10 @@ def PackDEV_BROADCAST_VOLUME(unitmask, flags):
 
 
 def PackDEV_BROADCAST_DEVICEINTERFACE(classguid, name=""):
-    if win32gui.UNICODE:
-        # This really means "is py3k?" - so not accepting bytes is OK
-        if not isinstance(name, str):
-            raise TypeError("Must provide unicode for the name")
-        name = name.encode("utf-16le")
-    else:
-        # py2k was passed a unicode object - encode as mbcs.
-        if isinstance(name, str):
-            name = name.encode("mbcs")
+    # Not accepting bytes since py3k
+    if not isinstance(name, str):
+        raise TypeError("Must provide unicode for the name")
+    name = name.encode("utf-16le")
 
     # 16 bytes for the IID followed by \0 term'd string.
     rest_fmt = "16s%ds" % len(name)

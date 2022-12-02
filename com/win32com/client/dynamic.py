@@ -15,17 +15,15 @@ Example
  >>> xl.Visible = 1 # The Excel window becomes visible.
 
 """
-import sys
 import traceback
 import types
 
 import pythoncom
+import win32com.client  # Needed as code we eval() references it.
 import winerror
-from . import build
-
 from pywintypes import IIDType
 
-import win32com.client  # Needed as code we eval() references it.
+from . import build
 
 debugging = 0  # General debugging
 debugging_attr = 0  # Debugging dynamic attribute lookups.
@@ -100,7 +98,7 @@ def _GetGoodDispatchAndUserName(IDispatch, userName, clsctx):
     if userName is None:
         if isinstance(IDispatch, str):
             userName = IDispatch
-        ## ??? else userName remains None ???
+        # ??? else userName remains None ???
     else:
         userName = str(userName)
     return (_GetGoodDispatch(IDispatch, clsctx), userName)

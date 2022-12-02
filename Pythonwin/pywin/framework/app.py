@@ -4,16 +4,16 @@
 #
 # We also grab the FileOpen command, to invoke our Python editor
 " The PythonWin application code. Manages most aspects of MDI, etc "
-import win32con
-import win32api
-import win32ui
-import sys
-import string
 import os
-from pywin.mfc import window, dialog, afxres
-from pywin.mfc.thread import WinApp
+import sys
 import traceback
+
 import regutil
+import win32api
+import win32con
+import win32ui
+from pywin.mfc import afxres, dialog, window
+from pywin.mfc.thread import WinApp
 
 from . import scriptutils
 
@@ -363,7 +363,13 @@ class AboutBox(dialog.Dialog):
     def OnInitDialog(self):
         text = (
             "Pythonwin - Python IDE and GUI Framework for Windows.\n\n%s\n\nPython is %s\n\n%s\n\n%s\n\n%s"
-            % (win32ui.copyright, sys.copyright, scintilla, idle, contributors)
+            % (
+                win32ui.copyright,
+                sys.copyright,
+                scintilla,
+                idle,
+                contributors,
+            )
         )
         self.SetDlgItemText(win32ui.IDC_EDIT1, text)
         # Get the build number - written by installers.
@@ -408,7 +414,7 @@ def Win32RawInput(prompt=None):
     if prompt is None:
         prompt = ""
     ret = dialog.GetSimpleInput(prompt)
-    if ret == None:
+    if ret is None:
         raise KeyboardInterrupt("operation cancelled")
     return ret
 
@@ -419,16 +425,7 @@ def Win32Input(prompt=None):
 
 
 def HookInput():
-    try:
-        raw_input
-        # must be py2x...
-        sys.modules["__builtin__"].raw_input = Win32RawInput
-        sys.modules["__builtin__"].input = Win32Input
-    except NameError:
-        # must be py3k
-        import code
-
-        sys.modules["builtins"].input = Win32RawInput
+    sys.modules["builtins"].input = Win32RawInput
 
 
 def HaveGoodGUI():

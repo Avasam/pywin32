@@ -1,4 +1,6 @@
-import win32security, ntsecuritycon, winnt
+import ntsecuritycon
+import win32security
+import winnt
 
 
 class Enum:
@@ -192,10 +194,10 @@ ACCESS_MODE = Enum(
 
 # Bit flags in PSECURITY_DESCRIPTOR->Control - not a real enum
 SECURITY_DESCRIPTOR_CONTROL_FLAGS = Enum(
-    "SE_DACL_AUTO_INHERITED",  ## win2k and up
-    "SE_SACL_AUTO_INHERITED",  ## win2k and up
-    "SE_DACL_PROTECTED",  ## win2k and up
-    "SE_SACL_PROTECTED",  ## win2k and up
+    "SE_DACL_AUTO_INHERITED",  # win2k and up
+    "SE_SACL_AUTO_INHERITED",  # win2k and up
+    "SE_DACL_PROTECTED",  # win2k and up
+    "SE_SACL_PROTECTED",  # win2k and up
     "SE_DACL_DEFAULTED",
     "SE_DACL_PRESENT",
     "SE_GROUP_DEFAULTED",

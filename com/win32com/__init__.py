@@ -2,14 +2,17 @@
 # Initialization for the win32com package
 #
 
-import win32api, sys, os
+import os
+import sys
+
 import pythoncom
+import win32api
 
 # flag if we are in a "frozen" build.
 _frozen = getattr(sys, "frozen", 1 == 0)
 # pythoncom dumbly defaults this to zero - we believe sys.frozen over it.
 if _frozen and not getattr(pythoncom, "frozen", 0):
-    pythoncom.frozen = sys.frozen
+    pythoncom.frozen = sys.frozen  # type: ignore[attr-defined]
 
 # Add support for an external "COM Extensions" path.
 #  Concept is that you can register a seperate path to be used for
@@ -30,7 +33,7 @@ def SetupEnvironment():
     # Open the root key once, as this is quite slow on NT.
     try:
         keyName = "SOFTWARE\\Python\\PythonCore\\%s\\PythonPath\\win32com" % sys.winver
-        key = win32api.RegOpenKey(HKEY_LOCAL_MACHINE, keyName, 0, KEY_QUERY_VALUE)
+        key = win32api.RegOpenKey(HKEY_LOCAL_MACHINE, keyName, False, KEY_QUERY_VALUE)
     except (win32api.error, AttributeError):
         key = None
 
@@ -91,7 +94,7 @@ if not _frozen:
 # a package.
 if not __gen_path__:
     try:
-        import win32com.gen_py
+        import win32com.gen_py  # pyright: ignore[reportMissingImports]
 
         # hrmph - 3.3 throws: TypeError: '_NamespacePath' object does not support indexing
         # attempting to get __path__[0] - but I can't quickly repro this stand-alone.

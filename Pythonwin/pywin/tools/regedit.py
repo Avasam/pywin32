@@ -1,9 +1,13 @@
 # Regedit - a Registry Editor for Python
-import win32api, win32ui, win32con, commctrl
-from pywin.mfc import window, docview, dialog
-from . import hierlist
+
+import commctrl
 import regutil
-import string
+import win32api
+import win32con
+import win32ui
+from pywin.mfc import dialog, docview, window
+
+from . import hierlist
 
 
 def SafeApply(fn, args, err_desc=""):
@@ -264,7 +268,7 @@ class RegistryValueView(docview.ListView):
     def SetItemsCurrentValue(self, item, valueName, value):
         # ** Assumes already checked is a string.
         hkey = win32api.RegOpenKey(
-            item.keyRoot, item.keyName, 0, win32con.KEY_SET_VALUE
+            item.keyRoot, item.keyName, False, win32con.KEY_SET_VALUE
         )
         try:
             win32api.RegSetValueEx(hkey, valueName, 0, win32con.REG_SZ, value)

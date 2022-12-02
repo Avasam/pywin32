@@ -1,4 +1,7 @@
-import pythoncom, time, win32api
+import time
+
+import pythoncom
+import win32api
 from win32com.taskscheduler import taskscheduler
 
 task_name = "test_addtask_2.job"
@@ -26,14 +29,14 @@ t.SetMaxRunTime(20000)  # milliseconds
 t.SetFlags(taskscheduler.TASK_FLAG_DELETE_WHEN_DONE)
 t.SetAccountInformation(
     "", None
-)  ## empty string for account name means to use local system
+)  # empty string for account name means to use local system
 ## None is only valid for local system acct or if task flags contain TASK_FLAG_RUN_ONLY_IF_LOGGED_ON
 
 run_time = time.localtime(time.time() + 60)
 tr_ind, tr = t.CreateTrigger()
 
 tt = tr.GetTrigger()
-tt.Flags = 0  ## flags for a new trigger default to TASK_TRIGGER_FLAG_DISABLED (4), make sure to clear them if not using any
+tt.Flags = 0  # flags for a new trigger default to TASK_TRIGGER_FLAG_DISABLED (4), make sure to clear them if not using any
 tt.TriggerType = taskscheduler.TASK_TIME_TRIGGER_ONCE
 tt.BeginYear = int(time.strftime("%Y", run_time))
 tt.BeginMonth = int(time.strftime("%m", run_time))

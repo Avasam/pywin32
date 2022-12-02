@@ -1,4 +1,7 @@
-import win32api, win32con, win32security, ntsecuritycon
+import ntsecuritycon
+import win32api
+import win32con
+import win32security
 
 new_privs = (
     (
@@ -17,11 +20,11 @@ th = win32security.OpenProcessToken(
 
 win32security.AdjustTokenPrivileges(th, 0, new_privs)
 hkey = win32api.RegOpenKey(
-    win32con.HKEY_LOCAL_MACHINE, None, 0, win32con.KEY_ALL_ACCESS
+    win32con.HKEY_LOCAL_MACHINE, None, False, win32con.KEY_ALL_ACCESS
 )
 win32api.RegCreateKey(hkey, "SYSTEM\\NOTMP")
 notmpkey = win32api.RegOpenKey(
-    hkey, "SYSTEM\\notmp", 0, win32con.ACCESS_SYSTEM_SECURITY
+    hkey, "SYSTEM\\notmp", False, win32con.ACCESS_SYSTEM_SECURITY
 )
 
 tmp_sid = win32security.LookupAccountName("", "tmp")[0]

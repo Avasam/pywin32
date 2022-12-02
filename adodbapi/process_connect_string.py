@@ -1,4 +1,6 @@
 """ a clumsy attempt at a macro language to let the programmer execute code on the server (ex: determine 64bit)"""
+import os
+
 from . import is64bit as is64bit
 
 
@@ -60,7 +62,7 @@ def macro_call(macro_name, args, kwargs):
         elif (
             macro_name == "find_temp_test_path"
         ):  # helper function for testing ado operation -- undocumented
-            import tempfile, os
+            import tempfile
 
             return new_key, os.path.join(
                 tempfile.gettempdir(), "adodbapi_test", args[1]
@@ -84,9 +86,8 @@ def process(
         dsn = args[0]
     except IndexError:
         dsn = None
-    if isinstance(
-        dsn, dict
-    ):  # as a convenience the first argument may be django settings
+    # as a convenience the first argument may be django settings
+    if isinstance(dsn, dict):
         kwargs.update(dsn)
     elif (
         dsn

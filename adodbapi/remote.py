@@ -26,21 +26,19 @@ This module source should run correctly in CPython versions 2.5 and later,
 or IronPython version 2.7 and later,
 or, after running through 2to3.py, CPython 3.0 or later.
 """
+from __future__ import annotations
 
-__version__ = "2.6.0.4"
-version = "adodbapi.remote v" + __version__
-
+import array
+import datetime
 import os
 import sys
-import array
 import time
-import datetime
 
 # Pyro4 is required for server and remote operation --> https://pypi.python.org/pypi/Pyro4/
 try:
     import Pyro4
 except ImportError:
-    print('* * * Sorry, server operation requires Pyro4. Please "pip import" it.')
+    print('* * * Sorry, server operation requires Pyro4. Please "pip install" it.')
     exit(11)
 
 import adodbapi
@@ -48,7 +46,8 @@ import adodbapi.apibase as api
 import adodbapi.process_connect_string
 from adodbapi.apibase import ProgrammingError
 
-_BaseException = api._BaseException
+__version__ = "2.6.0.4"
+version = "adodbapi.remote v" + __version__
 
 sys.excepthook = Pyro4.util.excepthook
 Pyro4.config.PREFER_IP_VERSION = 0  # allow system to prefer IPv6
@@ -61,17 +60,6 @@ except:
     verbose = False
 if verbose:
     print(version)
-
-# --- define objects to smooth out Python3 <-> Python 2.x differences
-unicodeType = str  # this line will be altered by 2to3.py to '= str'
-longType = int  # this line will be altered by 2to3.py to '= int'
-StringTypes = str
-makeByteBuffer = bytes
-memoryViewType = memoryview
-
-# -----------------------------------------------------------
-# conversion functions mandated by PEP 249
-Binary = makeByteBuffer  # override the function from apibase.py
 
 
 def Date(year, month, day):
@@ -121,6 +109,7 @@ def connect(*args, **kwargs):  # --> a remote db-api connection object
     ado_uri = kwargs["pyro_connection"] % kwargs
     # ask PyRO make us a remote connection object
     auto_retry = 3
+    uri: Pyro4.URI | None = None
     while auto_retry:
         try:
             dispatcher = Pyro4.Proxy(ado_uri)
@@ -136,6 +125,7 @@ def connect(*args, **kwargs):  # --> a remote db-api connection object
                 raise api.DatabaseError("Cannot create connection to=%s" % ado_uri)
 
     conn_uri = fix_uri(uri, kwargs)  # get a host connection from the proxy server
+    host_conn: Pyro4.Proxy | None = None
     while auto_retry:
         try:
             host_conn = Pyro4.Proxy(
@@ -150,7 +140,7 @@ def connect(*args, **kwargs):  # --> a remote db-api connection object
                 raise api.DatabaseError(
                     "Cannot create ADO connection object using=%s" % conn_uri
                 )
-    if "comm_timeout" in kwargs:
+    if "comm_timeout" in kwargs and host_conn:
         host_conn._pyroTimeout = float(kwargs["comm_timeout"])
     # make a local clone
     myConn = Connection()
@@ -168,7 +158,7 @@ def connect(*args, **kwargs):  # --> a remote db-api connection object
                 raise api.DatabaseError(
                     "Pyro error creating connection to/thru=%s" % repr(kwargs)
                 )
-        except _BaseException as e:
+        except Exception as e:
             raise api.DatabaseError(
                 "Error creating remote connection to=%s, e=%s, %s"
                 % (repr(kwargs), repr(e), sys.exc_info()[2])
@@ -176,7 +166,7 @@ def connect(*args, **kwargs):  # --> a remote db-api connection object
     return myConn
 
 
-def fix_uri(uri, kwargs):
+def fix_uri(uri: Pyro4.URI, kwargs):
     """convert a generic pyro uri with '0.0.0.0' into the address we actually called"""
     u = uri.asString()
     s = u.split("[::0]")  # IPv6 generic address
@@ -188,7 +178,7 @@ def fix_uri(uri, kwargs):
 
 
 # # # # # ----- the Class that defines a connection ----- # # # # #
-class Connection(object):
+class Connection:
     # include connection attributes required by api definition.
     Warning = api.Warning
     Error = api.Error
@@ -209,7 +199,7 @@ class Connection(object):
         return api
 
     def __init__(self):
-        self.proxy = None
+        self.proxy: Pyro4.Proxy | None = None
         self.kwargs = {}
         self.errorhandler = None
         self.supportsTransactions = False
@@ -217,7 +207,7 @@ class Connection(object):
         self.timeout = 30
         self.cursors = {}
 
-    def connect(self, kwargs, connection_maker):
+    def connect(self, kwargs, connection_maker: Pyro4.Proxy):
         self.kwargs = kwargs
         if verbose:
             print('%s attempting: "%s"' % (version, repr(kwargs)))
@@ -225,7 +215,7 @@ class Connection(object):
         ##try:
         ret = self.proxy.connect(kwargs)  # ask the server to hook us up
         ##except ImportError, e:   # Pyro is trying to import pywinTypes.comerrer
-        ##    self._raiseConnectionError(api.DatabaseError, 'Proxy cannot connect using=%s' % repr(kwargs))
+        #    self._raiseConnectionError(api.DatabaseError, 'Proxy cannot connect using=%s' % repr(kwargs))
         if ret is not True:
             self._raiseConnectionError(
                 api.OperationalError, "Proxy returns error message=%s" % repr(ret)
@@ -255,6 +245,7 @@ class Connection(object):
         ]:  # copy the list, then close each one
             crsr.close()
         try:
+            assert self.proxy
             """close the underlying remote Connection object"""
             self.proxy.close()
             if verbose:
@@ -267,6 +258,7 @@ class Connection(object):
 
     def __del__(self):
         try:
+            assert self.proxy
             self.proxy.close()
         except:
             pass
@@ -278,7 +270,7 @@ class Connection(object):
         this must be initially off. An interface method may be provided to turn it back on.
         Database modules that do not support transactions should implement this method with void functionality.
         """
-        if not self.supportsTransactions:
+        if not self.supportsTransactions or not self.proxy:
             return
         result = self.proxy.commit()
         if result:
@@ -291,6 +283,8 @@ class Connection(object):
         the start of any pending transaction. Closing a connection without committing the changes first will
         cause an implicit rollback to be performed.
         """
+        if not self.proxy:
+            return
         result = self.proxy.rollback()
         if result:
             self._raiseConnectionError(
@@ -328,6 +322,8 @@ class Connection(object):
             raise self.ProgrammingError('No remote access for attribute="%s"' % item)
 
     def getIndexedValue(self, index):
+        if not self.proxy:
+            return
         r = self.proxy.get_attribute_for_remote(index)
         return r
 
@@ -357,6 +353,7 @@ class Connection(object):
             self.commit()
 
     def get_table_names(self):
+        assert self.proxy
         return self.proxy.get_table_names()
 
 
@@ -368,7 +365,7 @@ def fixpickle(x):
         # for 'named' paramstyle user will pass a mapping
         newargs = {}
         for arg, val in list(x.items()):
-            if isinstance(val, memoryViewType):
+            if isinstance(val, memoryview):
                 newval = array.array("B")
                 newval.fromstring(val)
                 newargs[arg] = newval
@@ -378,7 +375,7 @@ def fixpickle(x):
     # if not a mapping, then a sequence
     newargs = []
     for arg in x:
-        if isinstance(arg, memoryViewType):
+        if isinstance(arg, memoryview):
             newarg = array.array("B")
             newarg.fromstring(arg)
             newargs.append(newarg)
@@ -387,12 +384,13 @@ def fixpickle(x):
     return newargs
 
 
-class Cursor(object):
-    def __init__(self, connection):
+class Cursor:
+    def __init__(self, connection: Connection):
+        assert connection.proxy
         self.command = None
-        self.errorhandler = None  ## was: connection.errorhandler
+        self.errorhandler = None  # was: connection.errorhandler
         self.connection = connection
-        self.proxy = self.connection.proxy
+        self.proxy: Pyro4.Proxy = connection.proxy
         self.rs = None  # the fetchable data for this cursor
         self.converters = NotImplemented
         self.id = connection.proxy.build_cursor()
@@ -432,12 +430,17 @@ class Cursor(object):
     def __getattr__(self, key):
         if key == "numberOfColumns":
             try:
-                return len(self.rs[0])
+                # error will be caught
+                return len(self.rs[0])  # pyright: ignore[reportOptionalSubscript]
             except:
                 return 0
         if key == "description":
             try:
-                self.description = self.proxy.crsr_get_description(self.id)[:]
+                self.description = self.proxy.crsr_get_description(
+                    self.id
+                )[  # pyright: ignore[reportOptionalSubscript] # error will be caught
+                    :
+                ]
                 return self.description
             except TypeError:
                 return None
@@ -569,7 +572,7 @@ class Cursor(object):
     def fetchone(self):
         try:
             f1 = self.proxy.crsr_fetchone(self.id)
-        except _BaseException as e:
+        except Exception as e:
             self._raiseCursorError(api.DatabaseError, e)
         else:
             if f1 is None:

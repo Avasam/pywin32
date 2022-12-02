@@ -1,30 +1,45 @@
-import win32com
-import win32com.client
-
-if type(__path__) == type(""):
-    # For freeze to work!
-    import sys
-
-    try:
-        import adsi
-
-        sys.modules["win32com.adsi.adsi"] = adsi
-    except ImportError:
-        pass
-else:
-    # See if we have a special directory for the binaries (for developers)
-    win32com.__PackageSupportBuildPath__(__path__)
-
-
-# Some helpers
-# We want to _look_ like the ADSI module, but provide some additional
-# helpers.
+from typing import TYPE_CHECKING
 
 # Of specific note - most of the interfaces supported by ADSI
 # derive from IDispatch - thus, you get the custome methods from the
 # interface, as well as via IDispatch.
 import pythoncom
-from .adsi import *
+import win32com
+import win32com.client
+
+__all__ = [
+    "LCID",
+    "IDispatchType",
+    "IADsContainerType",
+    "ADSIEnumerator",
+    "ADSIDispatch",
+    "ADsGetObject",
+    "ADsOpenObject",
+]
+
+# Some helpers
+# We want to _look_ like the ADSI module, but provide some additional
+# helpers.
+
+if TYPE_CHECKING:
+    from win32comext.adsi import adsi
+    from win32comext.adsi.adsi import *  # pyright: ignore[reportWildcardImportFromLibrary] # nopycln: import
+else:
+    if isinstance(__path__, str):
+        # For freeze to work!
+        import sys
+
+        try:
+            import adsi
+
+            sys.modules["win32com.adsi.adsi"] = adsi
+        except ImportError:
+            pass
+    else:
+        # See if we have a special directory for the binaries (for developers)
+        win32com.__PackageSupportBuildPath__(__path__)
+
+    from .adsi import *  # pyright: ignore[reportMissingImports]
 
 LCID = 0
 

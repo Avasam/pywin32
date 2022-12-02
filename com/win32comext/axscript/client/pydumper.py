@@ -12,11 +12,10 @@
 # As it is derived from the standard engine, it fully supports Python
 # as a scripting language - meaning the dumps produced can be quite dynamic,
 # and based on the script code you execute.
-
-from . import pyscript
 from win32com.axscript import axscript
 
-from .pyscript import RaiseAssert, trace, Exception, SCRIPTTEXT_FORCEEXECUTION
+from . import pyscript
+from .pyscript import SCRIPTTEXT_FORCEEXECUTION, Exception, RaiseAssert, trace
 
 PyDump_CLSID = "{ac527e60-c693-11d0-9c25-00aa00125a98}"
 

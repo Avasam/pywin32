@@ -5,10 +5,20 @@
 # (which is win32service.error, pywintypes.error, etc)
 # when things go wrong - eg, not enough permissions to hit the
 # registry etc.
+from __future__ import annotations
 
-import win32service, win32api, win32con, winerror
-import sys, pywintypes, os, warnings
 import importlib
+import os
+import sys
+import warnings
+from abc import ABC, abstractmethod
+from collections.abc import Iterable
+
+import pywintypes
+import win32api
+import win32con
+import win32service
+import winerror
 
 _d = "_d" if "_d.pyd" in importlib.machinery.EXTENSION_SUFFIXES else ""
 error = RuntimeError
@@ -71,7 +81,10 @@ def _GetServiceShortName(longName):
         win32con.KEY_READ | win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE
     )
     hkey = win32api.RegOpenKey(
-        win32con.HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services", 0, access
+        win32con.HKEY_LOCAL_MACHINE,
+        "SYSTEM\\CurrentControlSet\\Services",
+        False,
+        access,
     )
     num = win32api.RegQueryInfoKey(hkey)[0]
     longName = longName.lower()
@@ -79,7 +92,7 @@ def _GetServiceShortName(longName):
     for x in range(0, num):
         # find service name, open subkey
         svc = win32api.RegEnumKey(hkey, x)
-        skey = win32api.RegOpenKey(hkey, svc, 0, access)
+        skey = win32api.RegOpenKey(hkey, svc, False, access)
         try:
             # find display name
             thisName = str(win32api.RegQueryValueEx(skey, "DisplayName")[0])
@@ -110,7 +123,7 @@ def LocateSpecificServiceExe(serviceName):
     hkey = win32api.RegOpenKey(
         win32con.HKEY_LOCAL_MACHINE,
         "SYSTEM\\CurrentControlSet\\Services\\%s" % (serviceName),
-        0,
+        False,
         win32con.KEY_ALL_ACCESS,
     )
     try:
@@ -141,7 +154,7 @@ def InstallPerfmonForService(serviceName, iniName, dllName=None):
     hkey = win32api.RegOpenKey(
         win32con.HKEY_LOCAL_MACHINE,
         "SYSTEM\\CurrentControlSet\\Services\\%s" % (serviceName),
-        0,
+        False,
         win32con.KEY_ALL_ACCESS,
     )
     try:
@@ -192,8 +205,8 @@ def InstallService(
     displayName,
     startType=None,
     errorControl=None,
-    bRunInteractive=0,
-    serviceDeps=None,
+    bRunInteractive: bool = False,
+    serviceDeps: Iterable | None = None,
     userName=None,
     password=None,
     exeName=None,
@@ -226,7 +239,7 @@ def InstallService(
             errorControl,  # error control type
             commandLine,
             None,
-            0,
+            False,
             serviceDeps,
             userName,
             password,
@@ -237,7 +250,7 @@ def InstallService(
                     hs, win32service.SERVICE_CONFIG_DESCRIPTION, description
                 )
             except NotImplementedError:
-                pass  ## ChangeServiceConfig2 and description do not exist on NT
+                pass  # ChangeServiceConfig2 and description do not exist on NT
         if delayedstart is not None:
             try:
                 win32service.ChangeServiceConfig2(
@@ -246,7 +259,7 @@ def InstallService(
                     delayedstart,
                 )
             except (win32service.error, NotImplementedError):
-                ## delayed start only exists on Vista and later - warn only when trying to set delayed to True
+                # delayed start only exists on Vista and later - warn only when trying to set delayed to True
                 warnings.warn("Delayed Start not available on this system")
         win32service.CloseServiceHandle(hs)
     finally:
@@ -262,8 +275,8 @@ def ChangeServiceConfig(
     serviceName,
     startType=None,
     errorControl=None,
-    bRunInteractive=0,
-    serviceDeps=None,
+    bRunInteractive: bool = False,
+    serviceDeps: Iterable | None = None,
     userName=None,
     password=None,
     exeName=None,
@@ -307,7 +320,7 @@ def ChangeServiceConfig(
                 errorControl,  # error control type
                 commandLine,
                 None,
-                0,
+                False,
                 serviceDeps,
                 userName,
                 password,
@@ -319,7 +332,7 @@ def ChangeServiceConfig(
                         hs, win32service.SERVICE_CONFIG_DESCRIPTION, description
                     )
                 except NotImplementedError:
-                    pass  ## ChangeServiceConfig2 and description do not exist on NT
+                    pass  # ChangeServiceConfig2 and description do not exist on NT
             if delayedstart is not None:
                 try:
                     win32service.ChangeServiceConfig2(
@@ -328,9 +341,9 @@ def ChangeServiceConfig(
                         delayedstart,
                     )
                 except (win32service.error, NotImplementedError):
-                    ## Delayed start only exists on Vista and later.  On Nt, will raise NotImplementedError since ChangeServiceConfig2
-                    ## doensn't exist.  On Win2k and XP, will fail with ERROR_INVALID_LEVEL
-                    ## Warn only if trying to set delayed to True
+                    # Delayed start only exists on Vista and later.  On Nt, will raise NotImplementedError since ChangeServiceConfig2
+                    # doensn't exist.  On Win2k and XP, will fail with ERROR_INVALID_LEVEL
+                    # Warn only if trying to set delayed to True
                     if delayedstart:
                         warnings.warn("Delayed Start not available on this system")
         finally:
@@ -367,7 +380,7 @@ def SetServiceCustomOption(serviceName, option, value):
         "System\\CurrentControlSet\\Services\\%s\\Parameters" % serviceName,
     )
     try:
-        if type(value) == type(0):
+        if isinstance(value, int):
             win32api.RegSetValueEx(key, option, 0, win32con.REG_DWORD, value)
         else:
             win32api.RegSetValueEx(key, option, 0, win32con.REG_SZ, value)
@@ -722,7 +735,7 @@ def HandleCommandLine(
     perfMonIni = perfMonDll = None
     startup = None
     delayedstart = None
-    interactive = None
+    interactive = False
     waitSecs = 0
     for opt, val in opts:
         if opt == "--username":
@@ -734,12 +747,12 @@ def HandleCommandLine(
         elif opt == "--perfmondll":
             perfMonDll = val
         elif opt == "--interactive":
-            interactive = 1
+            interactive = True
         elif opt == "--startup":
             map = {
                 "manual": win32service.SERVICE_DEMAND_START,
                 "auto": win32service.SERVICE_AUTO_START,
-                "delayed": win32service.SERVICE_AUTO_START,  ## ChangeServiceConfig2 called later
+                "delayed": win32service.SERVICE_AUTO_START,  # ChangeServiceConfig2 called later
                 "disabled": win32service.SERVICE_DISABLED,
             }
             try:
@@ -750,7 +763,7 @@ def HandleCommandLine(
                 delayedstart = True
             elif val.lower() == "auto":
                 delayedstart = False
-            ## else no change
+            # else no change
         elif opt == "--wait":
             try:
                 waitSecs = int(val)
@@ -949,10 +962,34 @@ def HandleCommandLine(
 #
 # Useful base class to build services from.
 #
-class ServiceFramework:
+class ServiceFramework(ABC):
+    # Must define as a property due to the lack of abstract attribute in python
     # Required Attributes:
-    # _svc_name_ = The service name
-    # _svc_display_name_ = The service display name
+    @property  # type: ignore[misc]
+    @classmethod
+    @abstractmethod
+    def _svc_name_(cls) -> str:
+        """The service name"""
+        ...
+
+    @_svc_name_.setter
+    @classmethod
+    @abstractmethod
+    def _svc_name_(cls, value: str) -> None:
+        ...
+
+    @property  # type: ignore[misc]
+    @classmethod
+    @abstractmethod
+    def _svc_display_name_(cls) -> str:
+        """The service display name"""
+        ...
+
+    @_svc_display_name_.setter
+    @classmethod
+    @abstractmethod
+    def _svc_display_name_(cls, value: str) -> None:
+        ...
 
     # Optional Attributes:
     _svc_deps_ = None  # sequence of service names on which this depends
@@ -1064,3 +1101,19 @@ class ServiceFramework:
         # We tell the SCM the service is still stopping - the C framework
         # will automatically tell the SCM it has stopped when this returns.
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
+
+    @abstractmethod
+    def SvcDoRun(self):
+        ...
+
+    def SvcStop(self):
+        raise NotImplementedError
+
+    def SvcPause(self):
+        raise NotImplementedError
+
+    def SvcContinue(self):
+        raise NotImplementedError
+
+    def SvcShutdown(self):
+        raise NotImplementedError

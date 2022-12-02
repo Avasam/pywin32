@@ -35,6 +35,16 @@ jobs:
       run: |
         python setup.py --skip-verstamp install --user
 
+    - name: Type-check with mypy
+      run: mypy com/win32com com/win32comext win32/Lib isapi --install-types --python-version=${{ matrix.python-version }}
+
+    - name: Type-check with Pyright
+      uses: jakebailey/pyright-action@v1
+      with:
+        version: ${{ steps.pyright_version.outputs.value }}
+        python-version: ${{ matrix.python-version }}
+        no-comments: ${{ matrix.python-version != '3.7' }}  # Having each job create the same comment is too noisy.
+
     - name: Run tests
       # Run the tests directly from the source dir so support files (eg, .wav files etc)
       # can be found - they aren't installed into the Python tree.
@@ -90,6 +100,14 @@ jobs:
         name: artifacts
         path: |
           dist/*.whl
+
+  imports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pip install isort pycln
+      - run: pycln . --diff --config=pycln.toml
+      - run: isort . --diff --check-only
 
   black:
     runs-on: ubuntu-latest

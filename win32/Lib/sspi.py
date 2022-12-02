@@ -13,12 +13,22 @@ functions directly.
 """
 # Based on Roger Upole's sspi demos.
 # $Id$
-import win32security, sspicon
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
+import sspicon
+import win32security
+
+if TYPE_CHECKING:
+    from _win32typing import PySecBufferDesc
+else:
+    PySecBufferDesc = Any
 
 error = win32security.error
 
 
-class _BaseAuth(object):
+class _BaseAuth:
     def __init__(self):
         self.reset()
 
@@ -225,7 +235,7 @@ class ClientAuth(_BaseAuth):
             self.pkg_info["MaxToken"], sspicon.SECBUFFER_TOKEN
         )
         sec_buffer_out.append(tokenbuf)
-        ## input context handle should be NULL on first call
+        # input context handle should be NULL on first call
         ctxtin = self.ctxt
         if self.ctxt is None:
             self.ctxt = win32security.PyCtxtHandleType()
@@ -304,7 +314,7 @@ class ServerAuth(_BaseAuth):
             self.pkg_info["MaxToken"], sspicon.SECBUFFER_TOKEN
         )
         sec_buffer_out.append(tokenbuf)
-        ## input context handle is None initially, then handle returned from last call thereafter
+        # input context handle is None initially, then handle returned from last call thereafter
         ctxtin = self.ctxt
         if self.ctxt is None:
             self.ctxt = win32security.PyCtxtHandleType()
@@ -367,7 +377,7 @@ if __name__ == "__main__":
 
     # Perform the authentication dance, each loop exchanging more information
     # on the way to completing authentication.
-    sec_buffer = None
+    sec_buffer: list[PySecBufferDesc] = []
     client_step = 0
     server_step = 0
     while not (sspiclient.authenticated) or len(sec_buffer[0].Buffer):
@@ -385,7 +395,7 @@ if __name__ == "__main__":
     print("Initiator name from the service side:", sspiserver.initiator_name)
     print("Service name from the client side:   ", sspiclient.service_name)
 
-    data = "hello".encode("ascii")  # py3k-friendly
+    data = b"hello"
 
     # Simple signature, not compatible with GSSAPI.
     sig = sspiclient.sign(data)

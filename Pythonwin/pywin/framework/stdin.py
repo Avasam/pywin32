@@ -18,10 +18,7 @@ the way they were, simply use this magic incantation:
 """
 import sys
 
-try:
-    get_input_line = raw_input  # py2x
-except NameError:
-    get_input_line = input  # py3k
+get_input_line = input
 
 
 class Stdin:
