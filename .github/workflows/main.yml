@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  push:
+  # push:
   pull_request:
     branches:
     - main
@@ -36,7 +36,7 @@ jobs:
         python setup.py --skip-verstamp install --user
 
     - name: Type-check with mypy
-      run: mypy com/win32com com/win32comext win32/Lib isapi --install-types --python-version=${{ matrix.python-version }}
+      run: mypy --install-types --python-version=${{ matrix.python-version }}
 
     - name: Type-check with Pyright
       uses: jakebailey/pyright-action@v1

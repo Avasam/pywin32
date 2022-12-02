@@ -1,25 +1,24 @@
 [tool.pycln]
 expand_stars = false
 skip_imports = [
-  # C wrapped modules
-  # "_winxptheme",
-  # "dde",
-  # "ntsecuritycon",
-  # "odbc",
-  # "OpenGL",
-  # "win32api",
-  # "win32clipboard",
-  # "win32com",
-  # "win32cryptcon",
-  # "win32event",
-  # "win32file",
-  # "win32gui_struct",
-  # "win32gui",
-  # "win32inet",
-  # "win32inetcon",
-  # "win32pipe",
-  # "win32ras",
-  # "winxpgui",
+  # Star imported C wrapped modules
+  "_winxptheme",
+  "dde",
+  "ntsecuritycon",
+  "odbc",
+  "win32api",
+  "win32clipboard",
+  "win32com",
+  "win32cryptcon",
+  "win32event",
+  "win32file",
+  "win32gui_struct",
+  "win32gui",
+  "win32inet",
+  "win32inetcon",
+  "win32pipe",
+  "win32ras",
+  "winxpgui",
   # import has side-effects
   "win32traceutil",
 ]

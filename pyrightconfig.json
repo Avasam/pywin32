@@ -3,12 +3,6 @@
   "pythonPlatform": "Windows",
   // Default to the oldest supported for IDEs
   "pythonVersion": "3.7",
-  "include": [
-    "com/win32com",
-    "com/win32comext",
-    "win32/Lib/",
-    "isapi/",
-  ],
   "exclude": [
     // Tests are not public API
     "**/test/",
@@ -33,7 +27,8 @@
   "typeCheckingMode": "basic",
   // Not all dependencies are going to be py.typed or have stubs
   "useLibraryCodeForTypes": true,
-  // Extra strict settings
+  // Reserve "type: ignore" comments to mypy
+  "enableTypeIgnoreComments": false,
   "reportUnnecessaryTypeIgnoreComment": "error",
   // Most of pywin32's code is C-Module extensions
   "reportMissingModuleSource": "none",
