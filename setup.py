@@ -2421,7 +2421,7 @@ build_ext_command_obj = cast(
 )
 if build_ext_command_obj:
     what_string = "built"
-    if "install" in dist.command_obj:  # type: ignore[attr-defined] # until next typeshed sync  # just to be purdy
+    if "install" in dist.command_obj:  # just to be purdy
         what_string += "/installed"
     # Print the list of extension modules we skipped building.
     excluded_extensions = build_ext_command_obj.excluded_extensions
