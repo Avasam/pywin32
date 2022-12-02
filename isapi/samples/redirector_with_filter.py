@@ -43,7 +43,7 @@ from isapi.simple import SimpleFilter
 # sys.isapidllhandle will exist when we are loaded by the IIS framework.
 # In this case we redirect our output to the win32traceutil collector.
 if hasattr(sys, "isapidllhandle"):
-    import win32traceutil
+    import win32traceutil  # Sets up everything.
 
 # The site we are proxying.
 proxy = "http://www.python.org"

@@ -2,7 +2,6 @@
 import commctrl
 import dialog
 import win32con
-import win32ui
 
 
 class RegistryControl:

@@ -21,7 +21,7 @@ from isapi import isapicon
 from isapi.simple import SimpleExtension
 
 if hasattr(sys, "isapidllhandle"):
-    import win32traceutil
+    import win32traceutil  # Sets up everything.
 
 # Notes on reloading
 # If your HttpFilterProc or HttpExtensionProc functions raises

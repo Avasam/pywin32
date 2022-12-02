@@ -11,7 +11,7 @@ import win32com.client.dynamic
 import win32com.client.gencache
 import winerror
 from pywin32_testutil import str2memory
-from win32com.server.util import NewCollection, wrap
+from win32com.server.util import wrap
 from win32com.test import util
 
 # for debugging

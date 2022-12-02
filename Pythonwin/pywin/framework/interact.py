@@ -481,7 +481,7 @@ class InteractiveCore:
         return retList
 
     def OutputGrab(self):
-        # 		import win32traceutil; return
+        # 		import win32traceutil; return  # Sets up everything.
         self.oldStdOut = sys.stdout
         self.oldStdErr = sys.stderr
         sys.stdout = self

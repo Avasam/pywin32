@@ -5,13 +5,7 @@ import pywin.scintilla.keycodes
 import win32api
 import win32con
 import win32ui
-from pywin.framework.editor import (
-    GetEditorFontOption,
-    GetEditorOption,
-    SetEditorFontOption,
-    SetEditorOption,
-    defaultCharacterFormat,
-)
+from pywin.framework.editor import GetEditorOption
 from pywin.scintilla import bindings
 
 # from pywin.framework.editor import EditorPropertyPage
@@ -29,7 +23,6 @@ import pywin.scintilla.view
 from pywin.debugger import dbgcon
 from pywin.framework.editor.document import EditorDocumentBase
 from pywin.scintilla import scintillacon  # For the marker definitions
-from pywin.scintilla.document import CScintillaDocument
 
 
 class SyntEditDocument(EditorDocumentBase):

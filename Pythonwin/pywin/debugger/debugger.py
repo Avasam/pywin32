@@ -23,10 +23,10 @@ import win32con
 import win32ui
 from pywin.framework import app, editor, interact, scriptutils
 from pywin.framework.editor.color.coloreditor import MARKER_BREAKPOINT, MARKER_CURRENT
-from pywin.mfc import afxres, dialog, object, window
+from pywin.mfc import afxres, window
 from pywin.tools import browser, hierlist
 
-# import win32traceutil
+# import win32traceutil  # Sets up everything.
 if win32ui.UNICODE:
     LVN_ENDLABELEDIT = commctrl.LVN_ENDLABELEDITW
 else:

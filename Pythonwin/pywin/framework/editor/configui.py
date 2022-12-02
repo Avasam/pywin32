@@ -4,12 +4,8 @@ import win32con
 import win32ui
 from pywin.framework.editor import (
     DeleteEditorOption,
-    GetEditorFontOption,
     GetEditorOption,
-    SetEditorFontOption,
     SetEditorOption,
-    defaultCharacterFormat,
-    editorTemplate,
 )
 from pywin.mfc import dialog
 

@@ -284,7 +284,7 @@ class DispatcherWin32dbg(DispatcherBase):
 
 
 try:
-    import win32trace
+    import win32trace  # nopycln: import  # Test for DispatcherWin32trace
 
     DefaultDebugDispatcher: Type[DispatcherTrace] = DispatcherWin32trace
 except ImportError:  # no win32trace module - just use a print based one.

@@ -1,7 +1,6 @@
 import sys
 import unittest
 
-import pythoncom
 from win32com.client import Dispatch
 from win32com.client.gencache import EnsureDispatch
 

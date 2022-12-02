@@ -3,7 +3,7 @@
 # PyWin32 Internet Explorer Button
 #
 # written by Leonard Ritter (paniq@gmx.net)
-# and Robert Förtsch (info@robert-foertsch.com)
+# and Robert Fï¿½rtsch (info@robert-foertsch.com)
 
 
 """
@@ -29,18 +29,12 @@ import win32api
 import win32com
 import win32com.server.register
 
-# imports section
-from win32com import universal
-from win32com.client import Dispatch, DispatchWithEvents, constants, gencache, getevents
-
 # This demo uses 'print' - use win32traceutil to see it if we have no
 # console.
 try:
     win32api.GetConsoleTitle()
 except win32api.error:
-    import win32traceutil
-
-import array
+    import win32traceutil  # Sets up everything.
 
 from win32com.axcontrol import axcontrol
 

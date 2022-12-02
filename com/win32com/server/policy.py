@@ -85,14 +85,10 @@ from pythoncom import (
     DISPATCH_PROPERTYGET,
     DISPATCH_PROPERTYPUT,
     DISPATCH_PROPERTYPUTREF,
-    DISPID_COLLECT,
-    DISPID_CONSTRUCTOR,
-    DISPID_DESTRUCTOR,
     DISPID_EVALUATE,
     DISPID_NEWENUM,
     DISPID_PROPERTYPUT,
     DISPID_STARTENUM,
-    DISPID_UNKNOWN,
     DISPID_VALUE,
 )
 
@@ -819,15 +815,3 @@ def _import_module(mname):
     # Eeek - result of _import_ is "win32com" - not "win32com.a.b.c"
     # Get the full module from sys.modules
     return sys.modules[mname]
-
-
-#######
-#
-# Temporary hacks until all old code moves.
-#
-# These have been moved to a new source file, but some code may
-# still reference them here.  These will end up being removed.
-try:
-    from .dispatcher import DispatcherTrace, DispatcherWin32trace
-except ImportError:  # Quite likely a frozen executable that doesnt need dispatchers
-    pass

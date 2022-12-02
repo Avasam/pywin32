@@ -68,7 +68,7 @@ from win32com.util import IIDToInterfaceName
 # version will spew output to win32traceutil.
 debug = 0
 if debug:
-    import win32traceutil
+    import win32traceutil  # Sets up everything.
 
 # markh is toying with an implementation that allows auto reload of a module
 # if this attribute exists.

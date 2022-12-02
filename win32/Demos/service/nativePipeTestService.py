@@ -38,7 +38,7 @@ def main():
 
         # for the sake of debugging etc, we use win32traceutil to see
         # any unhandled exceptions and print statements.
-        import win32traceutil
+        import win32traceutil  # Sets up everything.
 
         print("service is still starting...")
 

@@ -19,7 +19,7 @@ if debugging:
     # the printing itself will trigger again trigger a trace.
 
     import win32trace
-    import win32traceutil
+    import win32traceutil  # Sets up everything.
 
     def trace(*args):
         win32trace.write(" ".join(map(str, args)) + "\n")

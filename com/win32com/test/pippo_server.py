@@ -6,7 +6,6 @@ import os
 import sys
 
 import pythoncom
-import win32com
 import winerror
 from win32com.server.util import wrap
 

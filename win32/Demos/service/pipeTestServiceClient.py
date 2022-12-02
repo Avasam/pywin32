@@ -7,10 +7,8 @@
 # Should work.
 
 import os
-import sys
 import traceback
 
-import pywintypes
 import win32api
 import winerror
 from win32event import *

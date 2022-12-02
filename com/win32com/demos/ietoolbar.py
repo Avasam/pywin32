@@ -3,7 +3,7 @@
 # PyWin32 Internet Explorer Toolbar
 #
 # written by Leonard Ritter (paniq@gmx.net)
-# and Robert Förtsch (info@robert-foertsch.com)
+# and Robert Fï¿½rtsch (info@robert-foertsch.com)
 
 
 """
@@ -21,9 +21,7 @@ import winreg
 
 import pythoncom
 import win32com
-from win32com import universal
 from win32com.axcontrol import axcontrol
-from win32com.client import Dispatch, DispatchWithEvents, constants, gencache, getevents
 from win32com.shell import shell
 from win32com.shell.shellcon import *
 
@@ -373,4 +371,4 @@ if __name__ == "__main__":
         DllRegisterServer()
 else:
     # import trace utility for remote debugging
-    import win32traceutil
+    import win32traceutil  # Sets up everything.

@@ -18,7 +18,6 @@ import sys
 import time
 
 import pythoncom
-import win32com
 
 from . import build
 

@@ -15,14 +15,13 @@ import urllib.request
 import win32api
 import winerror
 
-from isapi import ExtensionError, isapicon, threaded_extension
-from isapi.simple import SimpleFilter
+from isapi import ExtensionError, threaded_extension
 
 try:
     win32api.GetConsoleTitle()
 except win32api.error:
     # No console - redirect
-    import win32traceutil
+    import win32traceutil  # Sets up everything.
 
 # The ISAPI extension - handles requests in our virtual dir, and sends the
 # response to the client.

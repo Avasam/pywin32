@@ -1,6 +1,5 @@
 import win32api
 import win32con
-import win32ui
 
 MAPVK_VK_TO_CHAR = 2
 

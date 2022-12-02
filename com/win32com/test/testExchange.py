@@ -6,7 +6,7 @@
 import os
 
 import pythoncom
-from win32com.client import constants, gencache
+from win32com.client import gencache
 
 ammodule = None  # was the generated module!
 

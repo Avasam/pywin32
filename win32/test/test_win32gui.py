@@ -3,7 +3,6 @@ import array
 import operator
 import unittest
 
-import pywin32_testutil
 import win32gui
 
 

@@ -1,13 +1,10 @@
 # cmdline - command line utilities.
-import string
 import sys
-
-import win32ui
+import string
+import os
 
 
 def ParseArgs(str):
-    import string
-
     ret = []
     pos = 0
     length = len(str)
@@ -41,7 +38,6 @@ def FixArgFileName(fileName):
     """Convert a filename on the commandline to something useful.
     Given an automatic filename on the commandline, turn it a python module name,
     with the path added to sys.path."""
-    import os
 
     path, fname = os.path.split(fileName)
     if len(path) == 0:

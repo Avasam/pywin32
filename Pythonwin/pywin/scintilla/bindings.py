@@ -4,8 +4,6 @@ import win32api
 import win32con
 import win32ui
 
-from . import IDLEenvironment, keycodes
-
 HANDLER_ARGS_GUESS = 0
 HANDLER_ARGS_NATIVE = 1
 HANDLER_ARGS_IDLE = 2

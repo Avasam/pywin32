@@ -28,7 +28,6 @@ import traceback
 
 import sspi
 import win32api
-import win32security
 
 options = None  # set to optparse object.
 

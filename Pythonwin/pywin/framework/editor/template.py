@@ -1,6 +1,5 @@
 import os
 
-import pywin.framework.window
 import win32api
 import win32ui
 from pywin.mfc import docview
