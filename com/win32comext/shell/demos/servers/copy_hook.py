@@ -5,10 +5,11 @@
 # * Open Windows Explorer
 # * Attempt to move or copy a directory.
 # * Note our hook's dialog is displayed.
-import pythoncom
 import win32con
 import win32gui
-from win32com.shell import shell, shellcon
+from win32com.shell import shell
+import winreg
+import errno
 
 
 # Our shell extension.
@@ -31,8 +32,6 @@ class ShellExtension:
 
 
 def DllRegisterServer():
-    import winreg
-
     key = winreg.CreateKey(
         winreg.HKEY_CLASSES_ROOT,
         "directory\\shellex\\CopyHookHandlers\\" + ShellExtension._reg_desc_,
@@ -47,16 +46,12 @@ def DllRegisterServer():
 
 
 def DllUnregisterServer():
-    import winreg
-
     try:
         key = winreg.DeleteKey(
             winreg.HKEY_CLASSES_ROOT,
             "directory\\shellex\\CopyHookHandlers\\" + ShellExtension._reg_desc_,
         )
     except WindowsError as details:
-        import errno
-
         if details.errno != errno.ENOENT:
             raise
     try:
@@ -65,8 +60,6 @@ def DllUnregisterServer():
             "*\\shellex\\CopyHookHandlers\\" + ShellExtension._reg_desc_,
         )
     except WindowsError as details:
-        import errno
-
         if details.errno != errno.ENOENT:
             raise
     print(ShellExtension._reg_desc_, "unregistration complete.")

@@ -1,6 +1,4 @@
 # GUI Demo - just a worker script to invoke all the other demo/test scripts.
-import sys
-
 import __main__
 import regutil
 import win32api
@@ -28,7 +26,7 @@ demos = [  # 	('Font', 'import fontdemo;fontdemo.FontDemo()'),
 def demo():
     try:
         # seeif I can locate the demo files.
-        import fontdemo
+        import fontdemo  # nopycln: import
     except ImportError:
         # else put the demos direectory on the path (if not already)
         try:

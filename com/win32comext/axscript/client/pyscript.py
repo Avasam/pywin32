@@ -10,7 +10,6 @@ command line.
 import re
 
 import pythoncom
-import win32api
 import win32com
 import win32com.client.dynamic
 import win32com.server.register
@@ -22,7 +21,6 @@ from win32com.axscript.client.framework import (
     SCRIPTTEXT_ISEXPRESSION,
     SCRIPTTEXT_ISPERSISTENT,
     Exception,
-    RaiseAssert,
     trace,
 )
 

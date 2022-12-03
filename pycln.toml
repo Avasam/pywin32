@@ -1,24 +1,21 @@
 [tool.pycln]
+all = false
 expand_stars = false
 skip_imports = [
   # Star imported C wrapped modules
   "_winxptheme",
   "dde",
-  "ntsecuritycon",
   "odbc",
   "win32api",
   "win32clipboard",
-  "win32com",
-  "win32cryptcon",
   "win32event",
   "win32file",
-  "win32gui_struct",
   "win32gui",
   "win32inet",
-  "win32inetcon",
   "win32pipe",
   "win32ras",
   "winxpgui",
-  # import has side-effects
-  "win32traceutil",
+  # imports with side-effects
+  "win32ui",  # Must be imported to resolve: ImportError: This must be an MFC application
+  "win32traceutil",  # Sets up trace collector
 ]

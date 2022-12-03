@@ -30,7 +30,7 @@ jobs:
       run: |
         python --version
         pip --version
-        pip install --upgrade setuptools wheel mypy
+        pip install --upgrade setuptools wheel mypy Pyro4
 
     - name: Build and install
       run: |
@@ -107,7 +107,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: pip install isort pycln pyopengl
-      - run: pycln . --diff --config=pycln.toml
+      - run: pycln . --check --config=pycln.toml
       - run: isort . --diff --check-only
 
   black:

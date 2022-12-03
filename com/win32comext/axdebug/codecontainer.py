@@ -13,7 +13,7 @@ from win32com.axdebug import axdebug
 from win32com.server.exception import Exception
 
 from . import contexts
-from .util import RaiseNotImpl, _wrap
+from .util import _wrap
 
 _keywords = {}  # set of Python keywords
 for name in """

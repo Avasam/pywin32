@@ -10,7 +10,6 @@ import pythoncom
 import win32api
 import win32com.client.connect
 from win32com.axdebug.util import _wrap, _wrap_remove, trace
-from win32com.server.util import unwrap
 
 from . import axdebug, gateways, stackframe
 

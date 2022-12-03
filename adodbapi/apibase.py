@@ -178,11 +178,8 @@ class TimeConverter:  # this is a generic time converter skeleton
         except:  # might be a tuple
             try:
                 return self.ComDateFromTuple(obj)
-            except:  # try an mxdate
-                try:
-                    return obj.COMDate()
-                except:
-                    raise ValueError('Cannot convert "%s" to COMdate.' % repr(obj))
+            except:
+                raise ValueError('Cannot convert "%s" to COMdate.' % repr(obj))
 
     def ComDateFromTuple(self, t, microseconds=0):
         d = datetime.date(t[0], t[1], t[2])
@@ -216,23 +213,11 @@ class TimeConverter:  # this is a generic time converter skeleton
             if isinstance(obj, datetime.date):
                 s = obj.isoformat() + " 00:00:00"  # return exact midnight
             else:
-                try:  # maybe it has a strftime method, like mx
-                    s = obj.strftime("%Y-%m-%d %H:%M:%S")
-                except AttributeError:
-                    try:  # but may be time.struct_time
-                        s = time.strftime("%Y-%m-%d %H:%M:%S", obj)
-                    except:
-                        raise ValueError('Cannot convert "%s" to isoformat' % repr(obj))
+                try:  # but may be time.struct_time
+                    s = time.strftime("%Y-%m-%d %H:%M:%S", obj)
+                except:
+                    raise ValueError('Cannot convert "%s" to isoformat' % repr(obj))
         return s
-
-
-# mx extensions are not available above Python 2.7
-# This constant and fallback class are kept to avoid introducing a breaking change.
-mxDateTime = False
-
-
-class mxDateTimeConverter(TimeConverter):
-    pass
 
 
 class pythonDateTimeConverter(TimeConverter):  # standard since Python 2.3
@@ -672,9 +657,9 @@ class SQLrows:
         for n in range(self.numberOfRows):
             row = SQLrow(self, n)
             yield row
-            # # # # #
 
-    # # # # # functions to re-format SQL requests to other paramstyle requirements # # # # # # # # # #
+
+# # # # # # # # # # functions to re-format SQL requests to other paramstyle requirements # # # # # # # # # #
 
 
 def changeNamedToQmark(

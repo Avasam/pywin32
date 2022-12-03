@@ -27,11 +27,7 @@ from ntsecuritycon import (
 )
 from pythoncom import IID_NULL
 from win32com.authorization import authorization
-from win32com.shell.shellcon import (  # Msg parameter to PropertySheetPageCallback
-    PSPCB_CREATE,
-    PSPCB_RELEASE,
-)
-from win32security import CONTAINER_INHERIT_ACE, INHERIT_ONLY_ACE, OBJECT_INHERIT_ACE
+from win32security import CONTAINER_INHERIT_ACE, OBJECT_INHERIT_ACE
 
 
 class SecurityInformation(win32com.server.policy.DesignatedWrapPolicy):

@@ -44,15 +44,7 @@ from . import ado_consts as adc, apibase as api, process_connect_string
 onWin32 = False  # assume the worst
 if sys.platform == "cli":
     from clr import Reference
-    from System import (
-        Activator,
-        Array,
-        Byte,
-        DateTime,
-        DBNull,
-        Decimal as SystemDecimal,
-        Type,
-    )
+    from System import Activator, Type
 
     def Dispatch(dispatch):
         type = Type.GetTypeFromProgID(dispatch)

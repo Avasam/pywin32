@@ -154,7 +154,7 @@ class SimpleProgress(genpy.GeneratorProgress):
 
 class GUIProgress(SimpleProgress):
     def __init__(self, verboseLevel):
-        # Import some modules we need to we can trap failure now.
+        # Import some modules we need so we can trap failure now.
         import win32ui
 
         SimpleProgress.__init__(self, verboseLevel)

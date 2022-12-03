@@ -591,8 +591,6 @@ class HLIHeadingRegisterdTypeLibs(HLICOM):
 
 
 def main(modal=True, mdi=False):
-    from pywin.tools import hierlist
-
     root = HLIRoot("COM Browser")
     if mdi and "pywin.framework.app" in sys.modules:
         # do it in a MDI window
