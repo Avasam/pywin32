@@ -91,7 +91,7 @@ def CheckoutFile(fileName):
             if not database:
                 database = pythoncom.Missing
             g_sourceSafe.Open(database, pythoncom.Missing, pythoncom.Missing)
-        item = g_sourceSafe.VSSItem("$/%s/%s" % (project, vssFname))
+        item = g_sourceSafe.VSSItem("$/{}/{}".format(project, vssFname))
         item.Checkout(None, fileName)
         ok = 1
     except pythoncom.com_error as exc:
@@ -99,6 +99,8 @@ def CheckoutFile(fileName):
     except:
         typ, val, tb = sys.exc_info()
         traceback.print_exc()
-        win32ui.MessageBox("%s - %s" % (str(typ), str(val)), "Error checking out file")
+        win32ui.MessageBox(
+            "{} - {}".format(str(typ), str(val)), "Error checking out file"
+        )
         tb = None  # Cleanup a cycle
     return ok

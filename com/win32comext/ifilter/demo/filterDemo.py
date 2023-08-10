@@ -227,7 +227,9 @@ class FileParser:
 def _usage():
     import os
 
-    print("Usage: %s filename [verbose [dumpbody]]" % (os.path.basename(sys.argv[0]),))
+    print(
+        "Usage: {} filename [verbose [dumpbody]]".format(os.path.basename(sys.argv[0]))
+    )
     print()
     print("Where:-")
     print("filename = name of the file to extract text & properties from")

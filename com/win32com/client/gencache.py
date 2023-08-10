@@ -131,7 +131,7 @@ def GetGeneratedFileName(clsid, lcid, major, minor):
     """Given the clsid, lcid, major and  minor for a type lib, return
     the file name (no extension) providing this support.
     """
-    return str(clsid).upper()[1:-1] + "x%sx%sx%s" % (lcid, major, minor)
+    return str(clsid).upper()[1:-1] + "x{}x{}x{}".format(lcid, major, minor)
 
 
 def SplitGeneratedFileName(fname):
@@ -506,7 +506,7 @@ def EnsureModule(
                 bValidateFile = 0
         if module is not None and bValidateFile:
             assert not is_readonly, "Can't validate in a read-only gencache"
-            filePathPrefix = "%s\\%s" % (
+            filePathPrefix = "{}\\{}".format(
                 GetGeneratePath(),
                 GetGeneratedFileName(typelibCLSID, lcid, major, minor),
             )
@@ -543,7 +543,7 @@ def EnsureModule(
                 bReloadNeeded = 1
             else:
                 minor = module.MinorVersion
-                filePathPrefix = "%s\\%s" % (
+                filePathPrefix = "{}\\{}".format(
                     GetGeneratePath(),
                     GetGeneratedFileName(typelibCLSID, lcid, major, minor),
                 )
@@ -757,7 +757,7 @@ def _Dump():
         d[typelibCLSID, lcid, major, minor] = None
     for typelibCLSID, lcid, major, minor in d.keys():
         mod = GetModuleForTypelib(typelibCLSID, lcid, major, minor)
-        print("%s - %s" % (mod.__doc__, typelibCLSID))
+        print("{} - {}".format(mod.__doc__, typelibCLSID))
 
 
 # Boot up

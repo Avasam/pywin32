@@ -106,7 +106,7 @@ class BindingsManager:
             name = handler.replace("-", "_") + "_event"
             return getattr(instance, name)
         except (ImportError, AttributeError):
-            msg = "Can not find event '%s' in IDLE extension '%s'" % (handler, ext)
+            msg = "Can not find event '{}' in IDLE extension '{}'".format(handler, ext)
             self.report_error(msg)
             return None
 

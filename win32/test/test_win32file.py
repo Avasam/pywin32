@@ -229,12 +229,12 @@ class TestSimpleOps(unittest.TestCase):
             ct, at, wt = win32file.GetFileTime(f)
             self.assertTrue(
                 ct >= now,
-                "File was created in the past - now=%s, created=%s" % (now, ct),
+                "File was created in the past - now={}, created={}".format(now, ct),
             )
             self.assertTrue(now <= ct <= nowish, (now, ct))
             self.assertTrue(
                 wt >= now,
-                "File was written-to in the past now=%s, written=%s" % (now, wt),
+                "File was written-to in the past now={}, written={}".format(now, wt),
             )
             self.assertTrue(now <= wt <= nowish, (now, wt))
 

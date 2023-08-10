@@ -177,7 +177,7 @@ class AliasItem(build.OleItem, WritableItem):
             if isinstance(ai, int):
                 try:
                     typeStr = mapVTToTypeString[ai]
-                    print("# %s=%s" % (self.doc[0], typeStr), file=stream)
+                    print("# {}={}".format(self.doc[0], typeStr), file=stream)
                 except KeyError:
                     print(
                         self.doc[0] + " = None # Can't convert alias info " + str(ai),
@@ -262,7 +262,7 @@ class VTableItem(build.VTableItem, WritableItem):
             "%s_vtables_dispatch_ = %d" % (self.python_name, self.bIsDispatch),
             file=stream,
         )
-        print("%s_vtables_ = [" % (self.python_name,), file=stream)
+        print("{}_vtables_ = [".format(self.python_name), file=stream)
         for v in self.vtableFuncs:
             names, dispid, desc = v
             assert desc.desckind == pythoncom.DESCKIND_FUNCDESC
@@ -544,7 +544,9 @@ class DispatchItem(build.DispatchItem, WritableItem):
                         continue
 
                 print(
-                    '\t\t"%s": %s,' % (build.MakePublicAttributeName(key), mapEntry),
+                    '\t\t"{}": {},'.format(
+                        build.MakePublicAttributeName(key), mapEntry
+                    ),
                     file=stream,
                 )
         names = list(self.propMapGet.keys())
@@ -590,7 +592,9 @@ class DispatchItem(build.DispatchItem, WritableItem):
                     if details.memid == pythoncom.DISPID_NEWENUM:
                         continue
                 print(
-                    '\t\t"%s": %s,' % (build.MakePublicAttributeName(key), mapEntry),
+                    '\t\t"{}": {},'.format(
+                        build.MakePublicAttributeName(key), mapEntry
+                    ),
                     file=stream,
                 )
 
@@ -653,7 +657,9 @@ class DispatchItem(build.DispatchItem, WritableItem):
                     % propArgs
                 ]
             print(
-                "\t# Default %s for this class is '%s'" % (typename, entry.names[0]),
+                "\t# Default {} for this class is '{}'".format(
+                    typename, entry.names[0]
+                ),
                 file=stream,
             )
             for line in ret:
@@ -772,7 +778,9 @@ class CoClassItem(build.OleItem, WritableItem):
             print("import sys", file=stream)
             for ref in referenced_items:
                 print(
-                    "__import__('%s.%s')" % (generator.base_mod_name, ref.python_name),
+                    "__import__('{}.{}')".format(
+                        generator.base_mod_name, ref.python_name
+                    ),
                     file=stream,
                 )
                 print(
@@ -797,7 +805,7 @@ class CoClassItem(build.OleItem, WritableItem):
         )
         if doc and doc[1]:
             print("\t# " + doc[1], file=stream)
-        print("\tCLSID = %r" % (self.clsid,), file=stream)
+        print("\tCLSID = {!r}".format(self.clsid), file=stream)
         print("\tcoclass_sources = [", file=stream)
         defItem = None
         for item, flag in self.sources:
@@ -816,7 +824,7 @@ class CoClassItem(build.OleItem, WritableItem):
                 defName = defItem.python_name
             else:
                 defName = repr(str(defItem.clsid))  # really the iid.
-            print("\tdefault_source = %s" % (defName,), file=stream)
+            print("\tdefault_source = {}".format(defName), file=stream)
         print("\tcoclass_interfaces = [", file=stream)
         defItem = None
         for item, flag in self.interfaces:
@@ -827,14 +835,14 @@ class CoClassItem(build.OleItem, WritableItem):
                 key = item.python_name
             else:
                 key = repr(str(item.clsid))  # really the iid.
-            print("\t\t%s," % (key,), file=stream)
+            print("\t\t{},".format(key), file=stream)
         print("\t]", file=stream)
         if defItem:
             if defItem.bWritten:
                 defName = defItem.python_name
             else:
                 defName = repr(str(defItem.clsid))  # really the iid.
-            print("\tdefault_interface = %s" % (defName,), file=stream)
+            print("\tdefault_interface = {}".format(defName), file=stream)
         self.bWritten = 1
         print(file=stream)
 
@@ -1100,14 +1108,19 @@ class Generator:
         assert self.file.encoding, self.file
         encoding = self.file.encoding  # or "mbcs"
 
-        print("# -*- coding: %s -*-" % (encoding,), file=self.file)
-        print("# Created by makepy.py version %s" % (makepy_version,), file=self.file)
+        print("# -*- coding: {} -*-".format(encoding), file=self.file)
         print(
-            "# By python version %s" % (sys.version.replace("\n", "-"),), file=self.file
+            "# Created by makepy.py version {}".format(makepy_version), file=self.file
+        )
+        print(
+            "# By python version {}".format(sys.version.replace("\n", "-")),
+            file=self.file,
         )
         if self.sourceFilename:
             print(
-                "# From type library '%s'" % (os.path.split(self.sourceFilename)[1],),
+                "# From type library '{}'".format(
+                    os.path.split(self.sourceFilename)[1]
+                ),
                 file=self.file,
             )
         print("# On %s" % time.ctime(time.time()), file=self.file)
@@ -1115,7 +1128,7 @@ class Generator:
         print(build._makeDocString(docDesc), file=self.file)
 
         print("makepy_version =", repr(makepy_version), file=self.file)
-        print("python_version = 0x%x" % (sys.hexversion,), file=self.file)
+        print("python_version = 0x{:x}".format(sys.hexversion), file=self.file)
         print(file=self.file)
         print(
             "import win32com.client.CLSIDToClass, pythoncom, pywintypes", file=self.file
@@ -1198,7 +1211,7 @@ class Generator:
                 )
             else:
                 print(
-                    "\t%s: %s," % (repr(record.doc[0]), repr(str(record.clsid))),
+                    "\t{}: {},".format(repr(record.doc[0]), repr(str(record.clsid))),
                     file=stream,
                 )
         print("}", file=stream)
@@ -1210,7 +1223,7 @@ class Generator:
             for item in oleItems.values():
                 if item is not None and item.bWritten:
                     print(
-                        "\t'%s' : %s," % (str(item.clsid), item.python_name),
+                        "\t'{}' : {},".format(str(item.clsid), item.python_name),
                         file=stream,
                     )
             print("}", file=stream)
@@ -1222,7 +1235,9 @@ class Generator:
             print("VTablesToPackageMap = {}", file=stream)
             print("VTablesToClassMap = {", file=stream)
             for item in vtableItems.values():
-                print("\t'%s' : '%s'," % (item.clsid, item.python_name), file=stream)
+                print(
+                    "\t'{}' : '{}',".format(item.clsid, item.python_name), file=stream
+                )
             print("}", file=stream)
             print(file=stream)
 
@@ -1232,14 +1247,16 @@ class Generator:
             for item in oleItems.values():
                 if item is not None:
                     print(
-                        "\t'%s' : %s," % (str(item.clsid), repr(item.python_name)),
+                        "\t'{}' : {},".format(str(item.clsid), repr(item.python_name)),
                         file=stream,
                     )
             print("}", file=stream)
             print("VTablesToClassMap = {}", file=stream)
             print("VTablesToPackageMap = {", file=stream)
             for item in vtableItems.values():
-                print("\t'%s' : '%s'," % (item.clsid, item.python_name), file=stream)
+                print(
+                    "\t'{}' : '{}',".format(item.clsid, item.python_name), file=stream
+                )
             print("}", file=stream)
             print(file=stream)
 
@@ -1254,7 +1271,7 @@ class Generator:
 
         print("NamesToIIDMap = {", file=stream)
         for name, iid in map.items():
-            print("\t'%s' : '%s'," % (name, iid), file=stream)
+            print("\t'{}' : '{}',".format(name, iid), file=stream)
         print("}", file=stream)
         print(file=stream)
 
@@ -1275,7 +1292,9 @@ class Generator:
         major = la[3]
         minor = la[4]
         self.base_mod_name = (
-            "win32com.gen_py." + str(clsid)[1:-1] + "x%sx%sx%s" % (lcid, major, minor)
+            "win32com.gen_py."
+            + str(clsid)[1:-1]
+            + "x{}x{}x{}".format(lcid, major, minor)
         )
         try:
             # Process the type library's CoClass objects, looking for the
@@ -1327,7 +1346,7 @@ class Generator:
 
             assert (
                 found
-            ), "Cant find the '%s' interface in the CoClasses, or the interfaces" % (
+            ), "Cant find the '{}' interface in the CoClasses, or the interfaces".format(
                 child,
             )
             # Make a map of iid: dispitem, vtableitem)

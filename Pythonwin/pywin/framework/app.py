@@ -235,7 +235,7 @@ class CApp(WinApp):
         except:
             t, v, tb = sys.exc_info()
             win32ui.MessageBox(
-                "Internal error in help file processing\r\n%s: %s" % (t, v)
+                "Internal error in help file processing\r\n{}: {}".format(t, v)
             )
             tb = None  # Prevent a cycle
 
@@ -387,7 +387,7 @@ class AboutBox(dialog.Dialog):
                 "SOFTWARE\\ActiveState\\ActivePython", "CurrentVersion"
             )
             if ver is not None:
-                ver = "ActivePython build %s" % (ver,)
+                ver = "ActivePython build {}".format(ver)
         if ver is None:
             ver = ""
         self.SetDlgItemText(win32ui.IDC_ABOUT_VERSION, ver)

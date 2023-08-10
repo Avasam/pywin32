@@ -182,9 +182,11 @@ class WinExt(Extension):
             pch_dir = os.path.join(build_ext.build_temp)
             if not build_ext.debug:
                 self.extra_compile_args.append("/Zi")
-            self.extra_compile_args.append("/Fd%s\\%s_vc.pdb" % (pch_dir, self.name))
+            self.extra_compile_args.append(
+                "/Fd{}\\{}_vc.pdb".format(pch_dir, self.name)
+            )
             self.extra_link_args.append("/DEBUG")
-            self.extra_link_args.append("/PDB:%s\\%s.pdb" % (pch_dir, self.name))
+            self.extra_link_args.append("/PDB:{}\\{}.pdb".format(pch_dir, self.name))
             # enable unwind semantics - some stuff needs it and I can't see
             # it hurting
             self.extra_compile_args.append("/EHsc")
@@ -204,7 +206,7 @@ class WinExt(Extension):
                     suffix = "_d"
                 else:
                     suffix = ""
-                self.extra_link_args.append("/IMPLIB:%s%s.lib" % (implib, suffix))
+                self.extra_link_args.append("/IMPLIB:{}{}.lib".format(implib, suffix))
             # Try and find the MFC headers, so we can reach inside for
             # some of the ActiveX support we need.  We need to do this late, so
             # the environment is setup correctly.
@@ -369,7 +371,7 @@ class my_build(build):
             f.write("%s\n" % build_id)
             f.close()
         except EnvironmentError as why:
-            print("Failed to open '%s': %s" % (ver_fname, why))
+            print("Failed to open '{}': {}".format(ver_fname, why))
 
 
 class my_build_ext(build_ext):
@@ -431,7 +433,7 @@ class my_build_ext(build_ext):
                     break
             else:
                 log.debug("Header '%s' not found  in %s", h, look_dirs)
-                return "The header '%s' can not be located." % (h,)
+                return "The header '{}' can not be located.".format(h)
 
         common_dirs = self.compiler.library_dirs[:]
         common_dirs += os.environ.get("LIB", "").split(os.pathsep)
@@ -449,7 +451,7 @@ class my_build_ext(build_ext):
             patched_libs.append(os.path.splitext(os.path.basename(found))[0])
 
         if ext.platforms and self.plat_name not in ext.platforms:
-            return "Only available on platforms %s" % (ext.platforms,)
+            return "Only available on platforms {}".format(ext.platforms)
 
         # We update the .libraries list with the resolved library name.
         # This is really only so "_d" works.
@@ -542,9 +544,7 @@ class my_build_ext(build_ext):
         # The afxres.h/atls.lib files aren't always included by default,
         # so find and add them
         if vcbase and not atlmfc_found:
-            atls_lib = glob.glob(
-                vcbase + r"ATLMFC\lib\{}\atls.lib".format(self.plat_dir)
-            )
+            atls_lib = glob.glob(vcbase + rf"ATLMFC\lib\{self.plat_dir}\atls.lib")
             if atls_lib:
                 self.library_dirs.append(os.path.dirname(atls_lib[0]))
                 self.include_dirs.append(
@@ -605,7 +605,7 @@ class my_build_ext(build_ext):
             if why is not None:
                 self.excluded_extensions.append((ext, why))
                 assert why, "please give a reason, or None"
-                print("Skipping %s: %s" % (ext.name, why))
+                print("Skipping {}: {}".format(ext.name, why))
                 continue
             self.build_exefile(ext)
 
@@ -713,7 +713,7 @@ class my_build_ext(build_ext):
         if why is not None:
             assert why, "please give a reason, or None"
             self.excluded_extensions.append((ext, why))
-            print("Skipping %s: %s" % (ext.name, why))
+            print("Skipping {}: {}".format(ext.name, why))
             return
         self.current_extension = ext
 
@@ -758,7 +758,7 @@ class my_build_ext(build_ext):
                     sys.version_info[1],
                     extra,
                 )
-                needed = "%s%s" % (ext.name, extra)
+                needed = "{}{}".format(ext.name, extra)
             elif ext.name in ("win32ui",):
                 # This one just needs a copy.
                 created = needed = ext.name + extra
@@ -837,12 +837,12 @@ class my_build_ext(build_ext):
                     # More vile hacks.  winxpmodule is built from win32gui.i -
                     # just different #defines are setup for windows.h.
                     new_target = os.path.join(
-                        os.path.dirname(base), "winxpgui_swig%s" % (target_ext,)
+                        os.path.dirname(base), "winxpgui_swig{}".format(target_ext)
                     )
                     swig_targets[source] = new_target
                     new_sources.append(new_target)
                 else:
-                    new_target = "%s_swig%s" % (base, target_ext)
+                    new_target = "{}_swig{}".format(base, target_ext)
                     new_sources.append(new_target)
                     swig_targets[source] = new_target
             else:
@@ -930,7 +930,7 @@ class my_install(install):
             # may have had 2to3 run over it.
             filename = os.path.join(self.install_scripts, "pywin32_postinstall.py")
             if not os.path.isfile(filename):
-                raise RuntimeError("Can't find '%s'" % (filename,))
+                raise RuntimeError("Can't find '{}'".format(filename))
             print("Executing post install script...")
             # What executable to use?  This one I guess.
             subprocess.Popen(
@@ -1031,9 +1031,11 @@ class my_compiler(base_compiler):
         # verstamp must work.)
         if not skip_verstamp:
             args = ["py.exe", "-m" "win32verstamp"]
-            args.append("--version=%s" % (pywin32_version,))
+            args.append("--version={}".format(pywin32_version))
             args.append("--comments=https://github.com/mhammond/pywin32")
-            args.append("--original-filename=%s" % (os.path.basename(output_filename),))
+            args.append(
+                "--original-filename={}".format(os.path.basename(output_filename))
+            )
             args.append("--product=PyWin32")
             if "-v" not in sys.argv:
                 args.append("--quiet")
@@ -2304,7 +2306,7 @@ dist = setup(
     options={
         "bdist_wininst": {
             "install_script": "pywin32_postinstall.py",
-            "title": "pywin32-%s" % (build_id,),
+            "title": "pywin32-{}".format(build_id),
             "user_access_control": "auto",
         },
     },
@@ -2416,7 +2418,7 @@ if "build_ext" in dist.command_obj:
         skipped_ex = []
         print("*** NOTE: The following extensions were NOT %s:" % what_string)
         for ext, why in excluded_extensions:
-            print(" %s: %s" % (ext.name, why))
+            print(" {}: {}".format(ext.name, why))
             if ext.name not in skip_whitelist:
                 skipped_ex.append(ext.name)
         print("For more details on installing the correct libraries and headers,")
@@ -2428,4 +2430,4 @@ if "build_ext" in dist.command_obj:
             )
             sys.exit(1000 + len(skipped_ex))
     else:
-        print("All extension modules %s OK" % (what_string,))
+        print("All extension modules {} OK".format(what_string))

@@ -46,7 +46,7 @@ for pname in (
     # the new value isn't what we set or the original
     if new_value != orig_value + 1:
         assert new_value == orig_value
-        print("Strange - setting %s seems to have been ignored" % (pname,))
+        print("Strange - setting {} seems to have been ignored".format(pname))
     win32gui.SystemParametersInfo(cset, orig_value)
     assert win32gui.SystemParametersInfo(cget) == orig_value
 

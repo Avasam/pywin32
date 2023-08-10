@@ -642,7 +642,9 @@ class DesignatedWrapPolicy(MappedWrapPolicy):
                     # This helps you see what 'func' and 'args' actually is
                     if str(v).find("arguments") >= 0:
                         print(
-                            "** TypeError %s calling function %r(%r)" % (v, func, args)
+                            "** TypeError {} calling function {!r}({!r})".format(
+                                v, func, args
+                            )
                         )
                     raise
 

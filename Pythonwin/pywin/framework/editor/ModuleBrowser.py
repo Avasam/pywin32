@@ -61,7 +61,7 @@ class HierListCLBRItem(hierlist.HierListItem):
 
     def PerformItemSelected(self):
         if self.file is None:
-            msg = "%s - source can not be located." % (self.name,)
+            msg = "{} - source can not be located.".format(self.name)
         else:
             msg = "%s defined at line %d of %s" % (self.name, self.lineno, self.file)
         win32ui.SetStatusText(msg)
@@ -170,7 +170,7 @@ class BrowserView(pywin.mfc.docview.TreeView):
                     pass
             else:
                 what = "Building"
-            win32ui.SetStatusText("%s class list - please wait..." % (what,), 1)
+            win32ui.SetStatusText("{} class list - please wait...".format(what), 1)
             win32ui.DoWaitCursor(1)
             try:
                 reader = pyclbr.readmodule_ex  # new version post 1.5.2

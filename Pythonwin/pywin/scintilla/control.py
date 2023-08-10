@@ -455,7 +455,7 @@ class CScintillaEditInterface(ScintillaControlInterface):
             charPos = self.GetSel()[0]
         assert (
             charPos >= 0 and charPos <= self.GetTextLength()
-        ), "The charPos postion (%s) is invalid (max=%s)" % (
+        ), "The charPos postion ({}) is invalid (max={})".format(
             charPos,
             self.GetTextLength(),
         )

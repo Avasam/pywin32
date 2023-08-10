@@ -157,7 +157,7 @@ def main():
         if opt == "-c":
             hras, rc = Connect(val, bCallback)
             if hras is not None:
-                print("hras: 0x%8lx, rc: 0x%04x" % (hras, rc))
+                print("hras: 0x{:8x}, rc: 0x{:04x}".format(hras, rc))
         if opt == "-d":
             Disconnect(val)
         if opt == "-e":

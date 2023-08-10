@@ -50,7 +50,7 @@ verbose = 0
 def check_get_set(func, arg):
     got = func(arg)
     if got != arg:
-        raise error("%s failed - expected %r, got %r" % (func, arg, got))
+        raise error("{} failed - expected {!r}, got {!r}".format(func, arg, got))
 
 
 def check_get_set_raises(exc, func, arg):
@@ -60,7 +60,9 @@ def check_get_set_raises(exc, func, arg):
         pass  # what we expect!
     else:
         raise error(
-            "%s with arg %r didn't raise %s - returned %r" % (func, arg, exc, got)
+            "{} with arg {!r} didn't raise {} - returned {!r}".format(
+                func, arg, exc, got
+            )
         )
 
 
@@ -80,14 +82,14 @@ def TestApplyResult(fn, args, result):
     pref = "function " + fnName
     rc = fn(*args)
     if rc != result:
-        raise error("%s failed - result not %r but %r" % (pref, result, rc))
+        raise error("{} failed - result not {!r} but {!r}".format(pref, result, rc))
 
 
 def TestConstant(constName, pyConst):
     try:
         comConst = getattr(constants, constName)
     except:
-        raise error("Constant %s missing" % (constName,))
+        raise error("Constant {} missing".format(constName))
     if comConst != pyConst:
         raise error(
             "Constant value wrong for %s - got %s, wanted %s"
@@ -160,7 +162,7 @@ def TestCommon(o, is_generated):
     # CoClass instances have `default_interface`
     expected_class = getattr(expected_class, "default_interface", expected_class)
     if not isinstance(o.GetSetDispatch(o), expected_class):
-        raise error("GetSetDispatch failed: %r" % (o.GetSetDispatch(o),))
+        raise error("GetSetDispatch failed: {!r}".format(o.GetSetDispatch(o)))
     progress("Checking getting/passing IDispatch of known type")
     expected_class = o.__class__
     expected_class = getattr(expected_class, "default_interface", expected_class)
@@ -285,11 +287,11 @@ def TestCommon(o, is_generated):
     # currency.
     pythoncom.__future_currency__ = 1
     if o.CurrencyProp != 0:
-        raise error("Expecting 0, got %r" % (o.CurrencyProp,))
+        raise error("Expecting 0, got {!r}".format(o.CurrencyProp))
     for val in ("1234.5678", "1234.56", "1234"):
         o.CurrencyProp = decimal.Decimal(val)
         if o.CurrencyProp != decimal.Decimal(val):
-            raise error("%s got %r" % (val, o.CurrencyProp))
+            raise error("{} got {!r}".format(val, o.CurrencyProp))
     v1 = decimal.Decimal("1234.5678")
     TestApplyResult(o.DoubleCurrency, (v1,), v1 * 2)
 
@@ -434,7 +436,9 @@ def TestGenerated():
     if not isinstance(i1, DispatchBaseClass) or not isinstance(i2, DispatchBaseClass):
         # Yay - is now an instance returned!
         raise error(
-            "GetMultipleInterfaces did not return instances - got '%s', '%s'" % (i1, i2)
+            "GetMultipleInterfaces did not return instances - got '{}', '{}'".format(
+                i1, i2
+            )
         )
     del i1
     del i2
@@ -553,7 +557,7 @@ def _TestPyVariant(o, is_generated, val, checker=None):
 def _TestPyVariantFails(o, is_generated, val, exc):
     try:
         _TestPyVariant(o, is_generated, val)
-        raise error("Setting %r didn't raise %s" % (val, exc))
+        raise error("Setting {!r} didn't raise {}".format(val, exc))
     except exc:
         pass
 

@@ -156,7 +156,7 @@ def test1():
 
 def _pkn(n):
     vk, flags = parse_key_name(n)
-    print("%s -> %s,%s -> %s" % (n, vk, flags, make_key_name(vk, flags)))
+    print("{} -> {},{} -> {}".format(n, vk, flags, make_key_name(vk, flags)))
 
 
 def test2():

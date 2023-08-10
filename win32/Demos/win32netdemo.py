@@ -110,7 +110,7 @@ def LocalGroupEnum():
                         server, member["sid"]
                     )
                     nmembers = nmembers + 1
-                    verbose(" Member %s (%s)" % (username, member["domainandname"]))
+                    verbose(" Member {} ({})".format(username, member["domainandname"]))
                 if memberresume == 0:
                     break
         if not resume:
@@ -168,7 +168,11 @@ def LocalGroup(uname=None):
         mem, tot, res = win32net.NetLocalGroupGetMembers(server, group, level)
         print("members are", mem)
         if mem[0]["domainandname"] != uname:
-            print("ERROR: LocalGroup just added %s, but members are %r" % (uname, mem))
+            print(
+                "ERROR: LocalGroup just added {}, but members are {!r}".format(
+                    uname, mem
+                )
+            )
         # Convert the list of dicts to a list of strings.
         win32net.NetLocalGroupDelMembers(
             server, group, [m["domainandname"] for m in mem]
@@ -185,7 +189,7 @@ def GetInfo(userName=None):
     print("Dumping level 3 information about user")
     info = win32net.NetUserGetInfo(server, userName, 3)
     for key, val in list(info.items()):
-        verbose("%s=%s" % (key, val))
+        verbose("{}={}".format(key, val))
 
 
 def SetInfo(userName=None):

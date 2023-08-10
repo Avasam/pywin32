@@ -127,7 +127,7 @@ def stamp(pathname, options):
         f = open(pathname, "a+b")
         f.close()
     except IOError as why:
-        print("WARNING: File %s could not be opened - %s" % (pathname, why))
+        print("WARNING: File {} could not be opened - {}".format(pathname, why))
 
     ver = options.version
     try:

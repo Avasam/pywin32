@@ -91,7 +91,9 @@ def test():
             )
     # Check we saw a traceback in stderr
     if cap.get_captured().find("Traceback") < 0:
-        raise error("Could not find a traceback in stderr: %r" % (cap.get_captured(),))
+        raise error(
+            "Could not find a traceback in stderr: {!r}".format(cap.get_captured())
+        )
 
     # Now do it all again, but using IDispatch
     com_server = Dispatch(wrap(TestServer()))
@@ -143,7 +145,9 @@ def test():
             )
     # Check we saw a traceback in stderr
     if cap.get_captured().find("Traceback") < 0:
-        raise error("Could not find a traceback in stderr: %r" % (cap.get_captured(),))
+        raise error(
+            "Could not find a traceback in stderr: {!r}".format(cap.get_captured())
+        )
 
     # And an explicit com_error
     cap.clear()

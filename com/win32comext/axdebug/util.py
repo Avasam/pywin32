@@ -130,7 +130,9 @@ class Dispatcher(win32com.server.policy.DispatcherWin32trace):
             except AttributeError:
                 desc = ""
             print(
-                "*** Invoke of %s raised COM exception 0x%x%s" % (dispid, scode, desc)
+                "*** Invoke of {} raised COM exception 0x{:x}{}".format(
+                    dispid, scode, desc
+                )
             )
         except:
             print("*** Invoke of %s failed:" % dispid)

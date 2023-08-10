@@ -248,7 +248,7 @@ PyObject *Py%(interfacename)s::%(method)s(PyObject *self, PyObject *args)
                 )
 
                 f.write(
-                    "\t%s %s;\n\tPyObject *ob%s;\n" % (arg.type, arg.name, arg.name)
+                    "\t{} {};\n\tPyObject *ob{};\n".format(arg.type, arg.name, arg.name)
                 )
                 f.write(
                     "\t// @pyparm <o Py%s>|%s||Description for %s\n"
@@ -264,7 +264,9 @@ PyObject *Py%(interfacename)s::%(method)s(PyObject *self, PyObject *args)
                 argsParseTuple = argsParseTuple + ", &ob%s" % (arg.name)
 
                 argsCOM = argsCOM + ", " + arg.name
-                cleanup = cleanup + "\tPyObject_Free%s(%s);\n" % (arg.type, arg.name)
+                cleanup = cleanup + "\tPyObject_Free{}({});\n".format(
+                    arg.type, arg.name
+                )
 
         if needConversion:
             f.write("\tUSES_CONVERSION;\n")
@@ -430,11 +432,13 @@ STDMETHODIMP %s::%s(
         if method.args:
             for arg in method.args[:-1]:
                 inoutstr = "][".join(arg.inout)
-                f.write("\t\t/* [%s] */ %s,\n" % (inoutstr, arg.GetRawDeclaration()))
+                f.write(
+                    "\t\t/* [{}] */ {},\n".format(inoutstr, arg.GetRawDeclaration())
+                )
 
             arg = method.args[-1]
             inoutstr = "][".join(arg.inout)
-            f.write("\t\t/* [%s] */ %s)\n" % (inoutstr, arg.GetRawDeclaration()))
+            f.write("\t\t/* [{}] */ {})\n".format(inoutstr, arg.GetRawDeclaration()))
         else:
             f.write("\t\tvoid)\n")
 
@@ -493,11 +497,13 @@ STDMETHODIMP %s::%s(
             resStr = "NULL"
 
         if formatChars:
-            fullArgStr = '%s, "%s"%s' % (resStr, formatChars, argStr)
+            fullArgStr = '{}, "{}"{}'.format(resStr, formatChars, argStr)
         else:
             fullArgStr = resStr
 
-        f.write('\tHRESULT hr=InvokeViaPolicy("%s", %s);\n' % (method.name, fullArgStr))
+        f.write(
+            '\tHRESULT hr=InvokeViaPolicy("{}", {});\n'.format(method.name, fullArgStr)
+        )
         f.write(codePost)
         if cout:
             f.write("\tif (FAILED(hr)) return hr;\n")

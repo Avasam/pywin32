@@ -60,7 +60,7 @@ def DumpContainerDocuments(container):
         import time
 
         timeStr = time.ctime(int(doc.LastUpdated))
-        print("  %s - updated %s (" % (doc.Name, timeStr), end=" ")
+        print("  {} - updated {} (".format(doc.Name, timeStr), end=" ")
         print(doc.LastUpdated, ")")  # test the _print_ method?
 
 

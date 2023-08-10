@@ -166,7 +166,7 @@ class StringDef:
         self.value = value
 
     def __repr__(self):
-        return "StringDef(%r, %r, %r)" % (self.id, self.idNum, self.value)
+        return "StringDef({!r}, {!r}, {!r})".format(self.id, self.idNum, self.value)
 
 
 class RCParser:
@@ -204,7 +204,7 @@ class RCParser:
 
     def getCheckToken(self, expected):
         tok = self.getToken()
-        assert tok == expected, "Expected token '%s', but got token '%s'!" % (
+        assert tok == expected, "Expected token '{}', but got token '{}'!".format(
             expected,
             tok,
         )
@@ -324,7 +324,7 @@ class RCParser:
             else:
                 rp = id_parsers.get(self.token)
                 if rp is not None:
-                    self.debug("Dispatching '%s'" % (self.token,))
+                    self.debug("Dispatching '{}'".format(self.token))
                     rp(resource_id)
                 else:
                     # We don't know what the resource type is, but we
@@ -639,7 +639,7 @@ def GenerateFrozenResource(rc_name, output_name, h_name=None):
     out.write("class FakeParser:\n")
 
     for name in "dialogs", "ids", "names", "bitmaps", "icons", "stringTable":
-        out.write("\t%s = \\\n" % (name,))
+        out.write("\t{} = \\\n".format(name))
         pprint.pprint(getattr(rcp, name), out)
         out.write("\n")
 
@@ -665,11 +665,11 @@ if __name__ == "__main__":
             pprint.pprint(ddef)
             print()
         for id, sdef in resources.stringTable.items():
-            print("String %s=%r" % (id, sdef.value))
+            print("String {}={!r}".format(id, sdef.value))
             print()
         for id, sdef in resources.bitmaps.items():
-            print("Bitmap %s=%r" % (id, sdef))
+            print("Bitmap {}={!r}".format(id, sdef))
             print()
         for id, sdef in resources.icons.items():
-            print("Icon %s=%r" % (id, sdef))
+            print("Icon {}={!r}".format(id, sdef))
             print()

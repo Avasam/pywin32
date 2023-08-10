@@ -38,7 +38,7 @@ def GenerateFromRegistered(fname, *loadArgs):
     )
     f.close()
     print("compiling -", end=" ")
-    fullModName = "win32com.test.%s.%s" % (genDir, fname)
+    fullModName = "win32com.test.{}.{}".format(genDir, fname)
     exec("import " + fullModName)
     # Inject the generated module as a top level module.
     sys.modules[fname] = sys.modules[fullModName]

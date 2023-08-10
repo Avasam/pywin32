@@ -59,9 +59,9 @@ def print_attribute(col_data):
         value = [converters.get(prop_name, _null_converter)(v[0]) for v in values]
         if len(value) == 1:
             value = value[0]
-        print(" %s=%r" % (prop_name, value))
+        print(" {}={!r}".format(prop_name, value))
     else:
-        print(" %s is None" % (prop_name,))
+        print(" {} is None".format(prop_name))
 
 
 def search():

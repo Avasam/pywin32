@@ -469,13 +469,13 @@ class CDispatch:
                 print("\t", method)
             print("Props:")
             for prop, entry in self._olerepr_.propMap.items():
-                print("\t%s = 0x%x - %s" % (prop, entry.dispid, repr(entry)))
+                print("\t{} = 0x{:x} - {}".format(prop, entry.dispid, repr(entry)))
             print("Get Props:")
             for prop, entry in self._olerepr_.propMapGet.items():
-                print("\t%s = 0x%x - %s" % (prop, entry.dispid, repr(entry)))
+                print("\t{} = 0x{:x} - {}".format(prop, entry.dispid, repr(entry)))
             print("Put Props:")
             for prop, entry in self._olerepr_.propMapPut.items():
-                print("\t%s = 0x%x - %s" % (prop, entry.dispid, repr(entry)))
+                print("\t{} = 0x{:x} - {}".format(prop, entry.dispid, repr(entry)))
         except:
             traceback.print_exc()
 
@@ -483,7 +483,7 @@ class CDispatch:
         try:
             if self._LazyAddAttr_(attr):
                 debug_attr_print(
-                    "%s.__LazyMap__(%s) added something" % (self._username_, attr)
+                    "{}.__LazyMap__({}) added something".format(self._username_, attr)
                 )
                 return 1
         except AttributeError:
@@ -635,7 +635,7 @@ class CDispatch:
             return self._get_good_object_(ret)
 
         # no where else to look.
-        raise AttributeError("%s.%s" % (self._username_, attr))
+        raise AttributeError("{}.{}".format(self._username_, attr))
 
     def __setattr__(self, attr, value):
         if (
@@ -704,5 +704,5 @@ class CDispatch:
                 except pythoncom.com_error:
                     pass
         raise AttributeError(
-            "Property '%s.%s' can not be set." % (self._username_, attr)
+            "Property '{}.{}' can not be set.".format(self._username_, attr)
         )

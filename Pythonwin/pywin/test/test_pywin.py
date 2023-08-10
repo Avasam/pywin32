@@ -51,8 +51,7 @@ class T(unittest.TestCase):
         def _restore_oe():
             sys.stdout, sys.stderr = cls.std_oe_orig
 
-        if sys.version_info >= (3, 8):
-            cls.addClassCleanup(_restore_oe)
+        cls.addClassCleanup(_restore_oe)
         sys.argv[1:] = ["/new", src_dir + "\\_dbgscript.py"]
         if not _indebugger:
             thisApp.InitInstance()
@@ -88,7 +87,7 @@ class T(unittest.TestCase):
         scriptutils.JumpToDocument(__file__)
         if user_interaction:
             win32ui.MessageBox(
-                "Hello from test_pydocs() args=%s %s" % (sys.argv, os.getcwd())
+                "Hello from test_pydocs() args={} {}".format(sys.argv, os.getcwd())
             )
         v = scriptutils.GetActiveEditControl()
         assert file_abs == v.GetDocument().GetPathName()

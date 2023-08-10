@@ -818,7 +818,7 @@ def DllRegisterServer():
     s = struct.pack("i", attr)
     winreg.SetValueEx(key, "Attributes", 0, winreg.REG_BINARY, s)
     # register the context menu handler under the FolderViewSampleType type.
-    keypath = "%s\\shellex\\ContextMenuHandlers\\%s" % (
+    keypath = "{}\\shellex\\ContextMenuHandlers\\{}".format(
         ContextMenu._context_menu_type_,
         ContextMenu._reg_desc_,
     )
@@ -844,7 +844,7 @@ def DllUnregisterServer():
             import errno
 
             if details.errno != errno.ENOENT:
-                print("FAILED to remove %s: %s" % (path, details))
+                print("FAILED to remove {}: {}".format(path, details))
 
     propsys.PSUnregisterPropertySchema(get_schema_fname())
     print(ShellFolder._reg_desc_, "unregistration complete.")

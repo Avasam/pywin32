@@ -34,7 +34,9 @@ def TestText():
         SetClipboardText(text)
         got = GetClipboardData(win32con.CF_TEXT)
         # CF_TEXT always gives us 'bytes' back .
-        assert got == text_bytes, "Didnt get the correct result back - '%r'." % (got,)
+        assert got == text_bytes, "Didnt get the correct result back - '{!r}'.".format(
+            got
+        )
     finally:
         CloseClipboard()
 
@@ -42,14 +44,18 @@ def TestText():
     try:
         # CF_UNICODE text always gives unicode objects back.
         got = GetClipboardData(win32con.CF_UNICODETEXT)
-        assert got == text, "Didnt get the correct result back - '%r'." % (got,)
-        assert isinstance(got, str), "Didnt get the correct result back - '%r'." % (
+        assert got == text, "Didnt get the correct result back - '{!r}'.".format(got)
+        assert isinstance(
+            got, str
+        ), "Didnt get the correct result back - '{!r}'.".format(
             got,
         )
 
         # CF_OEMTEXT is a bytes-based format.
         got = GetClipboardData(win32con.CF_OEMTEXT)
-        assert got == text_bytes, "Didnt get the correct result back - '%r'." % (got,)
+        assert got == text_bytes, "Didnt get the correct result back - '{!r}'.".format(
+            got
+        )
 
         # Unicode tests
         EmptyClipboard()
@@ -59,8 +65,10 @@ def TestText():
         SetClipboardData(win32con.CF_UNICODETEXT, text)
         # Get it in Unicode.
         got = GetClipboardData(win32con.CF_UNICODETEXT)
-        assert got == text, "Didnt get the correct result back - '%r'." % (got,)
-        assert isinstance(got, str), "Didnt get the correct result back - '%r'." % (
+        assert got == text, "Didnt get the correct result back - '{!r}'.".format(got)
+        assert isinstance(
+            got, str
+        ), "Didnt get the correct result back - '{!r}'.".format(
             got,
         )
 
@@ -72,14 +80,20 @@ def TestText():
     try:
         # Make sure I can still get the text as bytes
         got = GetClipboardData(win32con.CF_TEXT)
-        assert got == text_bytes, "Didnt get the correct result back - '%r'." % (got,)
+        assert got == text_bytes, "Didnt get the correct result back - '{!r}'.".format(
+            got
+        )
         # Make sure we get back the correct types.
         got = GetClipboardData(win32con.CF_UNICODETEXT)
-        assert isinstance(got, str), "Didnt get the correct result back - '%r'." % (
+        assert isinstance(
+            got, str
+        ), "Didnt get the correct result back - '{!r}'.".format(
             got,
         )
         got = GetClipboardData(win32con.CF_OEMTEXT)
-        assert got == text_bytes, "Didnt get the correct result back - '%r'." % (got,)
+        assert got == text_bytes, "Didnt get the correct result back - '{!r}'.".format(
+            got
+        )
         print("Clipboard text tests worked correctly")
     finally:
         CloseClipboard()
@@ -102,7 +116,7 @@ def TestClipboardEnum():
                 try:
                     n = GetClipboardFormatName(enum)
                 except error:
-                    n = "unknown (%s)" % (enum,)
+                    n = "unknown ({})".format(enum)
 
             print("Have format", n)
         print("Clipboard enumerator tests worked correctly")

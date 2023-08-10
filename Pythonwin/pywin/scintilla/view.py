@@ -811,7 +811,7 @@ def LoadConfiguration():
     configManager = ConfigManager(configName)
     if configManager.last_error:
         bTryDefault = 0
-        msg = "Error loading configuration '%s'\n\n%s" % (
+        msg = "Error loading configuration '{}'\n\n{}".format(
             configName,
             configManager.last_error,
         )

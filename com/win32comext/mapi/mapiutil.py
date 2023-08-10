@@ -160,7 +160,7 @@ def SetPropertyValue(obj, prop, val):
             type_tag = _MapiTypeMap.get(type(val))
             if type_tag is None:
                 raise ValueError(
-                    "Don't know what to do with '%r' ('%s')" % (val, type(val))
+                    "Don't know what to do with '{!r}' ('{}')".format(val, type(val))
                 )
         prop = mapitags.PROP_TAG(type_tag, mapitags.PROP_ID(propIds[0]))
     if val is None:

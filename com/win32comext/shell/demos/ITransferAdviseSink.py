@@ -52,9 +52,9 @@ class TransferAdviseSink(DesignatedWrapPolicy):
         FoldersTotal,
     ):
         print("UpdateProgress - processed so far:")
-        print("\t %s out of %s bytes" % (SizeCurrent, SizeTotal))
-        print("\t %s out of %s files" % (FilesCurrent, FilesTotal))
-        print("\t %s out of %s folders" % (FoldersCurrent, FoldersTotal))
+        print("\t {} out of {} bytes".format(SizeCurrent, SizeTotal))
+        print("\t {} out of {} files".format(FilesCurrent, FilesTotal))
+        print("\t {} out of {} folders".format(FoldersCurrent, FoldersTotal))
 
     def UpdateTransferState(self, State):
         print(

@@ -180,7 +180,7 @@ class EngineTester(win32com.test.util.TestCase):
                 ob.hello("Goober")
                 self.assertTrue(
                     expected_exc is None,
-                    "Expected %r, but no exception seen" % (expected_exc,),
+                    "Expected {!r}, but no exception seen".format(expected_exc),
                 )
             except pythoncom.com_error:
                 if expected_exc is None:

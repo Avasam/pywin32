@@ -43,8 +43,10 @@ class TestStuff(unittest.TestCase):
 
             newdb.Close()
 
-            conn_str = "Driver={Microsoft Access Driver (*.mdb)};dbq=%s;Uid=;Pwd=;" % (
-                self.db_filename,
+            conn_str = (
+                "Driver={{Microsoft Access Driver (*.mdb)}};dbq={};Uid=;Pwd=;".format(
+                    self.db_filename,
+                )
             )
         ## print 'Connection string:', conn_str
         self.conn = odbc.odbc(conn_str)
@@ -170,7 +172,7 @@ class TestStuff(unittest.TestCase):
                 1,
             )
             self.cur.execute(
-                "select %s from %s where userid = ?" % (fieldName, self.tablename),
+                "select {} from {} where userid = ?".format(fieldName, self.tablename),
                 ["Frank"],
             )
             rows = self.cur.fetchmany()

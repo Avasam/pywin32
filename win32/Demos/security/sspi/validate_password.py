@@ -23,7 +23,7 @@ def validate(username, password, domain=""):
 
 if __name__ == "__main__":
     if len(sys.argv) not in [2, 3, 4]:
-        print("Usage: %s username [password [domain]]" % (__file__,))
+        print("Usage: {} username [password [domain]]".format(__file__))
         sys.exit(1)
 
     # password and domain are optional!

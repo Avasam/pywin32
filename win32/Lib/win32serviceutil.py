@@ -592,7 +592,7 @@ def DebugService(cls, argv=[]):
 
     global g_debugService
 
-    print("Debugging service %s - press Ctrl+C to stop." % (cls._svc_name_,))
+    print("Debugging service {} - press Ctrl+C to stop.".format(cls._svc_name_))
     servicemanager.Debugging(True)
     servicemanager.PrepareToHostSingle(cls)
     g_debugService = cls(argv)
@@ -801,7 +801,7 @@ def HandleCommandLine(
                     sys.exit(1)
                 raise
             try:
-                os.system("%s -debug %s %s" % (exeName, serviceName, svcArgs))
+                os.system("{} -debug {} {}".format(exeName, serviceName, svcArgs))
             # ^C is used to kill the debug service.  Sometimes Python also gets
             # interrupted - ignore it...
             except KeyboardInterrupt:
@@ -832,7 +832,7 @@ def HandleCommandLine(
             description = cls._svc_description_
         except AttributeError:
             description = None
-        print("Installing service %s" % (serviceName,))
+        print("Installing service {}".format(serviceName))
         # Note that we install the service before calling the custom option
         # handler, so if the custom handler fails, we have an installed service (from NT's POV)
         # but is unlikely to work, as the Python code controlling it failed.  Therefore

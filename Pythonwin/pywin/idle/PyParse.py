@@ -131,7 +131,7 @@ class Parser:
         self.tabwidth = tabwidth
 
     def set_str(self, str):
-        assert len(str) == 0 or str[-1] == "\n", "Oops - have str %r" % (str,)
+        assert len(str) == 0 or str[-1] == "\n", "Oops - have str {!r}".format(str)
         self.str = str
         self.study_level = 0
 

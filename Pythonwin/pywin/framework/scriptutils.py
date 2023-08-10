@@ -94,7 +94,9 @@ def IsOnPythonPath(path):
                 return 1
         except win32ui.error as details:
             print(
-                "Warning: The sys.path entry '%s' is invalid\n%s" % (syspath, details)
+                "Warning: The sys.path entry '{}' is invalid\n{}".format(
+                    syspath, details
+                )
             )
     return 0
 
@@ -398,7 +400,9 @@ def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
         sys.path[0] = oldPath0
     f.close()
     if bWorked:
-        win32ui.SetStatusText("Script '%s' returned exit code %s" % (script, exitCode))
+        win32ui.SetStatusText(
+            "Script '{}' returned exit code {}".format(script, exitCode)
+        )
     else:
         win32ui.SetStatusText("Exception raised while running script  %s" % base)
     try:
@@ -506,7 +510,7 @@ def CheckFile():
     try:
         f = open(pathName)
     except IOError as details:
-        print("Cant open file '%s' - %s" % (pathName, details))
+        print("Cant open file '{}' - {}".format(pathName, details))
         return
     try:
         code = f.read() + "\n"
@@ -642,7 +646,9 @@ def FindTabNanny():
         os.stat(fname)
     except os.error:
         print(
-            "WARNING - The file '%s' can not be located in path '%s'" % (filename, path)
+            "WARNING - The file '{}' can not be located in path '{}'".format(
+                filename, path
+            )
         )
         return None
 

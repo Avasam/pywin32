@@ -28,10 +28,10 @@ def ReadLog(computer, logType="Application", dumpEachRecord=0):
                     domain, user, typ = win32security.LookupAccountSid(
                         computer, object.Sid
                     )
-                    sidDesc = "%s/%s" % (domain, user)
+                    sidDesc = "{}/{}".format(domain, user)
                 except win32security.error:
                     sidDesc = str(object.Sid)
-                user_desc = "Event associated with user %s" % (sidDesc,)
+                user_desc = "Event associated with user {}".format(sidDesc)
             else:
                 user_desc = None
             if dumpEachRecord:

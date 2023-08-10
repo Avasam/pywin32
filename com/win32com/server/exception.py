@@ -78,7 +78,9 @@ class COMException(pythoncom.com_error):
         pythoncom.com_error.__init__(self, scode, self.description, None, -1)
 
     def __repr__(self):
-        return "<COM Exception - scode=%s, desc=%s>" % (self.scode, self.description)
+        return "<COM Exception - scode={}, desc={}>".format(
+            self.scode, self.description
+        )
 
 
 # Old name for the COMException class.

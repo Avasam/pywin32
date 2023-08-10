@@ -148,7 +148,7 @@ def FormatMessage(eventLogRecord, logType="Application"):
     # key to look under for the name of the message DLL that contains
     # the messages we need to extract with FormatMessage. So first get
     # the event log source name...
-    keyName = "SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s" % (
+    keyName = "SYSTEM\\CurrentControlSet\\Services\\EventLog\\{}\\{}".format(
         logType,
         eventLogRecord.SourceName,
     )

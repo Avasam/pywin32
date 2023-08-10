@@ -17,7 +17,9 @@ class TestCase(unittest.TestCase):
         for fmt in format_strings.split():
             v1 = pytime_current.Format(fmt)
             v2 = time.strftime(fmt, struct_current)
-            self.assertEqual(v1, v2, "format %s failed - %r != %r" % (fmt, v1, v2))
+            self.assertEqual(
+                v1, v2, "format {} failed - {!r} != {!r}".format(fmt, v1, v2)
+            )
 
     def testPyTimePrint(self):
         # This used to crash with an invalid, or too early time.

@@ -30,7 +30,7 @@ class TestSSPI(unittest.TestCase):
     def assertRaisesHRESULT(self, hr, func, *args):
         try:
             return func(*args)
-            raise RuntimeError("expecting %s failure" % (hr,))
+            raise RuntimeError("expecting {} failure".format(hr))
         except win32security.error as exc:
             self.assertEqual(exc.winerror, hr)
 

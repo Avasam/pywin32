@@ -99,7 +99,7 @@ class IDLEEditorWindow:
         # Find and bind all the events defined in the extension.
         events = [item for item in dir(klass) if item[-6:] == "_event"]
         for event in events:
-            name = "<<%s>>" % (event[:-6].replace("_", "-"),)
+            name = "<<{}>>".format(event[:-6].replace("_", "-"))
             self.edit.bindings.bind(name, getattr(ext, event))
         return ext
 
@@ -133,11 +133,13 @@ class IDLEEditorWindow:
             except ValueError:
                 err = "Please enter an integer"
             if not err and minvalue is not None and rc < minvalue:
-                err = "Please enter an integer greater then or equal to %s" % (
+                err = "Please enter an integer greater then or equal to {}".format(
                     minvalue,
                 )
             if not err and maxvalue is not None and rc > maxvalue:
-                err = "Please enter an integer less then or equal to %s" % (maxvalue,)
+                err = "Please enter an integer less then or equal to {}".format(
+                    maxvalue
+                )
             if err:
                 win32ui.MessageBox(err, caption, win32con.MB_OK)
                 continue

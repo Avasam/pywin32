@@ -109,14 +109,14 @@ def TestEnum(quiet=None):
         raise error("default method with no args worked when it shouldnt have!")
     except pythoncom.com_error as exc:
         if exc.hresult != winerror.DISP_E_BADPARAMCOUNT:
-            raise error("Expected DISP_E_BADPARAMCOUNT - got %s" % (exc,))
+            raise error("Expected DISP_E_BADPARAMCOUNT - got {}".format(exc))
 
     try:
         o.Insert("foo", 2)
         raise error("Insert worked when it shouldnt have!")
     except pythoncom.com_error as exc:
         if exc.hresult != winerror.DISP_E_TYPEMISMATCH:
-            raise error("Expected DISP_E_TYPEMISMATCH - got %s" % (exc,))
+            raise error("Expected DISP_E_TYPEMISMATCH - got {}".format(exc))
 
     # Remove the sublist for this test!
     try:
@@ -124,7 +124,7 @@ def TestEnum(quiet=None):
         raise error("Remove worked when it shouldnt have!")
     except pythoncom.com_error as exc:
         if exc.hresult != winerror.DISP_E_BADINDEX:
-            raise error("Expected DISP_E_BADINDEX - got %s" % (exc,))
+            raise error("Expected DISP_E_BADINDEX - got {}".format(exc))
 
     # Test an empty collection
     if not quiet:
@@ -150,7 +150,7 @@ def TestEnum(quiet=None):
         raise error("Empty list could be indexed")
     except pythoncom.com_error as exc:
         if exc.hresult != winerror.DISP_E_BADINDEX:
-            raise error("Expected DISP_E_BADINDEX - got %s" % (exc,))
+            raise error("Expected DISP_E_BADINDEX - got {}".format(exc))
 
 
 class TestCase(win32com.test.util.TestCase):

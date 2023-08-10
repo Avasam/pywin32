@@ -90,7 +90,7 @@ def VssLog(project, linePrefix="", noLabels=5, maxItems=150):
             if str(itemDesc[-4:]) == ".dsp":
                 continue
         if i.Comment:
-            commentDesc = "\n%s\t%s" % (linePrefix, i.Comment)
+            commentDesc = "\n{}\t{}".format(linePrefix, i.Comment)
         lines.append(
             "%s%s\t%s%s"
             % (
@@ -182,13 +182,13 @@ def MakeNewBuildNo(project, buildDesc=None, auto=0, bRebrand=0):
         from pywin.mfc import dialog
 
         buildNo = dialog.GetSimpleInput(
-            "Enter new build number", buildNo, "%s - Prev: %s" % (project, oldBuild)
+            "Enter new build number", buildNo, "{} - Prev: {}".format(project, oldBuild)
         )
         if buildNo is None:
             return
-    i.Label(buildNo, "Build %s: %s" % (buildNo, buildDesc))
+    i.Label(buildNo, "Build {}: {}".format(buildNo, buildDesc))
     if auto:
-        print("Branded project %s with label %s" % (project, buildNo))
+        print("Branded project {} with label {}".format(project, buildNo))
     return buildNo
 
 

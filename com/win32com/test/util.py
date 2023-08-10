@@ -53,9 +53,11 @@ def RegisterPythonServer(filename, progids=None, verbose=0):
                 "pythoncomloader%d%d.dll" % (sys.version_info[0], sys.version_info[1]),
             ]
             if os.path.basename(dll) not in ok_files:
-                why_not = "%r is registered against a different Python version (%s)" % (
-                    progid,
-                    dll,
+                why_not = (
+                    "{!r} is registered against a different Python version ({})".format(
+                        progid,
+                        dll,
+                    )
                 )
                 break
         else:
@@ -84,7 +86,9 @@ def RegisterPythonServer(filename, progids=None, verbose=0):
         # them the same way as "real" errors.
         raise pythoncom.com_error(winerror.CO_E_CLASSSTRING, msg, None, -1)
     # so theoretically we are able to register it.
-    cmd = '%s "%s" --unattended > nul 2>&1' % (win32api.GetModuleFileName(0), filename)
+    cmd = '{} "{}" --unattended > nul 2>&1'.format(
+        win32api.GetModuleFileName(0), filename
+    )
     if verbose:
         print("Registering engine", filename)
     #       print cmd
@@ -114,7 +118,9 @@ def ExecuteShellCommand(
         if rc:
             raise Failed("exit code was " + str(rc))
         if expected_output is not None and output != expected_output:
-            raise Failed("Expected output %r (got %r)" % (expected_output, output))
+            raise Failed(
+                "Expected output {!r} (got {!r})".format(expected_output, output)
+            )
         if not tracebacks_ok and output.find("Traceback (most recent call last)") >= 0:
             raise Failed("traceback in program output")
         return output
@@ -124,7 +130,7 @@ def ExecuteShellCommand(
         print("** start of program output **")
         print(output)
         print("** end of program output **")
-        testcase.fail("Executing '%s' failed as %s" % (cmd, why))
+        testcase.fail("Executing '{}' failed as {}".format(cmd, why))
 
 
 def assertRaisesCOM_HRESULT(testcase, hresult, func, *args, **kw):

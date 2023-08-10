@@ -137,7 +137,7 @@ except NameError:
             if maybe == path_name:
                 csidl = getattr(shellcon, maybe)
                 return shell.SHGetSpecialFolderPath(0, csidl, False)
-        raise ValueError("%s is an unknown path ID" % (path_name,))
+        raise ValueError("{} is an unknown path ID".format(path_name))
 
 
 def CopyTo(desc, src, dest):
@@ -203,7 +203,11 @@ def SetPyKeyVal(key_name, value_name, value):
         try:
             winreg.SetValueEx(my_key, value_name, 0, winreg.REG_SZ, value)
             if verbose:
-                print("-> %s\\%s[%s]=%r" % (root_key_name, key_name, value_name, value))
+                print(
+                    "-> {}\\{}[{}]={!r}".format(
+                        root_key_name, key_name, value_name, value
+                    )
+                )
         finally:
             my_key.Close()
     finally:
@@ -218,13 +222,15 @@ def UnsetPyKeyVal(key_name, value_name, delete_key=False):
         try:
             winreg.DeleteValue(my_key, value_name)
             if verbose:
-                print("-> DELETE %s\\%s[%s]" % (root_key_name, key_name, value_name))
+                print(
+                    "-> DELETE {}\\{}[{}]".format(root_key_name, key_name, value_name)
+                )
         finally:
             my_key.Close()
         if delete_key:
             winreg.DeleteKey(root_key, key_name)
             if verbose:
-                print("-> DELETE %s\\%s" % (root_key_name, key_name))
+                print("-> DELETE {}\\{}".format(root_key_name, key_name))
     except OSError as why:
         winerror = getattr(why, "winerror", why.errno)
         if winerror != 2:  # file not found
@@ -397,10 +403,10 @@ def fixup_dbi():
                     os.remove(this_pyd)
                 else:
                     os.rename(this_pyd, this_dest)
-                    print("renamed '%s'->'%s.old'" % (this_pyd, this_pyd))
+                    print("renamed '{}'->'{}.old'".format(this_pyd, this_pyd))
                     file_created(this_pyd + ".old")
             except os.error as exc:
-                print("FAILED to rename '%s': %s" % (this_pyd, exc))
+                print("FAILED to rename '{}': {}".format(this_pyd, exc))
 
 
 def install(lib_dir):
@@ -448,7 +454,7 @@ def install(lib_dir):
                 dst = os.path.join(dest_dir, base)
                 CopyTo("installing %s" % base, fname, dst)
                 if verbose:
-                    print("Copied %s to %s" % (base, dst))
+                    print("Copied {} to {}".format(base, dst))
                 # Register the files with the uninstaller
                 file_created(dst)
                 worked = 1
@@ -536,7 +542,7 @@ def install(lib_dir):
     make_dir = os.path.join(lib_dir, "win32com", "gen_py")
     if not os.path.isdir(make_dir):
         if verbose:
-            print("Creating directory %s" % (make_dir,))
+            print("Creating directory {}".format(make_dir))
         directory_created(make_dir)
         os.mkdir(make_dir)
 
@@ -569,7 +575,7 @@ def install(lib_dir):
                     print("Shortcut to documentation created")
         else:
             if verbose:
-                print("Can't install shortcuts - %r is not a folder" % (fldr,))
+                print("Can't install shortcuts - {!r} is not a folder".format(fldr))
     except Exception as details:
         print(details)
 
@@ -601,12 +607,12 @@ def uninstall(lib_dir):
     try:
         RegisterCOMObjects(False)
     except Exception as why:
-        print("Failed to unregister COM objects: %s" % (why,))
+        print("Failed to unregister COM objects: {}".format(why))
 
     try:
         RegisterHelpFile(False, lib_dir)
     except Exception as why:
-        print("Failed to unregister help file: %s" % (why,))
+        print("Failed to unregister help file: {}".format(why))
     else:
         if verbose:
             print("Unregistered help file")
@@ -614,7 +620,7 @@ def uninstall(lib_dir):
     try:
         RegisterPythonwin(False, lib_dir)
     except Exception as why:
-        print("Failed to unregister Pythonwin: %s" % (why,))
+        print("Failed to unregister Pythonwin: {}".format(why))
     else:
         if verbose:
             print("Unregistered Pythonwin")
@@ -625,7 +631,7 @@ def uninstall(lib_dir):
         if os.path.isdir(gen_dir):
             shutil.rmtree(gen_dir)
             if verbose:
-                print("Removed directory %s" % (gen_dir,))
+                print("Removed directory {}".format(gen_dir))
 
         # Remove pythonwin compiled "config" files.
         pywin_dir = os.path.join(lib_dir, "Pythonwin", "pywin")
@@ -643,7 +649,7 @@ def uninstall(lib_dir):
             pass
 
     except Exception as why:
-        print("Failed to remove misc files: %s" % (why,))
+        print("Failed to remove misc files: {}".format(why))
 
     try:
         fldr = get_shortcuts_folder()
@@ -652,9 +658,9 @@ def uninstall(lib_dir):
             if os.path.isfile(fqlink):
                 os.remove(fqlink)
                 if verbose:
-                    print("Removed %s" % (link,))
+                    print("Removed {}".format(link))
     except Exception as why:
-        print("Failed to remove shortcuts: %s" % (why,))
+        print("Failed to remove shortcuts: {}".format(why))
     # Now remove the system32 files.
     files = glob.glob(os.path.join(lib_dir, "pywin32_system32\\*.*"))
     # Try the system32 directory first - if that fails due to "access denied",
@@ -673,11 +679,11 @@ def uninstall(lib_dir):
                         if verbose:
                             print("Removed file %s" % (dst))
                     except Exception:
-                        print("FAILED to remove %s" % (dst,))
+                        print("FAILED to remove {}".format(dst))
             if worked:
                 break
     except Exception as why:
-        print("FAILED to remove system files: %s" % (why,))
+        print("FAILED to remove system files: {}".format(why))
 
 
 # NOTE: If this script is run from inside the bdist_wininst created
@@ -692,7 +698,7 @@ def uninstall(lib_dir):
 
 def verify_destination(location):
     if not os.path.isdir(location):
-        raise argparse.ArgumentTypeError('Path "{}" does not exist!'.format(location))
+        raise argparse.ArgumentTypeError(f'Path "{location}" does not exist!')
     return location
 
 
@@ -756,7 +762,7 @@ def main():
     args = parser.parse_args()
 
     if not args.quiet:
-        print("Parsed arguments are: {}".format(args))
+        print(f"Parsed arguments are: {args}")
 
     if not args.install ^ args.remove:
         parser.error("You need to either choose to -install or -remove!")

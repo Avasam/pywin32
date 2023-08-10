@@ -14,7 +14,7 @@ g_rcname = os.path.abspath(
 )
 
 if not os.path.isfile(g_rcname):
-    raise RuntimeError("Can't locate test.rc (should be at '%s')" % (g_rcname,))
+    raise RuntimeError("Can't locate test.rc (should be at '{}')".format(g_rcname))
 
 
 class DemoWindow:

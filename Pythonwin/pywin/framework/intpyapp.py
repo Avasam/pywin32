@@ -205,7 +205,7 @@ class InteractivePythonApp(app.CApp):
             self.ddeServer = None
 
         win32ui.SetRegistryKey(
-            "Python %s" % (sys.winver,)
+            "Python {}".format(sys.winver)
         )  # MFC automatically puts the main frame caption on!
         app.CApp.InitInstance(self)
 

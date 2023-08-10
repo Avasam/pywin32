@@ -65,7 +65,7 @@ def TestEngine():
         pyEngine.Start()  # Actually run the Python code
         vbEngine.Start()  # Actually run the VB code
     except pythoncom.com_error as details:
-        print("Script failed: %s (0x%x)" % (details[1], details[0]))
+        print("Script failed: {} (0x{:x})".format(details[1], details[0]))
     # Now run the code expected to fail!
     #  try:
     #    pyEngine2.Start() # Actually run the Python code that fails!

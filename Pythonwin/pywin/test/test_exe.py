@@ -47,11 +47,14 @@ class TestPythonwinExe(unittest.TestCase):
             if not os.path.isfile(dst):
                 try:
                     assert os.path.isfile(src)
-                    print("-- symlink %r -> %r" % (dst, src), file=sys.stderr)
+                    print("-- symlink {!r} -> {!r}".format(dst, src), file=sys.stderr)
                     os.symlink(src, dst)
                 except (OSError, AssertionError) as e:
-                    print("-- cannot make symlink %r: %r" % (dst, e), file=sys.stderr)
-        print("-- Starting: %r in %r" % (cmd, wd), file=sys.stderr)
+                    print(
+                        "-- cannot make symlink {!r}: {!r}".format(dst, e),
+                        file=sys.stderr,
+                    )
+        print("-- Starting: {!r} in {!r}".format(cmd, wd), file=sys.stderr)
         self.p = subprocess.Popen(cmd, cwd=wd)
 
     def test_exe(self):
@@ -62,7 +65,7 @@ class TestPythonwinExe(unittest.TestCase):
             rc = "TIMEOUT"
         with open(self.tfn) as f:
             outs = f.read()
-        assert rc == 0, "rc is %r, outs=%r" % (rc, outs)
+        assert rc == 0, "rc is {!r}, outs={!r}".format(rc, outs)
         assert "Success!" in outs, outs
         print("-- test_exe Ok! --", file=sys.stderr)
 

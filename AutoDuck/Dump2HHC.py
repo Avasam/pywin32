@@ -153,16 +153,16 @@ def parseTopics(cat, input):
             elif top.type == "const":
                 d = cat.constants
             else:
-                raise RuntimeError("What is '%s'" % (top.type,))
+                raise RuntimeError("What is '{}'".format(top.type))
 
             if top.name in d:
-                print("Duplicate named %s detected: %s" % (top.type, top.name))
+                print("Duplicate named {} detected: {}".format(top.type, top.name))
 
             # Skip the property fields line for module/object
             line = input.readline()
             line = line[:-1]
             fields = line.split("\t")
-            assert len(fields[0]) == 0 and len(fields[1]) == 0, "%s, %s" % (
+            assert len(fields[0]) == 0 and len(fields[1]) == 0, "{}, {}".format(
                 fields,
                 top.name,
             )
@@ -197,13 +197,13 @@ def parseTopics(cat, input):
                 assert len(fields[0]) == 0 and len(fields[1]) == 0, fields
                 if top2.type == "pymeth":
                     top2.name = fields[2]
-                    top2.context = "%s__%s_meth.html" % (
+                    top2.context = "{}__{}_meth.html".format(
                         _urlescape(top.name),
                         top2.name,
                     )
                 elif top2.type == "prop":
                     top2.name = fields[3]
-                    top2.context = "%s__%s_prop.html" % (
+                    top2.context = "{}__{}_prop.html".format(
                         _urlescape(top.name),
                         top2.name,
                     )
@@ -244,7 +244,7 @@ def _genCategoryHTMLFromDict(dict, output):
     keys.sort()
     for key in keys:
         topic = dict[key]
-        output.write('<LI><A HREF="%s">%s</A>\n' % (topic.context, topic.name))
+        output.write('<LI><A HREF="{}">{}</A>\n'.format(topic.context, topic.name))
 
 
 def _genOneCategoryHTML(output_dir, cat, title, suffix, *dicts):
@@ -271,7 +271,9 @@ def _genCategoryTopic(output_dir, cat, title):
         ("Modules", "_modules"),
         ("Objects", "_objects"),
     ):
-        output.write('<LI><A HREF="%s%s.html">%s</A>\n' % (cat.id, suffix, subtitle))
+        output.write(
+            '<LI><A HREF="{}{}.html">{}</A>\n'.format(cat.id, suffix, subtitle)
+        )
     output.write("</BODY></HTML>\n")
     output.close()
 

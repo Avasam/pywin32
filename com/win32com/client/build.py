@@ -427,27 +427,30 @@ class DispatchItem(OleItem):
                     repr(argsDesc),
                     _BuildArgList(fdesc, names),
                 )
-                s = s + "%s\tif ret is not None:\n" % (linePrefix,)
+                s = s + "{}\tif ret is not None:\n".format(linePrefix)
                 if rd == pythoncom.VT_UNKNOWN:
-                    s = s + "%s\t\t# See if this IUnknown is really an IDispatch\n" % (
-                        linePrefix,
+                    s = (
+                        s
+                        + "{}\t\t# See if this IUnknown is really an IDispatch\n".format(
+                            linePrefix,
+                        )
                     )
-                    s = s + "%s\t\ttry:\n" % (linePrefix,)
+                    s = s + "{}\t\ttry:\n".format(linePrefix)
                     s = (
                         s
                         + "%s\t\t\tret = ret.QueryInterface(pythoncom.IID_IDispatch)\n"
                         % (linePrefix,)
                     )
-                    s = s + "%s\t\texcept pythoncom.error:\n" % (linePrefix,)
-                    s = s + "%s\t\t\treturn ret\n" % (linePrefix,)
-                s = s + "%s\t\tret = Dispatch(ret, %s, %s)\n" % (
+                    s = s + "{}\t\texcept pythoncom.error:\n".format(linePrefix)
+                    s = s + "{}\t\t\treturn ret\n".format(linePrefix)
+                s = s + "{}\t\tret = Dispatch(ret, {}, {})\n".format(
                     linePrefix,
                     repr(name),
                     resclsid,
                 )
                 s = s + "%s\treturn ret" % (linePrefix)
             elif rd == pythoncom.VT_BSTR:
-                s = "%s\t# Result is a Unicode object\n" % (linePrefix,)
+                s = "{}\t# Result is a Unicode object\n".format(linePrefix)
                 s = (
                     s
                     + "%s\treturn self._oleobj_.InvokeTypes(%d, LCID, %s, %s, %s%s)"

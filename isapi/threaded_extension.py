@@ -45,7 +45,7 @@ class WorkerThread(threading.Thread):
             # Let the parent extension handle the command.
             dispatcher = self.extension.dispatch_map.get(key)
             if dispatcher is None:
-                raise RuntimeError("Bad request '%s'" % (key,))
+                raise RuntimeError("Bad request '{}'".format(key))
 
             dispatcher(errCode, bytes, key, overlapped)
 

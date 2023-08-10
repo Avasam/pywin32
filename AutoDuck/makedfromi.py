@@ -123,13 +123,13 @@ def make_doc_summary(inFile, outFile):
             for extra in extras:
                 outFile.write(extra)
         if g_com_parent:
-            outFile.write("\n// @object %s|%s" % (thisModName, modDoc))
+            outFile.write("\n// @object {}|{}".format(thisModName, modDoc))
             outFile.write("\n// <nl>Derived from <o %s>\n" % (g_com_parent))
         else:
-            outFile.write("\n// @module %s|%s\n" % (thisModName, modDoc))
+            outFile.write("\n// @module {}|{}\n".format(thisModName, modDoc))
         for meth, extras in these_methods:
             fields = meth.split("|")
-            outFile.write("// @pymeth %s|%s\n" % (fields[1], fields[2]))
+            outFile.write("// @pymeth {}|{}\n".format(fields[1], fields[2]))
         chunk_number += 1
         method_num += max_methods
 
@@ -137,7 +137,7 @@ def make_doc_summary(inFile, outFile):
     for extra in extra_tags:
         outFile.write("%s\n" % (extra))
     for cname, doc in constants:
-        outFile.write("// @const %s|%s|%s\n" % (modName, cname, doc))
+        outFile.write("// @const {}|{}|{}\n".format(modName, cname, doc))
 
 
 def doit():

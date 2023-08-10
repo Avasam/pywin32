@@ -40,7 +40,7 @@ def handle_globs(lGlobs):
     for g in lGlobs:
         new = glob.glob(g)
         if len(new) == 0:
-            print("The pattern '%s' yielded no files!" % (g,))
+            print("The pattern '{}' yielded no files!".format(g))
         lFiles = lFiles + new
     # lFiles is now the list of origin files.
     # Normalize all of the paths:
@@ -111,12 +111,14 @@ def main():
             shutil.copyfile(lSrcFiles[i], file)
 
         for file in lDestFiles:
-            html_files = html_files + "%s\\%s\n" % (html_dir, file)
+            html_files = html_files + "{}\\{}\n".format(html_dir, file)
 
     for cat in doc:
-        html_files = html_files + "%s\\%s.html\n" % (output_dir, cat.id)
+        html_files = html_files + "{}\\{}.html\n".format(output_dir, cat.id)
         for suffix in "_overview _modules _objects _constants".split():
-            html_files = html_files + "%s\\%s%s.html\n" % (output_dir, cat.id, suffix)
+            html_files = html_files + "{}\\{}{}.html\n".format(
+                output_dir, cat.id, suffix
+            )
 
     f.write(sHHPFormat % {"output": output, "target": target, "html_files": html_files})
     f.close()

@@ -40,7 +40,7 @@ def RegisterInterfaces(typelibGUID, lcid, major, minor, interface_names=None):
             # Not sure why we don't get an exception here - BindType's C
             # impl looks correct..
             if type_info is None:
-                raise ValueError("The interface '%s' can not be located" % (name,))
+                raise ValueError("The interface '{}' can not be located".format(name))
             # If we got back a Dispatch interface, convert to the real interface.
             attr = type_info.GetTypeAttr()
             if attr.typekind == pythoncom.TKIND_DISPATCH:
@@ -66,14 +66,14 @@ def RegisterInterfaces(typelibGUID, lcid, major, minor, interface_names=None):
                 iid = mod.NamesToIIDMap[name]
             except KeyError:
                 raise ValueError(
-                    "Interface '%s' does not exist in this cached typelib" % (name,)
+                    "Interface '{}' does not exist in this cached typelib".format(name)
                 )
             #            print "Processing interface", name
             sub_mod = gencache.GetModuleForCLSID(iid)
             is_dispatch = getattr(sub_mod, name + "_vtables_dispatch_", None)
             method_defs = getattr(sub_mod, name + "_vtables_", None)
             if is_dispatch is None or method_defs is None:
-                raise ValueError("Interface '%s' is IDispatch only" % (name,))
+                raise ValueError("Interface '{}' is IDispatch only".format(name))
 
             # And create the univgw defn
             _doCreateVTable(iid, name, is_dispatch, method_defs)
