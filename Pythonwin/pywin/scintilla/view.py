@@ -160,7 +160,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
         self.bindings = bindings.BindingsManager(self)
 
         self.idle = IDLEenvironment.IDLEEditorWindow(self)
-        self.idle.IDLEExtension("AutoExpand")
+        self.idle.IDLEExtension("autoexpand")
         # SendScintilla is called so frequently it is worth optimizing.
         self.SendScintilla = self._obj_.SendMessage
 

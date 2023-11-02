@@ -7,6 +7,7 @@ import sys
 import win32api
 import win32con
 import win32ui
+from git import TYPE_CHECKING
 from pywin import default_scintilla_encoding
 from pywin.mfc.dialog import GetSimpleInput
 
@@ -61,10 +62,12 @@ def fast_readline(self):
     return val.encode(default_scintilla_encoding)
 
 
-try:
-    GetIDLEModule("AutoIndent").IndentSearcher.readline = fast_readline
-except AttributeError:  # GetIDLEModule may return None
-    pass
+if TYPE_CHECKING:
+    from ..idle import editor as editor_module
+else:
+    editor_module = GetIDLEModule("editor")
+if editor_module is not None:
+    editor_module.IndentSearcher.readline = fast_readline
 
 
 # A class that attempts to emulate an IDLE editor window.

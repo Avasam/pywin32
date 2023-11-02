@@ -1,6 +1,8 @@
 # Color Editor originally by Neil Hodgson, but restructured by mh to integrate
 # even tighter into Pythonwin.
 
+from typing import TYPE_CHECKING
+
 import pywin.scintilla.keycodes
 import pywin.scintilla.view
 import win32api
@@ -181,11 +183,14 @@ class SyntEditView(SyntEditViewParent):
 
     def DoConfigChange(self):
         SyntEditViewParent.DoConfigChange(self)
-        tabSize = GetEditorOption("Tab Size", 4, 2)
+        tabSize = int(GetEditorOption("Tab Size", 4, 2))
         indentSize = GetEditorOption("Indent Size", 4, 2)
-        bUseTabs = GetEditorOption("Use Tabs", 0)
+        bUseTabs = bool(GetEditorOption("Use Tabs", 0))
         bSmartTabs = GetEditorOption("Smart Tabs", 1)
-        ext = self.idle.IDLEExtension("AutoIndent")  # Required extension.
+        if TYPE_CHECKING:
+            from ....idle import editor
+        else:
+            editor = self.idle.IDLEExtension("editor")  # Required extension.
 
         self.SCISetViewWS(GetEditorOption("View Whitespace", 0))
         self.SCISetViewEOL(GetEditorOption("View EOL", 0))
@@ -239,12 +244,15 @@ class SyntEditView(SyntEditViewParent):
         # So for smart tabs we configure the widget with completely dummy
         # values (ensuring tabwidth != indentwidth), ask it to guess, then
         # look at the values it has guessed, and re-configure
+        editorWindow = editor.EditorWindow()
         if bSmartTabs:
-            ext.config(usetabs=1, tabwidth=5, indentwidth=4)
-            ext.set_indentation_params(1)
-            if ext.indentwidth == 5:
+            editorWindow.usetabs = True
+            editorWindow.tabwidth = 5
+            editorWindow.indentwidth = 4
+            editorWindow.set_indentation_params(1)
+            if editorWindow.indentwidth == 5:
                 # Either 5 literal spaces, or a single tab character. Assume a tab
-                usetabs = 1
+                usetabs = True
                 indentwidth = tabSize
             else:
                 # Either Indented with spaces, and indent size has been guessed or
@@ -253,13 +261,17 @@ class SyntEditView(SyntEditViewParent):
                     usetabs = bUseTabs
                     indentwidth = indentSize
                 else:  # guessed.
-                    indentwidth = ext.indentwidth
-                    usetabs = 0
+                    indentwidth = editorWindow.indentwidth
+                    usetabs = False
             # Tab size can never be guessed - set at user preference.
-            ext.config(usetabs=usetabs, indentwidth=indentwidth, tabwidth=tabSize)
+            editorWindow.usetabs = usetabs
+            editorWindow.indentwidth = indentwidth
+            editorWindow.tabwidth = tabSize
         else:
             # Dont want smart-tabs - just set the options!
-            ext.config(usetabs=bUseTabs, tabwidth=tabSize, indentwidth=indentSize)
+            editorWindow.usetabs = bUseTabs
+            editorWindow.tabwidth = tabSize
+            editorWindow.indentwidth = indentSize
         self.SCISetIndent(indentSize)
         self.SCISetTabWidth(tabSize)
 

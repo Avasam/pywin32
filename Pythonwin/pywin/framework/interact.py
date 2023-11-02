@@ -20,6 +20,7 @@ import win32api
 import win32clipboard
 import win32con
 import win32ui
+from git import TYPE_CHECKING
 
 ## sequential after ID_GOTO_LINE defined in editor.py
 ID_EDIT_COPY_CODE = 0xE2002
@@ -420,9 +421,12 @@ class InteractiveCore:
         self.HookCommand(self.OnSelectBlock, win32ui.ID_EDIT_SELECT_BLOCK)
         self.HookCommand(self.OnEditCopyCode, ID_EDIT_COPY_CODE)
         self.HookCommand(self.OnEditExecClipboard, ID_EDIT_EXEC_CLIPBOARD)
-        mod = pywin.scintilla.IDLEenvironment.GetIDLEModule("IdleHistory")
-        if mod is not None:
-            self.history = mod.History(self.idle.text, "\n" + sys.ps2)
+        if TYPE_CHECKING:
+            from ..idle import history
+        else:
+            history = pywin.scintilla.IDLEenvironment.GetIDLEModule("history")
+        if history is not None:
+            self.history = history.History(self.idle.text, "\n" + sys.ps2)
         else:
             self.history = None
         # hack for now for event handling.
