@@ -17,9 +17,9 @@ def GetPropTagName(pt):
                 # to the ID.
 
                 # String types should have 3 definitions in mapitags.py
-                # PR_BODY	= PROP_TAG( PT_TSTRING,	4096)
-                # PR_BODY_W	= PROP_TAG( PT_UNICODE, 4096)
-                # PR_BODY_A	= PROP_TAG( PT_STRING8, 4096)
+                # PR_BODY   = PROP_TAG( PT_TSTRING, 4096)
+                # PR_BODY_W = PROP_TAG( PT_UNICODE, 4096)
+                # PR_BODY_A = PROP_TAG( PT_STRING8, 4096)
                 # The following change ensures a lookup using only the the
                 # property id returns the conditional default.
 

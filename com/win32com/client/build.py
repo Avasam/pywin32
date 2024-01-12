@@ -220,18 +220,18 @@ class DispatchItem(OleItem):
 
         # We need to translate any Alias', Enums, structs etc in result and args
         typerepr, flag, defval = fdesc.rettype
-        # 		sys.stderr.write("%s result - %s -> " % (name, typerepr))
+        # sys.stderr.write("%s result - %s -> " % (name, typerepr))
         typerepr, resultCLSID, resultDoc = _ResolveType(typerepr, typeinfo)
-        # 		sys.stderr.write("%s\n" % (typerepr,))
+        # sys.stderr.write("%s\n" % (typerepr,))
         fdesc.rettype = typerepr, flag, defval, resultCLSID
         # Translate any Alias or Enums in argument list.
         argList = []
         for argDesc in fdesc.args:
             typerepr, flag, defval = argDesc
-            # 			sys.stderr.write("%s arg - %s -> " % (name, typerepr))
+            # sys.stderr.write("%s arg - %s -> " % (name, typerepr))
             arg_type, arg_clsid, arg_doc = _ResolveType(typerepr, typeinfo)
             argDesc = arg_type, flag, defval, arg_clsid
-            # 			sys.stderr.write("%s\n" % (argDesc[0],))
+            # sys.stderr.write("%s\n" % (argDesc[0],))
             argList.append(argDesc)
         fdesc.args = tuple(argList)
 
@@ -263,8 +263,8 @@ class DispatchItem(OleItem):
         else:
             map = None
         if not map is None:
-            # 				if map.has_key(name):
-            # 					sys.stderr.write("Warning - overwriting existing method/attribute %s\n" % name)
+            # if map.has_key(name):
+            #     sys.stderr.write("Warning - overwriting existing method/attribute %s\n" % name)
             map[name] = MapEntry(fdesc, names, doc, resultCLSID, resultDoc, hidden)
             # any methods that can't be reached via DISPATCH we return None
             # for, so dynamic dispatch doesnt see it.

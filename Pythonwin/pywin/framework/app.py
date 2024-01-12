@@ -299,23 +299,24 @@ class CApp(WinApp):
     # but handles errors slightly better.
     # It all still works, tho, so if you need similar functionality, you can use it.
     # Therefore I havent deleted this code completely!
-    # 	def CallbackManager( self, ob, args = () ):
-    # 		"""Manage win32 callbacks.  Trap exceptions, report on them, then return 'All OK'
-    # 		to the frame-work. """
-    # 		import traceback
-    # 		try:
-    # 			ret = apply(ob, args)
-    # 			return ret
-    # 		except:
-    # 			# take copies of the exception values, else other (handled) exceptions may get
-    # 			# copied over by the other fns called.
-    # 			win32ui.SetStatusText('An exception occured in a windows command handler.')
-    # 			t, v, tb = sys.exc_info()
-    # 			traceback.print_exception(t, v, tb.tb_next)
-    # 			try:
-    # 				sys.stdout.flush()
-    # 			except (NameError, AttributeError):
-    # 				pass
+    # def CallbackManager( self, ob, args = () ):
+    #     """Manage win32 callbacks.  Trap exceptions, report on them, then return 'All OK'
+    #     to the frame-work. """
+    #     import traceback
+
+    #     try:
+    #         ret = apply(ob, args)
+    #         return ret
+    #     except:
+    #         # take copies of the exception values, else other (handled) exceptions may get
+    #         # copied over by the other fns called.
+    #         win32ui.SetStatusText('An exception occured in a windows command handler.')
+    #         t, v, tb = sys.exc_info()
+    #         traceback.print_exception(t, v, tb.tb_next)
+    #         try:
+    #             sys.stdout.flush()
+    #         except (NameError, AttributeError):
+    #             pass
 
     # Command handlers.
     def OnFileMRU(self, id, code):

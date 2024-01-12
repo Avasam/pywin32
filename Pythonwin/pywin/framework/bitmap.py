@@ -140,15 +140,15 @@ win32ui.GetApp().AddDocTemplate(bitmapTemplate)
 
 # This works, but just didnt make it through the code reorg.
 # class PPMBitmap(Bitmap):
-# 	def LoadBitmapFile(self, file ):
-# 		magic=file.readline()
-# 		if magic <> "P6\n":
-# 			raise TypeError, "The file is not a PPM format file"
-# 		rowcollist=file.readline().split()
-# 		cols=int(rowcollist[0])
-# 		rows=int(rowcollist[1])
-# 		file.readline()	# whats this one?
-# 		self.bitmap.LoadPPMFile(file,(cols,rows))
+#     def LoadBitmapFile(self, file ):
+#         magic=file.readline()
+#         if magic <> "P6\n":
+#             raise TypeError, "The file is not a PPM format file"
+#         rowcollist=file.readline().split()
+#         cols=int(rowcollist[0])
+#         rows=int(rowcollist[1])
+#         file.readline()  # whats this one?
+#         self.bitmap.LoadPPMFile(file,(cols,rows))
 
 
 def t():

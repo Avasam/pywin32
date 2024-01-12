@@ -290,7 +290,7 @@ class WindowOutputViewScintilla(
         self.HandleSpecialLine()
 
     ##	def OnLDoubleClick(self,params):
-    ##			return 0	# never dont pass on
+    ##			return 0  # never dont pass on
 
     def RestoreKillBuffer(self):
         assert len(self.template.killBuffer) in (0, 1), "Unexpected killbuffer contents"

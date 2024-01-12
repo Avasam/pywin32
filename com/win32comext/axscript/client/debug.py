@@ -115,11 +115,11 @@ class DebugManager:
         The result is a boolean which indicates if the error handler should call
         IActiveScriptSite::OnScriptError()
         """
-        # 		if self.IsAnyHost:
-        # 			site = _wrap(self, axdebug.IID_IActiveScriptSite)
-        # 			breakResume, errorResume, fCallOnError = self.debugApplication(activeScriptErrorDebug, site)
+        # if self.IsAnyHost:
+        #     site = _wrap(self, axdebug.IID_IActiveScriptSite)
+        #     breakResume, errorResume, fCallOnError = self.debugApplication(activeScriptErrorDebug, site)
         # Do something with these!
-        # 		else:
+        #     else:
         trace("HandleRuntimeError")
         fCallOnError = 1
         return fCallOnError
@@ -178,8 +178,8 @@ class DebugCodeBlockContainer(SourceCodeContainer):
             return self.codeBlock.GetDisplayName()
         elif dnt == axdebug.DOCUMENTNAMETYPE_TITLE:
             return self.codeBlock.GetDisplayName()
-        # 		elif dnt==axdebug.DOCUMENTNAMETYPE_FILE_TAIL:
-        # 		elif dnt==axdebug.DOCUMENTNAMETYPE_URL:
+        # elif dnt==axdebug.DOCUMENTNAMETYPE_FILE_TAIL:
+        # elif dnt==axdebug.DOCUMENTNAMETYPE_URL:
         else:
             raise COMException(scode=winerror.S_FALSE)
 

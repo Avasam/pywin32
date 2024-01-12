@@ -48,7 +48,7 @@ def profile(fn, *args):
     prof = profile.Profile()
     try:
         # roll on 1.6 :-)
-        # 		return prof.runcall(fn, *args)
+        # return prof.runcall(fn, *args)
         return prof.runcall(*(fn,) + args)
     finally:
         import pstats
@@ -274,7 +274,7 @@ class EventSink:
     def Connect(self):
         if self.connection is not None or self.iid is None:
             return
-        # 		trace("Connect for sink item", self.myScriptItem.name, "with IID",str(self.iid))
+        # trace("Connect for sink item", self.myScriptItem.name, "with IID",str(self.iid))
         self.connection = win32com.client.connect.SimpleConnection(
             self.coDispatch, self, self.iid
         )
@@ -301,7 +301,7 @@ class ScriptItem:
         self.createdConnections = 0
         self.isRegistered = 0
 
-    # 		trace("Creating ScriptItem", name, "of parent", parentItem,"with dispatch", dispatch)
+    #     trace("Creating ScriptItem", name, "of parent", parentItem,"with dispatch", dispatch)
 
     def __repr__(self):
         flagsDesc = ""
@@ -415,8 +415,8 @@ class ScriptItem:
             )
         return rc
 
-    # 		if self.dispatch is None:
-    # 			RaiseAssert(winerror.E_UNEXPECTED, "??")
+    #     if self.dispatch is None:
+    #         RaiseAssert(winerror.E_UNEXPECTED, "??")
 
     def CreateConnections(self):
         # Create (but do not connect to) the connection points.
@@ -450,7 +450,7 @@ class ScriptItem:
                 "Item already has built events, or no dispatch available?",
             )
 
-        # 		trace("BuildEvents for named item", self._GetFullItemName())
+        # trace("BuildEvents for named item", self._GetFullItemName())
         self.eventSink = EventSink(self, self.dispatch)
         self.eventSink.BuildEvents()
 
@@ -616,7 +616,7 @@ class COMScript:
     def __init__(self):
         # Make sure we can print/trace wihout an exception!
         MakeValidSysOuts()
-        # 		trace("AXScriptEngine object created", self)
+        # trace("AXScriptEngine object created", self)
         self.baseThreadId = -1
         self.debugManager = None
         self.threadState = axscript.SCRIPTTHREADSTATE_NOTINSCRIPT
@@ -630,7 +630,7 @@ class COMScript:
     def _query_interface_(self, iid):
         if self.debugManager:
             return self.debugManager._query_interface_for_debugger_(iid)
-        # 		trace("ScriptEngine QI - unknown IID", iid)
+        # trace("ScriptEngine QI - unknown IID", iid)
         return 0
 
     # IActiveScriptParse
@@ -649,7 +649,7 @@ class COMScript:
         sourceContextCookie,
         startLineNumber,
     ):
-        # 		trace ("AddScriptlet", defaultName, code, itemName, subItemName, eventName, delimiter, sourceContextCookie, startLineNumber)
+        # trace ("AddScriptlet", defaultName, code, itemName, subItemName, eventName, delimiter, sourceContextCookie, startLineNumber)
         self.DoAddScriptlet(
             defaultName,
             code,
@@ -672,7 +672,7 @@ class COMScript:
         flags,
         bWantResult,
     ):
-        # 		trace ("ParseScriptText", code[:20],"...", itemName, context, delimiter, sourceContextCookie, startLineNumber, flags, bWantResult)
+        # trace ("ParseScriptText", code[:20],"...", itemName, context, delimiter, sourceContextCookie, startLineNumber, flags, bWantResult)
         if (
             bWantResult
             or self.scriptState == axscript.SCRIPTSTATE_STARTED
@@ -724,7 +724,7 @@ class COMScript:
         # <SCRIPT for="whatever" event="onClick" language="Python">
         # (but even for those blocks, the "onClick" information is still missing!?!?!?)
 
-        # 		self.DoAddScriptlet(None, code, itemName, subItemName, eventName, delimiter,sourceContextCookie, startLineNumber)
+        # self.DoAddScriptlet(None, code, itemName, subItemName, eventName, delimiter,sourceContextCookie, startLineNumber)
         return None
 
     #
@@ -826,7 +826,7 @@ class COMScript:
         return self.scriptState
 
     def Close(self):
-        # 		trace("Close")
+        # trace("Close")
         if self.scriptState in [
             axscript.SCRIPTSTATE_CONNECTED,
             axscript.SCRIPTSTATE_DISCONNECTED,
@@ -906,7 +906,7 @@ class COMScript:
     # This is never called by the C++ framework - it does magic.
     # See PyGActiveScript.cpp
     # def InterruptScriptThread(self, stidThread, exc_info, flags):
-    # 	raise Exception("Not Implemented", scode=winerror.E_NOTIMPL)
+    #     raise Exception("Not Implemented", scode=winerror.E_NOTIMPL)
 
     def Clone(self):
         raise Exception("Not Implemented", scode=winerror.E_NOTIMPL)
@@ -919,15 +919,15 @@ class COMScript:
     # reflected in GetInterfaceSafetyOptions and the QIs obviously fail, but still IE
     # allows our engine to initialize.
     def SetInterfaceSafetyOptions(self, iid, optionsMask, enabledOptions):
-        # 		trace ("SetInterfaceSafetyOptions", iid, optionsMask, enabledOptions)
+        # trace ("SetInterfaceSafetyOptions", iid, optionsMask, enabledOptions)
         if optionsMask & enabledOptions == 0:
             return
 
         # See comments above.
-        # 		if (optionsMask & enabledOptions & \
-        # 			~(axscript.INTERFACESAFE_FOR_UNTRUSTED_DATA | axscript.INTERFACESAFE_FOR_UNTRUSTED_CALLER)):
-        # 			# request for options we don't understand
-        # 			RaiseAssert(scode=winerror.E_FAIL, desc="Unknown safety options")
+        # if (optionsMask & enabledOptions & \
+        #     ~(axscript.INTERFACESAFE_FOR_UNTRUSTED_DATA | axscript.INTERFACESAFE_FOR_UNTRUSTED_CALLER)):
+        #     # request for options we don't understand
+        #     RaiseAssert(scode=winerror.E_FAIL, desc="Unknown safety options")
 
         if iid in [
             pythoncom.IID_IPersist,
@@ -964,7 +964,7 @@ class COMScript:
         self.DoExecutePendingScripts()
 
     def ProcessScriptItemEvent(self, item, event, lcid, wFlags, args):
-        # 		trace("ProcessScriptItemEvent", item, event, lcid, wFlags, args)
+        # trace("ProcessScriptItemEvent", item, event, lcid, wFlags, args)
         self.RegisterNewNamedItems()
         return self.DoProcessScriptItemEvent(item, event, lcid, wFlags, args)
 
@@ -1016,13 +1016,13 @@ class COMScript:
         self.ConnectEventHandlers()
 
     def Run(self):
-        # 		trace("AXScript running...")
+        # trace("AXScript running...")
         if (
             self.scriptState != axscript.SCRIPTSTATE_INITIALIZED
             and self.scriptState != axscript.SCRIPTSTATE_STARTED
         ):
             raise Exception(scode=winerror.E_UNEXPECTED)
-        # 		self._DumpNamedItems_()
+        # self._DumpNamedItems_()
         self.ExecutePendingScripts()
         self.DoRun()
 

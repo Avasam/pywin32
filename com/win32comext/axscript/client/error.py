@@ -228,7 +228,7 @@ def ProcessAXScriptException(scriptingSite, debugManager, exceptionInstance):
     likely call back on the IActiveScriptError interface to get the source text
     and other information not normally in COM exceptions.
     """
-    # 	traceback.print_exc()
+    # traceback.print_exc()
     instance = IActiveScriptError()
     instance._SetExceptionInfo(exceptionInstance)
     gateway = win32com.server.util.wrap(instance, axscript.IID_IActiveScriptError)

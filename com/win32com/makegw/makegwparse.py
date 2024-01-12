@@ -34,7 +34,7 @@ DEBUG = 0
 
 
 class ArgFormatter:
-    """An instance for a specific type of argument.	 Knows how to convert itself"""
+    """An instance for a specific type of argument. Knows how to convert itself"""
 
     def __init__(self, arg, builtinIndirection, declaredIndirection=0):
         # print("init:", arg.name, builtinIndirection, declaredIndirection, arg.indirectionLevel)
@@ -109,12 +109,12 @@ class ArgFormatter:
         """
 
         # the first return element is the variable to be passed as
-        # 	 an argument to an interface method. the variable was
-        # 	 declared with only its builtin indirection level. when
-        # 	 we pass it, we'll need to pass in whatever amount of
-        # 	 indirection was applied (plus the builtin amount)
+        # an argument to an interface method. the variable was
+        # declared with only its builtin indirection level. when
+        # we pass it, we'll need to pass in whatever amount of
+        # indirection was applied (plus the builtin amount)
         # the second return element is the variable declaration; it
-        # 	 should simply be builtin indirection
+        # should simply be builtin indirection
         return (
             self.GetIndirectedArgName(
                 self.builtinIndirection,
@@ -159,7 +159,7 @@ class ArgFormatter:
         "Declare the variable used as the PyArg_ParseTuple param for a gateway"
         # Only declare it??
         # if self.arg.indirectionLevel==0:
-        # 	return "\t%s %s;\n" % (self.arg.type, self.arg.name)
+        #     return "\t%s %s;\n" % (self.arg.type, self.arg.name)
         # else:
         if DEBUG:
             return (
@@ -213,7 +213,7 @@ class ArgFormatter:
         )
 
     def _GetPythonTypeDesc(self):
-        "Returns a string with the description of the type.	 Used for doco purposes"
+        "Returns a string with the description of the type. Used for doco purposes"
         return None
 
     def NeedUSES_CONVERSION(self):
@@ -339,8 +339,8 @@ class ArgFormatterPythonCOM(ArgFormatter):
         return "O"
 
     # def GetInterfaceCppObjectInfo(self):
-    # 	return ArgFormatter.GetInterfaceCppObjectInfo(self)[0], \
-    # 		"%s %s%s" % (self.arg.unc_type, "*" * self._GetDeclaredIndirection(), self.arg.name)
+    #     return ArgFormatter.GetInterfaceCppObjectInfo(self)[0], \
+    #         "%s %s%s" % (self.arg.unc_type, "*" * self._GetDeclaredIndirection(), self.arg.name)
     def DeclareParseArgTupleInputConverter(self):
         # Declare a PyObject variable
         return "\tPyObject *ob%s;\n" % self.arg.name
@@ -456,7 +456,7 @@ class ArgFormatterIID(ArgFormatterPythonCOM):
         )
 
     def GetBuildForInterfacePreCode(self):
-        # 		notdirected = self.GetIndirectedArgName(self.arg.indirectionLevel, 0)
+        # notdirected = self.GetIndirectedArgName(self.arg.indirectionLevel, 0)
         notdirected = self.GetIndirectedArgName(None, 0)
         return f"\tob{self.arg.name} = PyWinObject_FromIID({notdirected});\n"
 
@@ -662,7 +662,7 @@ class ArgFormatterVARIANT(ArgFormatterPythonCOM):
     def GetBuildForGatewayPostCode(self):
         return "\tPy_XDECREF(ob%s);\n" % self.arg.name
 
-        # Key :		, Python Type Description, ParseTuple format char
+        # Key : , Python Type Description, ParseTuple format char
 
 
 ConvertSimpleTypes = {
@@ -791,8 +791,8 @@ class Argument:
     to/from Python arguments.
     """
 
-    # 									  in,out					  type			  name			 [	]
-    # 								   --------------				--------	  ------------		------
+    #                       in,out              type          name         [  ]
+    #                   --------------        --------    ------------    ------
     regex = re.compile(r"/\* \[([^\]]*.*?)] \*/[ \t](.*[* ]+)(\w+)(\[ *])?[\),]")
 
     def __init__(self, good_interface_names):
@@ -842,7 +842,7 @@ class Argument:
 
         if VERBOSE:
             print(
-                "	   Arg {} of type {}{} ({})".format(
+                "       Arg {} of type {}{} ({})".format(
                     self.name, self.type, "*" * self.indirectionLevel, self.inout
                 )
             )
@@ -870,8 +870,8 @@ class Method:
     a list of all @Argument@s
     """
 
-    # 										 options	 ret type callconv	 name
-    # 								   ----------------- -------- -------- --------
+    #                         options      ret type callconv   name
+    #                    ----------------- -------- -------- --------
     regex = re.compile(r"virtual (/\*.*?\*/ )?(.*?) (.*?) (.*?)\(\w?")
 
     def __init__(self, good_interface_names):
@@ -901,8 +901,8 @@ class Method:
                 print(
                     "Method %s - Only HRESULT return types are supported." % self.name
                 )
-            # 				raise error_not_supported,		if VERBOSE:
-            print(f"	 Method {self.result} {self.name}(")
+            # raise error_not_supported, if VERBOSE:
+            print(f"     Method {self.result} {self.name}(")
         while 1:
             arg = Argument(self.good_interface_names)
             try:
@@ -919,8 +919,8 @@ class Interface:
     a list of all @Method@s
     """
 
-    # 									  name				 base
-    # 									 --------		   --------
+    #                                  name             base
+    #                                --------         --------
     regex = re.compile(r"(interface|) ([^ ]*) : public (.*)$")
 
     def __init__(self, mo):

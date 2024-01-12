@@ -24,7 +24,7 @@
 ##  +++ ./intpyapp.py	2006-10-02 17:59:32.974161600 +0200
 ##  @@ -272,7 +282,7 @@
 ## 	def LoadUserModules(self, moduleNames = None):
-## 		# Load the users modules.
+## 	    # Load the users modules.
 ## 		if moduleNames is None:
 ##  -			default = "sgrepmdi"
 ##  +			default = "sgrepmdi,mdi_pychecker"

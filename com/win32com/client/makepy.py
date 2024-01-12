@@ -274,7 +274,7 @@ def GenerateFromTypeLibSpec(
     elif hasattr(typelibInfo, "GetLibAttr"):
         # A real typelib object!
         # Could also use isinstance(typelibInfo, PyITypeLib) instead, but PyITypeLib is not directly exposed by pythoncom.
-        # 	pythoncom.TypeIIDs[pythoncom.IID_ITypeLib] seems to work
+        # pythoncom.TypeIIDs[pythoncom.IID_ITypeLib] seems to work
         tla = typelibInfo.GetLibAttr()
         guid = tla[0]
         lcid = tla[1]

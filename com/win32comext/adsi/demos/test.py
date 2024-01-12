@@ -150,7 +150,7 @@ def DumpSchema2():
                 items.append("Abstract")
             if item.Auxiliary:
                 items.append("Auxiliary")
-            # 			if item.Structural: items.append("Structural")
+            # if item.Structural: items.append("Structural")
             desc = ", ".join(items)
             import win32com.util
 

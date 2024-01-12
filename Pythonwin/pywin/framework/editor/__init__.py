@@ -10,56 +10,56 @@ import win32ui
 defaultCharacterFormat = (-402653169, 0, 200, 0, 0, 0, 49, "Courier New")
 
 ##def GetDefaultEditorModuleName():
-##	import pywin
-##	# If someone has set pywin.editormodulename, then this is what we use
-##	try:
-##		prefModule = pywin.editormodulename
-##	except AttributeError:
-##		prefModule = win32ui.GetProfileVal("Editor","Module", "")
-##	return prefModule
+##    import pywin
+##    # If someone has set pywin.editormodulename, then this is what we use
+##    try:
+##        prefModule = pywin.editormodulename
+##    except AttributeError:
+##        prefModule = win32ui.GetProfileVal("Editor","Module", "")
+##    return prefModule
 ##
 ##def WriteDefaultEditorModule(module):
-##	try:
-##		module = module.__name__
-##	except:
-##		pass
-##	win32ui.WriteProfileVal("Editor", "Module", module)
+##    try:
+##        module = module.__name__
+##    except:
+##        pass
+##    win32ui.WriteProfileVal("Editor", "Module", module)
 
 
 def LoadDefaultEditor():
     pass
 
 
-##	prefModule = GetDefaultEditorModuleName()
-##	restorePrefModule = None
-##	mod = None
-##	if prefModule:
-##		try:
-##			mod = __import__(prefModule)
-##		except 'xx':
-##			msg = "Importing your preferred editor ('%s') failed.\n\nError %s: %s\n\nAn attempt will be made to load the default editor.\n\nWould you like this editor disabled in the future?" % (prefModule, sys.exc_info()[0], sys.exc_info()[1])
-##			rc = win32ui.MessageBox(msg, "Error importing editor", win32con.MB_YESNO)
-##			if rc == win32con.IDNO:
-##				restorePrefModule = prefModule
-##			WriteDefaultEditorModule("")
-##			del rc
+##    prefModule = GetDefaultEditorModuleName()
+##    restorePrefModule = None
+##    mod = None
+##    if prefModule:
+##        try:
+##            mod = __import__(prefModule)
+##        except 'xx':
+##            msg = "Importing your preferred editor ('%s') failed.\n\nError %s: %s\n\nAn attempt will be made to load the default editor.\n\nWould you like this editor disabled in the future?" % (prefModule, sys.exc_info()[0], sys.exc_info()[1])
+##            rc = win32ui.MessageBox(msg, "Error importing editor", win32con.MB_YESNO)
+##            if rc == win32con.IDNO:
+##                restorePrefModule = prefModule
+##            WriteDefaultEditorModule("")
+##            del rc
 ##
-##	try:
-##		# Try and load the default one - dont catch errors here.
-##		if mod is None:
-##			prefModule = "pywin.framework.editor.color.coloreditor"
-##			mod = __import__(prefModule)
+##    try:
+##        # Try and load the default one - dont catch errors here.
+##        if mod is None:
+##            prefModule = "pywin.framework.editor.color.coloreditor"
+##            mod = __import__(prefModule)
 ##
-##		# Get at the real module.
-##		mod = sys.modules[prefModule]
+##        # Get at the real module.
+##        mod = sys.modules[prefModule]
 ##
-##		# Do a "from mod import *"
-##		globals().update(mod.__dict__)
+##        # Do a "from mod import *"
+##        globals().update(mod.__dict__)
 ##
-##	finally:
-##		# Restore the users default editor if it failed and they requested not to disable it.
-##		if restorePrefModule:
-##			WriteDefaultEditorModule(restorePrefModule)
+##    finally:
+##        # Restore the users default editor if it failed and they requested not to disable it.
+##        if restorePrefModule:
+##            WriteDefaultEditorModule(restorePrefModule)
 
 
 def GetEditorOption(option, defaultValue, min=None, max=None):
