@@ -65,7 +65,6 @@ if __name__ == "__main__":
     import getopt
 
     try:
-
         opts, args = getopt.getopt(sys.argv[1:], "af:d:r")
     except getopt.GetoptError as msg:
         usage(msg)

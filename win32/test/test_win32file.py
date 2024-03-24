@@ -632,7 +632,10 @@ class TestDirectoryChanges(unittest.TestCase):
             try:
                 print("waiting", dh)
                 changes = win32file.ReadDirectoryChangesW(
-                    dh, 8192, False, flags  # sub-tree
+                    dh,
+                    8192,
+                    False,
+                    flags,  # sub-tree
                 )
                 print("got", changes)
             except:
@@ -646,7 +649,11 @@ class TestDirectoryChanges(unittest.TestCase):
         overlapped.hEvent = win32event.CreateEvent(None, 0, 0, None)
         while 1:
             win32file.ReadDirectoryChangesW(
-                dh, buf, False, flags, overlapped  # sub-tree
+                dh,
+                buf,
+                False,
+                flags,
+                overlapped,  # sub-tree
             )
             # Wait for our event, or for 5 seconds.
             rc = win32event.WaitForSingleObject(overlapped.hEvent, 5000)
