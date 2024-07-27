@@ -245,7 +245,7 @@ def _event_setattr_(self, attr, val):
 # to the real object as the proxy dies.
 class EventsProxy:
     def __init__(self, ob):
-        self.__dict__["_obj_"] = ob
+        self._obj_ = ob
 
     def __del__(self):
         try:
@@ -507,7 +507,7 @@ class DispatchBaseClass:
                 if details.hresult != winerror.E_NOINTERFACE:
                     raise
                 oobj = oobj._oleobj_
-        self.__dict__["_oleobj_"] = oobj  # so we don't call __setattr__
+        self._oleobj_ = oobj  # so we don't call __setattr__
 
     def __dir__(self):
         lst = (
@@ -596,7 +596,7 @@ class CoClassBaseClass:
     def __init__(self, oobj=None):
         if oobj is None:
             oobj = pythoncom.new(self.CLSID)
-        dispobj = self.__dict__["_dispobj_"] = self.default_interface(oobj)
+        self._dispobj_ = self.default_interface(oobj)
         # See comments below re the special methods.
         for maybe in [
             "__call__",
@@ -606,16 +606,15 @@ class CoClassBaseClass:
             "__len__",
             "__bool__",
         ]:
-            if hasattr(dispobj, maybe):
+            if hasattr(self._dispobj_, maybe):
                 setattr(self, maybe, getattr(self, "__maybe" + maybe))
 
     def __repr__(self):
         return f"<win32com.gen_py.{__doc__}.{self.__class__.__name__}>"
 
     def __getattr__(self, attr):
-        d = self.__dict__["_dispobj_"]
-        if d is not None:
-            return getattr(d, attr)
+        if self._dispobj_ is not None:
+            return getattr(self._dispobj_, attr)
         raise AttributeError(attr)
 
     def __setattr__(self, attr, value):
@@ -623,9 +622,8 @@ class CoClassBaseClass:
             self.__dict__[attr] = value
             return
         try:
-            d = self.__dict__["_dispobj_"]
-            if d is not None:
-                d.__setattr__(attr, value)
+            if self._dispobj_ is not None:
+                self._dispobj_.__setattr__(attr, value)
                 return
         except AttributeError:
             pass
@@ -640,22 +638,22 @@ class CoClassBaseClass:
         # do and if so, wires them up.
 
     def __maybe__call__(self, *args, **kwargs):
-        return self.__dict__["_dispobj_"].__call__(*args, **kwargs)
+        return self._dispobj_.__call__(*args, **kwargs)
 
     def __maybe__str__(self, *args):
-        return self.__dict__["_dispobj_"].__str__(*args)
+        return self._dispobj_.__str__(*args)
 
     def __maybe__int__(self, *args):
-        return self.__dict__["_dispobj_"].__int__(*args)
+        return self._dispobj_.__int__(*args)
 
     def __maybe__iter__(self):
-        return self.__dict__["_dispobj_"].__iter__()
+        return self._dispobj_.__iter__()
 
     def __maybe__len__(self):
-        return self.__dict__["_dispobj_"].__len__()
+        return self._dispobj_.__len__()
 
     def __maybe__bool__(self):
-        return self.__dict__["_dispobj_"].__bool__()
+        return self._dispobj_.__bool__()
 
 
 # A very simple VARIANT class.  Only to be used with poorly-implemented COM
