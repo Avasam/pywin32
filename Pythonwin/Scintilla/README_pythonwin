@@ -7,7 +7,11 @@ included (plus the Scintilla Licence.txt and README).
 For the full set of Scintilla sources, including its documentation
 and companion editor SciTE, see https://www.scintilla.org/.
 
-When updating the Scintilla source, also update the copyright year
-in Pythonwin/pywin/framework/app.py and regenerate
-Pythonwin/pywin/scintilla/scintillacon.py using h2py:
-https://github.com/python/cpython/blob/3.8/Tools/scripts/h2py.py
+When updating the Scintilla source, also do the following steps:
+- Update the copyright year in Pythonwin/pywin/framework/app.py
+- Regenerate Pythonwin/pywin/scintilla/scintillacon.py using h2py:
+  https://github.com/python/cpython/blob/3.8/Tools/scripts/h2py.py
+- Remove all lexers except lexers/LexPython.cxx
+- Run DepGen.py in Pythonwin/Scintilla/win32/
+- Comment out gtk in Pythonwin/Scintilla/scripts/LexGen.py
+- Run Pythonwin/Scintilla/scripts/LexGen.py
