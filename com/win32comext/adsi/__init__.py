@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
+
 import win32com
 import win32com.client
 
-if isinstance(__path__, str):
+if TYPE_CHECKING:
+    # Pretend adsi isn't potentially unbound, usage is all lazy anyway
+    import adsi
+elif isinstance(__path__, str):
     # For freeze to work!
     import sys
 
