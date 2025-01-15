@@ -88,13 +88,15 @@ class Expression(gateways.DebugExpression):
 
 
 def MakeEnumDebugProperty(object, dwFieldSpec, nRadix, iid, stackFrame=None):
-    name_vals = []
     if hasattr(object, "items") and hasattr(object, "keys"):  # If it is a dict.
         name_vals = object.items()
         dictionary = object
     elif hasattr(object, "__dict__"):  # object with dictionary, module
         name_vals = object.__dict__.items()
         dictionary = object.__dict__
+    else:
+        name_vals = []
+        dictionary = {}
     infos = []
     for name, val in name_vals:
         infos.append(

@@ -246,6 +246,7 @@ class EventSink:
                 return typeinfo.GetRefTypeInfo(href)
 
     def BuildEvents(self):
+        mainTypeInfo = None
         # See if it is an extender object.
         try:
             mainTypeInfo = self.coDispatch.QueryInterface(
@@ -262,6 +263,8 @@ class EventSink:
                 )
             except pythoncom.com_error:
                 numTypeInfos = 0
+        if not mainTypeInfo:
+            return
         # Create an event handler for the item.
         for item in range(numTypeInfos):
             if isMulti:
@@ -1150,9 +1153,9 @@ class COMScript:
     def ExecInScriptedSection(self, codeBlock: AXScriptCodeBlock, globals, locals=None):
         if locals is None:
             locals = globals
-        assert (
-            not codeBlock.beenExecuted
-        ), "This code block should not have been executed"
+        assert not codeBlock.beenExecuted, (
+            "This code block should not have been executed"
+        )
         codeBlock.beenExecuted = 1
         self.BeginScriptedSection()
         try:
@@ -1178,9 +1181,9 @@ class COMScript:
     def EvalInScriptedSection(self, codeBlock, globals, locals=None):
         if locals is None:
             locals = globals
-        assert (
-            not codeBlock.beenExecuted
-        ), "This code block should not have been executed"
+        assert not codeBlock.beenExecuted, (
+            "This code block should not have been executed"
+        )
         codeBlock.beenExecuted = 1
         self.BeginScriptedSection()
         try:

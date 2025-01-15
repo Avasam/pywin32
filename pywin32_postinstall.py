@@ -417,6 +417,7 @@ def install(lib_dir):
     for dest_dir in [get_system_dir(), sys.prefix]:
         # and copy some files over there
         worked = 0
+        dst = ""
         try:
             for fname in files:
                 base = os.path.basename(fname)
@@ -447,9 +448,9 @@ def install(lib_dir):
                 # in that place - otherwise that one will still get used!
                 if os.path.exists(dst):
                     msg = (
-                        "The file '%s' exists, but can not be replaced "
+                        f"The file '{dst}' exists, but can not be replaced "
                         "due to insufficient permissions.  You must "
-                        "reinstall this software as an Administrator" % dst
+                        "reinstall this software as an Administrator"
                     )
                     print(msg)
                     raise RuntimeError(msg)

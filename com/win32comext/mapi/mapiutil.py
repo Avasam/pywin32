@@ -183,14 +183,14 @@ def SetProperties(msg, propDict):
     (only 1 if dictionary full of int keys)
     """
 
-    newProps = []
     # First pass over the properties we should get IDs for.
-    for key, val in propDict.items():
-        if isinstance(key, str):
-            newProps.append((mapi.PS_PUBLIC_STRINGS, key))
+    newProps = [
+        (mapi.PS_PUBLIC_STRINGS, key)
+        for key, val in propDict.items()
+        if isinstance(key, str)
+    ]
     # Query for the new IDs
-    if newProps:
-        newIds = msg.GetIDsFromNames(newProps, mapi.MAPI_CREATE)
+    newIds = msg.GetIDsFromNames(newProps, mapi.MAPI_CREATE) if newProps else {}
     newIdNo = 0
     newProps = []
     for key, val in propDict.items():

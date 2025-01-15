@@ -47,6 +47,7 @@ def CheckPythonPaths(verbose):
         )
     except win32api.error as exc:
         print("** does not exist - ", exc.strerror)
+        raise
     problem = CheckPathString(appPath)
     if problem:
         print(problem)

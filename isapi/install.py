@@ -806,4 +806,4 @@ def HandleCommandLine(
             traceback.print_exc()
         print(f"{details.__class__.__name__}: {details}")
     except KeyError:
-        parser.error("Invalid arg '%s'" % arg)
+        parser.error(f"Invalid arg '{arg}'")  # pyright: ignore[reportPossiblyUnboundVariable] # Keyerror ensures at least 1 iteration happened

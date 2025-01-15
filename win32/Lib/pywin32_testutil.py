@@ -75,7 +75,7 @@ class LeakTestCase(unittest.TestCase):
             self.real_test(result)
             if result.shouldStop:
                 break
-        del i  # created after we remembered the refcount!
+        del i  # pyright: ignore[reportPossiblyUnboundVariable] created after we remembered the refcount!
         # int division here means one or 2 stray references won't force
         # failure, but one per loop
         gc.collect()
@@ -181,6 +181,7 @@ def find_test_fixture(basename, extra_dir="."):
         extra_dir,
         ".",
     ]
+    fname = ""
     for candidate in candidates:
         fname = os.path.join(candidate, basename)
         if os.path.isfile(fname):

@@ -45,9 +45,9 @@ def Connect(rasEntryName, numRetries=5):
         win32api.Sleep(5000)
         retryCount -= 1
 
-    if errCode:
+    if errCode:  # pyright: ignore[reportPossiblyUnboundVariable] # Loop will iterate at least once
         raise ConnectionError(errCode, win32ras.GetErrorString(errCode))
-    return 1, rasHandle
+    return 1, rasHandle  # pyright: ignore[reportPossiblyUnboundVariable] # Loop will iterate at least once
 
 
 def Disconnect(handle):
