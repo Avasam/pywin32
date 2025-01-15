@@ -245,7 +245,7 @@ class BaseQuery:
                 return 0  # open succeeded
             except:  # if we encounter any errors, kill the Query
                 try:
-                    self.killbase(base)
+                    self.killbase(base)  # pyright: ignore[reportPossiblyUnboundVariable]
                 except NameError:  # failed in creating query
                     pass
                 self.active = 0

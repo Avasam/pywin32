@@ -1,5 +1,6 @@
 # This module is very old and useless in this day and age!  It will be
 # removed in a few years (ie, 2009 or so...)
+from __future__ import annotations
 
 import warnings
 
@@ -27,10 +28,10 @@ def CheckRegisteredExe(exename):
         print("Registration of %s - Not registered correctly" % exename)
 
 
-def CheckPathString(pathString):
-    for path in pathString.split(";"):
+def CheckPathString(pathString: str) -> str | None:
+    for path in pathString.split(";") or [""]:
         if not os.path.isdir(path):
-            return "'%s' is not a valid directory!" % path
+            return f"{path!r} is not a valid directory!"
     return None
 
 

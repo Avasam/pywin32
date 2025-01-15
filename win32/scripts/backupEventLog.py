@@ -8,9 +8,9 @@ import win32evtlog
 
 def BackupClearLog(logType):
     datePrefix = time.strftime("%Y%m%d", time.localtime(time.time()))
-    fileExists = 1
+    fname = ""
     retry = 0
-    while fileExists:
+    while True:
         if retry == 0:
             index = ""
         else:
@@ -22,7 +22,7 @@ def BackupClearLog(logType):
             )
             os.stat(fname)
         except OSError:
-            fileExists = 0
+            break
         retry += 1
     # OK - have unique file name.
     try:

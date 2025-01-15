@@ -7,11 +7,12 @@ import os
 import shutil
 import sys
 import winreg
+from typing import NoReturn
 
 import win32api
 
 
-def usage_and_die(rc):
+def usage_and_die(rc) -> NoReturn:
     print()
     print("This script is designed to copy and register the Python debug")
     print("binaries.  It looks for pythonXX_d.dll, pythoncomXX_d.dll etc,")

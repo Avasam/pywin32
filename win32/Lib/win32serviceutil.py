@@ -10,6 +10,7 @@ import importlib.machinery
 import os
 import sys
 import warnings
+from typing import NoReturn
 
 import pywintypes
 import win32api
@@ -649,7 +650,7 @@ def QueryServiceStatus(serviceName, machine=None):
     return status
 
 
-def usage():
+def usage() -> NoReturn:
     try:
         fname = os.path.split(sys.argv[0])[1]
     except:

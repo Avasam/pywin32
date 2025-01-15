@@ -6,6 +6,7 @@
 import getopt
 import os
 import sys
+from typing import NoReturn
 
 import bulkstamp
 import vssutil
@@ -37,7 +38,7 @@ def BrandProject(
     return 1
 
 
-def usage(msg):
+def usage(msg) -> NoReturn:
     print(msg)
     print(
         f"""\

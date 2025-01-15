@@ -1,5 +1,6 @@
 # A demo of using the RAS API from Python
 import sys
+from typing import NoReturn
 
 import win32api
 import win32ras
@@ -72,7 +73,7 @@ Usage:
 """
 
 
-def Usage(why):
+def Usage(why) -> NoReturn:
     print(why)
     print(usage)
     sys.exit(1)

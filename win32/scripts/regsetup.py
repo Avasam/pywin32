@@ -112,8 +112,8 @@ def FindAppPath(appName, knownFileName, searchPaths):
     regPath = regutil.GetRegisteredNamedPath(appName)
     if regPath:
         pathLook = regPath.split(";")[0]
-    if regPath and FileExists(os.path.join(pathLook, knownFileName)):
-        return None  # The currently registered one is good.
+        if FileExists(os.path.join(pathLook, knownFileName)):
+            return None  # The currently registered one is good.
     # Search down the search paths.
     for pathLook in searchPaths:
         if FileExists(os.path.join(pathLook, knownFileName)):
@@ -187,13 +187,14 @@ def LocateFileName(fileNamesString, searchPaths):
 
     fileNames = fileNamesString.split(";")
     for path in searchPaths:
+        retPath = None
         for fileName in fileNames:
             try:
                 retPath = os.path.join(path, fileName)
                 os.stat(retPath)
                 break
             except OSError:
-                retPath = None
+                pass
         if retPath:
             break
     else:
