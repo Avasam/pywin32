@@ -1,8 +1,5 @@
-from __future__ import annotations
-
-build_id = "308.1"  # may optionally include a ".{patchno}" suffix.
-
-__doc__ = """This is a distutils setup-script for the pywin32 extensions.
+# Originally by Thomas Heller, started in 2000 or so.
+"""This is a distutils setup-script for the pywin32 extensions.
 
 The canonical source of truth for supported versions and build environments
 is [the GitHub CI](https://github.com/mhammond/pywin32/tree/main/.github/workflows).
@@ -24,7 +21,9 @@ instead of a failing, it will report what was skipped, and why. See also
 build_env.md, which is getting out of date but might help getting everything
 required for an official build - see README.md for that process.
 """
-# Originally by Thomas Heller, started in 2000 or so.
+
+from __future__ import annotations
+
 import glob
 import logging
 import os
@@ -34,6 +33,7 @@ import shutil
 import subprocess
 import sys
 import winreg
+from importlib.metadata import version
 from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build import build
@@ -47,14 +47,10 @@ from distutils import ccompiler
 from distutils._msvccompiler import MSVCCompiler
 from distutils.command.install_data import install_data
 
-build_id_patch = build_id
+build_id_patch = version("pywin32")
 if not "." in build_id_patch:
     build_id_patch += ".0"
-pywin32_version = "%d.%d.%s" % (
-    sys.version_info.major,
-    sys.version_info.minor,
-    build_id_patch,
-)
+pywin32_version = f"{sys.version_info.major}.{sys.version_info.minor}.{build_id_patch}"
 print("Building pywin32", pywin32_version)
 
 try:
@@ -350,7 +346,7 @@ class my_build(build):
         ver_fname = os.path.join(gettempdir(), "pywin32.version.txt")
         try:
             f = open(ver_fname, "w")
-            f.write("%s\n" % build_id)
+            f.write(f"{build_id_patch}\n")
             f.close()
         except OSError as why:
             print(f"Failed to open '{ver_fname}': {why}")
@@ -872,8 +868,6 @@ class my_install(install):
         filename = os.path.join(self.install_scripts, "pywin32_postinstall.py")
         if not os.path.isfile(filename):
             raise RuntimeError(f"Can't find '{filename}'")
-        # As of setuptools>=74.0.0, we no longer need to
-        # be concerned about distutils calling win32api
         subprocess.Popen(
             [
                 sys.executable,
@@ -2051,31 +2045,8 @@ cmdclass = {
     "install_data": my_install_data,
 }
 
-classifiers = [
-    "Environment :: Win32 (MS Windows)",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: Python Software Foundation License",
-    "Operating System :: Microsoft :: Windows",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: Implementation :: CPython",
-]
 
 dist = setup(
-    name="pywin32",
-    version=build_id,
-    description="Python for Window Extensions",
-    long_description=(Path(__file__).parent / "README.md").read_text(),
-    long_description_content_type="text/markdown",
-    author="Mark Hammond (et al)",
-    author_email="mhammond@skippinet.com.au",
-    url="https://github.com/mhammond/pywin32",
-    license="PSF",
-    classifiers=classifiers,
     cmdclass=cmdclass,
     scripts=["pywin32_postinstall.py", "pywin32_testall.py"],
     ext_modules=ext_modules,

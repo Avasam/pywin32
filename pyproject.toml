@@ -1,0 +1,29 @@
+[build-system]
+# As of setuptools>=74.0.0, we no longer need to be concerned about distutils calling win32api
+# As of setuptools>=70.1.0, "wheel" package is vendored
+requires = ["setuptools >= 74.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "308.1" # may optionally include a ".{patchno}" suffix.
+requires-python = ">=3.8"
+name = "pywin32"
+description = "Python for Window Extensions"
+readme = "README.md"
+authors = [{ name = "Mark Hammond (et al)", email = "mhammond@skippinet.com.au" }]
+urls = { "Homepage" = "https://github.com/mhammond/pywin32" }
+license = "PSF"
+classifiers = [
+  "Environment :: Win32 (MS Windows)",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Python Software Foundation License",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = []

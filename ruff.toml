@@ -1,5 +1,6 @@
-target-version = "py38" # Target the oldest supported version in editors and default CLI
-# This file is not UTF-8
+extend = "pyproject.toml" # extend pyproject.toml for requires-python
+
+# That file is not UTF-8
 extend-exclude = ["Pythonwin/pywin/test/_dbgscript.py"]
 
 [format]
