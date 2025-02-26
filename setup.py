@@ -577,6 +577,23 @@ class my_build_ext(build_ext):
             print("-- compiler.library_dirs:", self.compiler.library_dirs)
             raise RuntimeError("Too many extensions skipped, check build environment")
 
+        # Stamp the version of the built target.
+        # Do this externally to avoid suddenly dragging in the
+        # modules needed by this process, and which we will soon try and update.
+        ext_path = self.get_ext_fullpath(ext.name)
+        self.spawn(
+            [
+                sys.executable,
+                Path(__file__).parent / "win32" / "Lib" / "win32verstamp.py",
+                f"--version={pywin32_version}",
+                "--comments=https://github.com/mhammond/pywin32",
+                f"--original-filename={os.path.basename(ext_path)}",
+                "--product=PyWin32",
+                "--quiet" if "-v" not in sys.argv else "",
+                ext_path,
+            ]
+        )
+
         # Not sure how to make this completely generic, and there is no
         # need at this stage.
         self._build_scintilla()
@@ -701,7 +718,7 @@ class my_build_ext(build_ext):
         old_build_temp = self.build_temp
 
         try:
-            build_ext.build_extension(self, ext)
+            super().build_extension(ext)
             # Convincing distutils to create .lib files with the name we
             # need is difficult, so we just hack around it by copying from
             # the created name to the name we need.
@@ -900,50 +917,6 @@ ccompiler.new_compiler = my_new_compiler  # type: ignore[assignment] # Assuming 
 
 
 class my_compiler(MSVCCompiler):
-    def link(
-        self,
-        target_desc,
-        objects,
-        output_filename,
-        output_dir=None,
-        libraries=None,
-        library_dirs=None,
-        runtime_library_dirs=None,
-        export_symbols=None,
-        debug=0,
-        *args,
-        **kw,
-    ):
-        super().link(
-            target_desc,
-            objects,
-            output_filename,
-            output_dir,
-            libraries,
-            library_dirs,
-            runtime_library_dirs,
-            export_symbols,
-            debug,
-            *args,
-            **kw,
-        )
-        # Here seems a good place to stamp the version of the built
-        # target.  Do this externally to avoid suddenly dragging in the
-        # modules needed by this process, and which we will soon try and
-        # update.
-        args = [
-            sys.executable,
-            # NOTE: On Python 3.7, all args must be str
-            str(Path(__file__).parent / "win32" / "Lib" / "win32verstamp.py"),
-            f"--version={pywin32_version}",
-            "--comments=https://github.com/mhammond/pywin32",
-            f"--original-filename={os.path.basename(output_filename)}",
-            "--product=PyWin32",
-            "--quiet" if "-v" not in sys.argv else "",
-            output_filename,
-        ]
-        self.spawn(args)
-
     # Work around bpo-36302/bpo-42009 - it sorts sources but this breaks
     # support for building .mc files etc :(
     def compile(self, sources, **kwargs):
@@ -954,34 +927,30 @@ class my_compiler(MSVCCompiler):
             return (e, b)
 
         sources = sorted(sources, key=key_reverse_mc)
-        return MSVCCompiler.compile(self, sources, **kwargs)
+        return super().compile(self, sources, **kwargs)
 
     def spawn(self, cmd):
-        is_link = cmd[0].endswith("link.exe") or cmd[0].endswith('"link.exe"')
         is_mt = cmd[0].endswith("mt.exe") or cmd[0].endswith('"mt.exe"')
-        if is_mt:
-            # We don't want mt.exe run...
-            return
+        assert not is_mt, (
+            "We don't want mt.exe run. We used to special case it,"
+            + " now just sanity check that this is unreachable"
+        )
+        is_link = cmd[0].endswith("link.exe") or cmd[0].endswith('"link.exe"')
         if is_link:
             # remove /MANIFESTFILE:... and add MANIFEST:NO
             for i in range(len(cmd)):
                 if cmd[i].startswith(("/MANIFESTFILE:", "/MANIFEST:EMBED")):
                     cmd[i] = "/MANIFEST:NO"
                     break
-        if is_mt:
-            # We want mt.exe run with the original manifest
-            for i in range(len(cmd)):
-                if cmd[i] == "-manifest":
-                    cmd[i + 1] += ".orig"
-                    break
         super().spawn(cmd)
         if is_link:
             # We want a copy of the original manifest so we can use it later.
             for i in range(len(cmd)):
                 if cmd[i].startswith("/MANIFESTFILE:"):
-                    mfname = cmd[i][14:]
-                    shutil.copyfile(mfname, mfname + ".orig")
-                    break
+                    assert not is_mt, (
+                        "We used to copy the original manifest so we can use it later,"
+                        + " now just sanity check that this is unreachable"
+                    )
 
     # CCompiler's implementations of these methods completely replace the values
     # determined by the build environment. This seems like a design that must
