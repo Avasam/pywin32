@@ -30,7 +30,6 @@ import logging
 import os
 import platform
 import re
-import shutil
 import subprocess
 import sys
 import winreg
@@ -106,11 +105,12 @@ class WinExt(Extension):
         delay_load_libraries="",
     ):
         include_dirs = ["com/win32com/src/include", "win32/src"] + include_dirs
-        libraries = libraries.split()
         self.delay_load_libraries = delay_load_libraries.split()
+        libraries = libraries.split()
         libraries.extend(self.delay_load_libraries)
 
         extra_link_args = extra_link_args or []
+        extra_link_args.append("/MANIFEST:NO")
         if export_symbol_file:
             extra_link_args.append("/DEF:" + export_symbol_file)
 
@@ -577,22 +577,23 @@ class my_build_ext(build_ext):
             print("-- compiler.library_dirs:", self.compiler.library_dirs)
             raise RuntimeError("Too many extensions skipped, check build environment")
 
-        # Stamp the version of the built target.
-        # Do this externally to avoid suddenly dragging in the
-        # modules needed by this process, and which we will soon try and update.
-        ext_path = self.get_ext_fullpath(ext.name)
-        self.spawn(
-            [
-                sys.executable,
-                Path(__file__).parent / "win32" / "Lib" / "win32verstamp.py",
-                f"--version={pywin32_version}",
-                "--comments=https://github.com/mhammond/pywin32",
-                f"--original-filename={os.path.basename(ext_path)}",
-                "--product=PyWin32",
-                "--quiet" if "-v" not in sys.argv else "",
-                ext_path,
-            ]
-        )
+        for ext in [*self.extensions, *W32_exe_files]:
+            # Stamp the version of the built target.
+            # Do this externally to avoid suddenly dragging in the
+            # modules needed by this process, and which we will soon try and update.
+            ext_path = self.get_ext_fullpath(ext.name)
+            self.spawn(
+                [
+                    sys.executable,
+                    Path(__file__).parent / "win32" / "Lib" / "win32verstamp.py",
+                    f"--version={pywin32_version}",
+                    "--comments=https://github.com/mhammond/pywin32",
+                    f"--original-filename={os.path.basename(ext_path)}",
+                    "--product=PyWin32",
+                    "--quiet" if "-v" not in sys.argv else "",
+                    ext_path,
+                ]
+            )
 
         # Not sure how to make this completely generic, and there is no
         # need at this stage.
@@ -937,19 +938,22 @@ class my_compiler(MSVCCompiler):
         )
         is_link = cmd[0].endswith("link.exe") or cmd[0].endswith('"link.exe"')
         if is_link:
-            # remove /MANIFESTFILE:... and add MANIFEST:NO
-            for i in range(len(cmd)):
-                if cmd[i].startswith(("/MANIFESTFILE:", "/MANIFEST:EMBED")):
-                    cmd[i] = "/MANIFEST:NO"
-                    break
+            # This is optional, but since we special-case MSVCCompiler, may as well do anyway.
+            # Solves some
+            # LINK : warning LNK4075: ignoring '...' due to '/MANIFEST:NO' specification
+            cmd = [
+                arg
+                for arg in cmd
+                if not arg.startswith(
+                    ("/MANIFESTFILE:", "/MANIFEST:EMBED", "/MANIFESTUAC:")
+                )
+            ]
         super().spawn(cmd)
         if is_link:
-            for i in range(len(cmd)):
-                if cmd[i].startswith("/MANIFESTFILE:"):
-                    assert not is_mt, (
-                        "We used to copy the original manifest so we can use it later,"
-                        + " now just sanity check that this is unreachable"
-                    )
+            assert not any(arg.startswith("/MANIFESTFILE:") for arg in cmd), (
+                "We used to copy the original manifest so we can use it later,"
+                + " now just sanity check that this is unreachable"
+            )
 
     # CCompiler's implementations of these methods completely replace the values
     # determined by the build environment. This seems like a design that must
