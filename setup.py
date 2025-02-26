@@ -927,7 +927,7 @@ class my_compiler(MSVCCompiler):
             return (e, b)
 
         sources = sorted(sources, key=key_reverse_mc)
-        return super().compile(self, sources, **kwargs)
+        return super().compile(sources, **kwargs)
 
     def spawn(self, cmd):
         is_mt = cmd[0].endswith("mt.exe") or cmd[0].endswith('"mt.exe"')
@@ -944,7 +944,6 @@ class my_compiler(MSVCCompiler):
                     break
         super().spawn(cmd)
         if is_link:
-            # We want a copy of the original manifest so we can use it later.
             for i in range(len(cmd)):
                 if cmd[i].startswith("/MANIFESTFILE:"):
                     assert not is_mt, (
