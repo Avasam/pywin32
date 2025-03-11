@@ -11,41 +11,35 @@ import time
 
 import pythoncom
 import pywintypes
+import win32api
 import win32com
 import win32com.client.connect
-import win32com.test.util
 import win32timezone
 import winerror
-from win32com.client import (
-    VARIANT,
-    CastTo,
-    DispatchBaseClass,
-    Record,
-    constants,
-    register_record_class,
-)
+from win32com import universal
+from win32com.client import VARIANT, CastTo, DispatchBaseClass, constants, gencache
+from win32com.test.util import RegisterPythonServer
 
-importMsg = "**** PyCOMTest is not installed ***\n  PyCOMTest is a Python test specific COM client and server.\n  It is likely this server is not installed on this machine\n  To install the server, you must get the win32com sources\n  and build it using MS Visual C++"
-
-# This test uses a Python implemented COM server - ensure correctly registered.
-win32com.test.util.RegisterPythonServer(
+RegisterPythonServer(
     os.path.join(os.path.dirname(__file__), "..", "servers", "test_pycomtest.py"),
     "Python.Test.PyCOMTest",
 )
 
-from win32com.client import gencache
-
+# This test uses a Python implemented COM server - ensure correctly registered.
 try:
     gencache.EnsureModule("{6BCDCB60-5605-11D0-AE5F-CADD4C000000}", 0, 1, 1)
 except pythoncom.com_error:
-    print("The PyCOMTest module can not be located or generated.")
-    print(importMsg)
-    raise RuntimeError(importMsg)
+    error_msg = """\
+**** PyCOMTest is not installed ***
+  PyCOMTest is a Python test specific COM client and server.
+  It is likely this server is not installed on this machine.
+  To install the server, you must get the win32com sources
+  and build it using MS Visual C++"""
+    print(f"The PyCOMTest module can not be located or generated.\n{error_msg}\n")
+    raise RuntimeError(error_msg)
 
-# We had a bg where RegisterInterfaces would fail if gencache had
+# We had a bug where RegisterInterfaces would fail if gencache had
 # already been run - exercise that here
-from win32com import universal
-
 universal.RegisterInterfaces("{6BCDCB60-5605-11D0-AE5F-CADD4C000000}", 0, 1, 1)
 
 verbose = 0
