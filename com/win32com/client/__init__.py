@@ -333,6 +333,7 @@ def DispatchWithEvents(clsid, user_event_class) -> EventsProxy:
     >>> ie = DispatchWithEvents("InternetExplorer.Application", IEEvents)
     >>> ie.Visible = 1
     Visible changed: 1
+    >>>
     """
     disp, disp_class, events_class = __get_disp_and_event_classes(clsid)
     result_class = type(
