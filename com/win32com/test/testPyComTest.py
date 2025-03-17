@@ -16,16 +16,29 @@ import win32com.client.connect
 import win32com.test.util
 import win32timezone
 import winerror
+from win32com import universal
 from win32com.client import (
     VARIANT,
     CastTo,
     DispatchBaseClass,
     Record,
     constants,
+    gencache,
     register_record_class,
 )
 
-importMsg = "**** PyCOMTest is not installed ***\n  PyCOMTest is a Python test specific COM client and server.\n  It is likely this server is not installed on this machine\n  To install the server, you must get the win32com sources\n  and build it using MS Visual C++"
+try:
+    gencache.EnsureModule("{6BCDCB60-5605-11D0-AE5F-CADD4C000000}", 0, 1, 1)
+except pythoncom.com_error:
+    print()
+    importMsg = """\
+**** PyCOMTest is not installed ***
+  PyCOMTest is a Python test specific COM client and server.
+  It is likely this server is not installed on this machine
+  To install the server, you must get the win32com sources
+  and build it using MS Visual C++"""
+    print("The PyCOMTest module can not be located or generated.\n" + importMsg)
+    raise RuntimeError(importMsg)
 
 # This test uses a Python implemented COM server - ensure correctly registered.
 win32com.test.util.RegisterPythonServer(
@@ -33,19 +46,8 @@ win32com.test.util.RegisterPythonServer(
     "Python.Test.PyCOMTest",
 )
 
-from win32com.client import gencache
-
-try:
-    gencache.EnsureModule("{6BCDCB60-5605-11D0-AE5F-CADD4C000000}", 0, 1, 1)
-except pythoncom.com_error:
-    print("The PyCOMTest module can not be located or generated.")
-    print(importMsg)
-    raise RuntimeError(importMsg)
-
 # We had a bg where RegisterInterfaces would fail if gencache had
 # already been run - exercise that here
-from win32com import universal
-
 universal.RegisterInterfaces("{6BCDCB60-5605-11D0-AE5F-CADD4C000000}", 0, 1, 1)
 
 verbose = 0
