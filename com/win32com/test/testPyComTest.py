@@ -310,7 +310,7 @@ def TestCommon(o, is_generated):
     TestConstant("LongTest2", 0x7FFFFFFF)
     TestConstant("UCharTest", 255)
     TestConstant("CharTest", -1)
-    # 'Hello World', but the 'r' is the "Registered" sign (\xae)
+    # 'Hello World', but the 'r' is the "Registered" sign (\xae --> ®)
     TestConstant("StringTest", "Hello Wo\xaeld")
 
     progress("Checking dates and times")
