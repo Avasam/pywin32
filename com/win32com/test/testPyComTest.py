@@ -499,7 +499,7 @@ def TestGenerated():
     # This is `CoPyComTest`
     from win32com.client.CLSIDToClass import GetClass
 
-    win32com_path = os.path.join(sysconfig.get_paths()["purelib"], "win32com")
+    win32com_path = os.path.dirname(win32com.__file__)
     print(f"{win32com_path=}")
     print(f"{os.listdir(win32com_path)}")
     gen_py_path = os.path.join(win32com_path, "gen_py")
