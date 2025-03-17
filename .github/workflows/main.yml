@@ -62,7 +62,7 @@ jobs:
         id: UserSite
         run: |
           $UserSite = "$(python -m site --user-site)"
-          echo "UserSite=$UserSite" >> "$GITHUB_OUTPUT"
+          echo "UserSite=$UserSite" >> $Env:$GITHUB_OUTPUT
           python -m win32.scripts.pywin32_postinstall -install -destination "$UserSite"
           pywin32_postinstall -remove -destination "$UserSite"
 
