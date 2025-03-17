@@ -59,8 +59,10 @@ jobs:
 
       # Smokescreen test to validate postinstall doesn't crash, dlls can be found, and both pathless invocation methods work
       - name: Run postinstall install/remove
+        id: UserSite
         run: |
           $UserSite = "$(python -m site --user-site)"
+          echo "UserSite=$UserSite" >> "$GITHUB_OUTPUT"
           python -m win32.scripts.pywin32_postinstall -install -destination "$UserSite"
           pywin32_postinstall -remove -destination "$UserSite"
 
@@ -81,6 +83,14 @@ jobs:
 
       - name: Build wheels
         run: pip wheel . -v --wheel-dir=dist
+
+      - uses: actions/upload-artifact@v4
+        # Upload artifacts even if tests fail
+        if: ${{ always() }}
+        with:
+          name: gen_py-${{ matrix.python-version }}
+          path: "${{ steps.UserSite.outputs.UserSite }}/win32com/gen_py"
+          if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
         # Upload artifacts even if tests fail
