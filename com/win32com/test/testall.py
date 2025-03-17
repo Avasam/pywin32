@@ -316,6 +316,6 @@ if __name__ == "__main__":
 
     CheckClean()
     pythoncom.CoUninitialize()
-    CleanGenerated()
+    # CleanGenerated()
     if not testResult.wasSuccessful():
         sys.exit(1)
