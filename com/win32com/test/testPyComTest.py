@@ -493,9 +493,18 @@ def TestGenerated():
     counter = EnsureDispatch("PyCOMTest.SimpleCounter")
     TestCounter(counter, True)
 
+    import sysconfig
+
     # This dance lets us get a CoClass even though it's not explicitly registered.
     # This is `CoPyComTest`
     from win32com.client.CLSIDToClass import GetClass
+
+    win32com_path = os.path.join(sysconfig.get_paths()["purelib"], "win32com")
+    print(f"{win32com_path=}")
+    print(f"{os.listdir(win32com_path)}")
+    gen_py_path = os.path.join(win32com_path, "gen_py")
+    print(f"{gen_py_path=}")
+    print(f"{os.listdir(gen_py_path)}")
 
     coclass_o = GetClass("{8EE0C520-5605-11D0-AE5F-CADD4C000000}")()
     TestCommon(coclass_o, True)
