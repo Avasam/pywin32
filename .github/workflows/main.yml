@@ -48,7 +48,7 @@ jobs:
           Add-Content $env:GITHUB_PATH $ScriptsPath
 
       - name: Build and install
-        run: pip install . -v --user
+        run: pip install pywin32==310 --user
 
       # This needs to happen *after* installing pywin32 since
       # AutoDuck/py2d.py currently relies on runtime imports for introspection
@@ -81,8 +81,8 @@ jobs:
         # can be found - they aren't installed into the Python tree.
         run: python win32/scripts/pywin32_testall.py -v -skip-adodbapi
 
-      - name: Build wheels
-        run: pip wheel . -v --wheel-dir=dist
+      # - name: Build wheels
+      #   run: pip wheel . -v --wheel-dir=dist
 
       - uses: actions/upload-artifact@v4
         # Upload artifacts even if tests fail
@@ -92,13 +92,13 @@ jobs:
           path: "${{ steps.UserSite.outputs.UserSite }}/win32com/gen_py"
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@v4
-        # Upload artifacts even if tests fail
-        if: ${{ always() }}
-        with:
-          name: artifacts-${{ matrix.python-version }}-${{ matrix.architecture }}
-          path: dist/*.whl
-          if-no-files-found: error
+      # - uses: actions/upload-artifact@v4
+      #   # Upload artifacts even if tests fail
+      #   if: ${{ always() }}
+      #   with:
+      #     name: artifacts-${{ matrix.python-version }}-${{ matrix.architecture }}
+      #     path: dist/*.whl
+      #     if-no-files-found: error
 
   # # We cannot build and test on ARM64, so we cross-compile.
   # # Later, when available, we can add tests using this wheel on ARM64 VMs
