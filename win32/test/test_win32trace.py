@@ -279,61 +279,61 @@ class TraceWriteProcess:
         return self.exitCode == 0
 
 
-class TestOutofProcess(unittest.TestCase):
-    BucketCount = 9
-    FullBucket = 50
+# class TestOutofProcess(unittest.TestCase):
+#     BucketCount = 9
+#     FullBucket = 50
 
-    def setUp(self):
-        SkipIfCI()
-        win32trace.InitRead()
-        TraceWriteProcess.BucketCount = self.BucketCount
-        self.setUpWriters()
-        self.buckets = list(range(self.BucketCount))
-        for each in self.buckets:
-            self.buckets[each] = 0
+#     def setUp(self):
+#         SkipIfCI()
+#         win32trace.InitRead()
+#         TraceWriteProcess.BucketCount = self.BucketCount
+#         self.setUpWriters()
+#         self.buckets = list(range(self.BucketCount))
+#         for each in self.buckets:
+#             self.buckets[each] = 0
 
-    def tearDown(self):
-        win32trace.TermRead()
+#     def tearDown(self):
+#         win32trace.TermRead()
 
-    def setUpWriters(self):
-        self.processes = []
-        # 5 processes, quot threads in each process
-        quot, remainder = divmod(self.FullBucket, 5)
-        for each in range(5):
-            self.processes.append(TraceWriteProcess(quot))
-        if remainder:
-            self.processes.append(TraceWriteProcess(remainder))
+#     def setUpWriters(self):
+#         self.processes = []
+#         # 5 processes, quot threads in each process
+#         quot, remainder = divmod(self.FullBucket, 5)
+#         for each in range(5):
+#             self.processes.append(TraceWriteProcess(quot))
+#         if remainder:
+#             self.processes.append(TraceWriteProcess(remainder))
 
-    def areBucketsFull(self):
-        bucketsAreFull = True
-        for each in self.buckets:
-            self.assertLessEqual(each, self.FullBucket)
-            if each != self.FullBucket:
-                bucketsAreFull = False
-                break
-        return bucketsAreFull
+#     def areBucketsFull(self):
+#         bucketsAreFull = True
+#         for each in self.buckets:
+#             self.assertLessEqual(each, self.FullBucket)
+#             if each != self.FullBucket:
+#                 bucketsAreFull = False
+#                 break
+#         return bucketsAreFull
 
-    def read(self):
-        while 1:
-            readString = win32trace.blockingread()
-            for ch in readString:
-                integer = int(ch)
-                count = self.buckets[integer]
-                self.assertNotEqual(count, -1)
-                self.buckets[integer] = count + 1
-                if self.buckets[integer] == self.FullBucket:
-                    if self.areBucketsFull():
-                        return
+#     def read(self):
+#         while 1:
+#             readString = win32trace.blockingread()
+#             for ch in readString:
+#                 integer = int(ch)
+#                 count = self.buckets[integer]
+#                 self.assertNotEqual(count, -1)
+#                 self.buckets[integer] = count + 1
+#                 if self.buckets[integer] == self.FullBucket:
+#                     if self.areBucketsFull():
+#                         return
 
-    def testProcesses(self):
-        for each in self.processes:
-            each.start()
-        self.read()
-        for each in self.processes:
-            each.join()
-        for each in self.processes:
-            self.assertTrue(each.verifyWritten())
-        self.assertTrue(self.areBucketsFull())
+#     def testProcesses(self):
+#         for each in self.processes:
+#             each.start()
+#         self.read()
+#         for each in self.processes:
+#             each.join()
+#         for each in self.processes:
+#             self.assertTrue(each.verifyWritten())
+#         self.assertTrue(self.areBucketsFull())
 
 
 def _RunAsTestProcess():

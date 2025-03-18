@@ -10,6 +10,7 @@ expected_output = "The jscript test worked.\nThe Python test worked"
 class XSLT(win32com.test.util.TestCase):
     def testAll(self):
         output_name = tempfile.mktemp("-pycom-test")
+        os.chdir(os.path.dirname(__file__))
         cmd = (
             "cscript //nologo testxslt.js doesnt_matter.xml testxslt.xsl " + output_name
         )
