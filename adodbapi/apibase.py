@@ -10,6 +10,7 @@ from __future__ import annotations
 import datetime
 import decimal
 import numbers
+import operator
 import sys
 import time
 from collections.abc import Callable, Iterable, Mapping
@@ -562,17 +563,16 @@ class SQLrow:  # a single database row
         for n in range(self.rows.numberOfColumns):
             yield self._getValue(n)
 
-    def __repr__(self):  # create a human readable representation
-        taglist = sorted(list(self.rows.columnNames.items()), key=lambda x: x[1])
-        s = "<SQLrow={"
-        for name, i in taglist:
-            s += f"{name}:{self._getValue(i)!r}, "
-        return s[:-2] + "}>"
+    def __repr__(self) -> str:  # create a human readable representation
+        taglist = sorted(self.rows.columnNames.items(), key=operator.itemgetter(1))
+        return (
+            "<SQLrow={"
+            + ", ".join([f"{name}:{self._getValue(i)!r}" for name, i in taglist])
+            + "}>"
+        )
 
     def __str__(self):  # create a pretty human readable representation
-        return str(
-            tuple(str(self._getValue(i)) for i in range(self.rows.numberOfColumns))
-        )
+        return str(tuple(self._getValue(i) for i in range(self.rows.numberOfColumns)))
 
     # TO-DO implement pickling an SQLrow directly
     # def __getstate__(self): return self.__dict__
