@@ -149,12 +149,15 @@ jobs:
           cache-dependency-path: .github/workflows/main.yml
       - run: pip install clang-format==18.1.* pycln
       - run: pycln . --config=pycln.toml --check
-      - uses: astral-sh/ruff-action@v3
+      - name: Run Ruff linter
+        uses: astral-sh/ruff-action@v3
         with:
           version: "0.8.4"
-      - run: ruff format --check
-      - run:
-          | # Too many files to fit in a single command, also exclude vendored Scintilla and MAPIStubLibrary
+      - name: Run Ruff formatter
+        run: ruff format --check
+      - name: Run ClangFormat
+        # Too many files to fit in a single command, also exclude vendored Scintilla and MAPIStubLibrary
+        run: |
           clang-format --Werror --dry-run $(git ls-files '*.cpp' ':!:com/win32comext/mapi/src/MAPIStubLibrary/')
           if ($LastExitCode -ne 0) { exit $LastExitCode }
           clang-format --Werror --dry-run $(git ls-files '*.h' ':!:Pythonwin/Scintilla/' ':!:com/win32comext/mapi/src/MAPIStubLibrary/')
