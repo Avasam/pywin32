@@ -44,6 +44,23 @@ _DEFAULT_ENABLE_DEFAULT_DOC = False
 this_dir = os.path.abspath(os.path.dirname(__file__))
 
 
+def _GetIISObject():
+    try:
+        return GetObject(_IIS_OBJECT)
+    except pythoncom.com_error as details:
+        if details.args[0] == winerror.MK_E_SYNTAX:
+            log(
+                2,
+                f"Got {details}, "
+                + "The 'IIS://' moniker can be enabled with Windows Feature: "
+                + "'Internet Information Services "
+                + "> Web Management Tools "
+                + "> IIS 6 Management Compatibility "
+                + "> IIS Metabase and IIS 6 configuration compatibility'",
+            )
+        raise
+
+
 class FilterParameters:
     Name = None
     Description = None
@@ -178,7 +195,7 @@ def LocateWebServerPath(description):
     >>> LocateWebServerPath('1') #doctest: +SKIP
     """
     assert len(description) >= 1, "Server name or comment is required"
-    iis = GetObject(_IIS_OBJECT)
+    iis = _GetIISObject()
     description = description.lower().strip()
     for site in iis:
         # Name is generally a number, but no need to assume that.
@@ -447,7 +464,7 @@ def _AddExtensionFile(module, def_groupid, def_desc, params, options):
     group_id = params.AddExtensionFile_GroupID or def_groupid
     desc = params.AddExtensionFile_Description or def_desc
     try:
-        ob = GetObject(_IIS_OBJECT)
+        ob = _GetIISObject()
         ob.AddExtensionFile(
             module,
             params.AddExtensionFile_Enabled,
@@ -481,7 +498,7 @@ def AddExtensionFiles(params, options):
 
 def _DeleteExtensionFileRecord(module, options):
     try:
-        ob = GetObject(_IIS_OBJECT)
+        ob = _GetIISObject()
         ob.DeleteExtensionFileRecord(module)
         log(2, "Deleted extension file record for '%s'" % module)
     except (pythoncom.com_error, AttributeError) as details:

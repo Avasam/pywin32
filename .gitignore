@@ -36,6 +36,9 @@ com/TestSources/PyCOMTest/x64/
 !com/TestSources/PyCOMTest/PyCOMTest.sln
 !com/TestSources/PyCOMTest/PyCOMTest.vcxproj
 
+# ISAPI test and samples generated files
+*.dll
+
 # SWIG generated files.
 com/win32comext/adsi/src/*.cpp
 !com/win32comext/adsi/src/PyADSIUtil.cpp
