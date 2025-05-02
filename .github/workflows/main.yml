@@ -70,6 +70,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
         with:
           vs-version: "[17,"
+          msbuild-architecture: x64
 
       - name: Build and register the PyCOMTest server dll
         run: |
