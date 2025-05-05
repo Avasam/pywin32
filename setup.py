@@ -363,8 +363,12 @@ class my_build(build):
 
 
 class my_build_ext(build_ext):
+    def initialize_options(self) -> None:
+        super().initialize_options()
+        self.parallel = True  # Automatically gets cpu count
+
     def finalize_options(self):
-        build_ext.finalize_options(self)
+        super().finalize_options()
 
         self.plat_dir = {
             "win-amd64": "x64",
