@@ -951,18 +951,6 @@ class my_compiler(MSVCCompiler):
                     shutil.copyfile(mfname, mfname + ".orig")
                     break
 
-    # CCompiler's implementations of these methods completely replace the values
-    # determined by the build environment. This seems like a design that must
-    # always have been broken, but we work around it here.
-    def set_include_dirs(self, dirs):
-        self.include_dirs[:0] = dirs
-
-    def set_library_dirs(self, dirs):
-        self.library_dirs[:0] = dirs
-
-    def set_libraries(self, libs):
-        self.libraries.extend(libs)
-
 
 ################################################################
 
