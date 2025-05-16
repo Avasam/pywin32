@@ -30,7 +30,6 @@ import logging
 import os
 import platform
 import re
-import shutil
 import sys
 import winreg
 from collections.abc import MutableSequence
@@ -127,11 +126,12 @@ class WinExt(Extension):
         delay_load_libraries="",
     ):
         include_dirs = ["com/win32com/src/include", "win32/src"] + include_dirs
-        libraries = libraries.split()
         self.delay_load_libraries = delay_load_libraries.split()
+        libraries = libraries.split()
         libraries.extend(self.delay_load_libraries)
 
         extra_link_args = extra_link_args or []
+        extra_link_args.append("/MANIFEST:NO")
         if export_symbol_file:
             extra_link_args.append("/DEF:" + export_symbol_file)
 
@@ -740,7 +740,7 @@ class my_build_ext(build_ext):
         old_build_temp = self.build_temp
 
         try:
-            build_ext.build_extension(self, ext)
+            super().build_extension(ext)
             # Convincing distutils to create .lib files with the name we
             # need is difficult, so we just hack around it by copying from
             # the created name to the name we need.
@@ -900,34 +900,32 @@ class my_compiler(MSVCCompiler):
             return (e, b)
 
         sources = sorted(sources, key=key_reverse_mc)
-        return MSVCCompiler.compile(self, sources, **kwargs)
+        return super().compile(sources, **kwargs)
 
     def spawn(self, cmd: MutableSequence[str]) -> None:  # type: ignore[override] # More restrictive than supertype
-        is_link = cmd[0].endswith("link.exe") or cmd[0].endswith('"link.exe"')
         is_mt = cmd[0].endswith("mt.exe") or cmd[0].endswith('"mt.exe"')
-        if is_mt:
-            # We don't want mt.exe run...
-            return
+        assert not is_mt, (
+            "We don't want mt.exe run. We used to special case it,"
+            + " now just sanity check that this is unreachable"
+        )
+        is_link = cmd[0].endswith("link.exe") or cmd[0].endswith('"link.exe"')
         if is_link:
-            # remove /MANIFESTFILE:... and add MANIFEST:NO
-            for i in range(len(cmd)):
-                if cmd[i].startswith(("/MANIFESTFILE:", "/MANIFEST:EMBED")):
-                    cmd[i] = "/MANIFEST:NO"
-                    break
-        if is_mt:
-            # We want mt.exe run with the original manifest
-            for i in range(len(cmd)):
-                if cmd[i] == "-manifest":
-                    cmd[i + 1] += ".orig"
-                    break
+            # This is optional, but since we special-case MSVCCompiler, may as well do anyway.
+            # Solves some
+            # LINK : warning LNK4075: ignoring '...' due to '/MANIFEST:NO' specification
+            cmd = [
+                arg
+                for arg in cmd
+                if not arg.startswith(
+                    ("/MANIFESTFILE:", "/MANIFEST:EMBED", "/MANIFESTUAC:")
+                )
+            ]
         super().spawn(cmd)  # type: ignore[arg-type] # mypy variance issue, but pyright ok
         if is_link:
-            # We want a copy of the original manifest so we can use it later.
-            for i in range(len(cmd)):
-                if cmd[i].startswith("/MANIFESTFILE:"):
-                    mfname = cmd[i][14:]
-                    shutil.copyfile(mfname, mfname + ".orig")
-                    break
+            assert not any(arg.startswith("/MANIFESTFILE:") for arg in cmd), (
+                "We used to copy the original manifest so we can use it later,"
+                + " now just sanity check that this is unreachable"
+            )
 
     # CCompiler's implementations of these methods completely replace the values
     # determined by the build environment. This seems like a design that must
