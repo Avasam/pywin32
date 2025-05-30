@@ -224,7 +224,6 @@ class EventSink:
     def GetSourceTypeInfo(self, typeinfo):
         """Gets the typeinfo for the Source Events for the passed typeinfo"""
         attr = typeinfo.GetTypeAttr()
-        cFuncs = attr[6]
         typeKind = attr[5]
         if typeKind not in [pythoncom.TKIND_COCLASS, pythoncom.TKIND_INTERFACE]:
             RaiseAssert(
@@ -547,7 +546,6 @@ class ScriptItem:
     def GetDefaultSourceTypeInfo(self, typeinfo):
         """Gets the typeinfo for the Default Dispatch for the passed typeinfo"""
         attr = typeinfo.GetTypeAttr()
-        cFuncs = attr[6]
         typeKind = attr[5]
         if typeKind not in [pythoncom.TKIND_COCLASS, pythoncom.TKIND_INTERFACE]:
             RaiseAssert(
@@ -1079,6 +1077,7 @@ class COMScript:
                 if self.scriptSite:
                     self.scriptSite.OnStateChange(state)
             except pythoncom.com_error as xxx_todo_changeme:
+                # Try unpacking
                 (hr, desc, exc, arg) = xxx_todo_changeme.args
         finally:
             self.EnableInterrupts()
