@@ -126,7 +126,6 @@ class SourceCodeContainer:
 
     def _ProcessToken(self, type, token, spos, epos, line):
         srow, scol = spos
-        erow, ecol = epos
         self.GetText()  # Prime us.
         linenum = srow - 1  # Lines zero based for us too.
         realCharPos = self.lineOffsets[linenum] + scol
