@@ -23,7 +23,7 @@ jobs:
     env:
       # We can't yet run tests with PYTHONDEVMODE=1, let's emulated it as much as we can
       # https://docs.python.org/3/library/devmode.html#effects-of-the-python-development-mode
-      PYTHONMALLOC: debug
+      # PYTHONMALLOC: debug
       PYTHONASYNCIODEBUG: 1
       PYTHONWARNINGS: always
       PYTHONFAULTHANDLER: 1
