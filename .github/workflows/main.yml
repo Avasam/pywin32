@@ -26,7 +26,7 @@ jobs:
       # PYTHONMALLOC: debug
       PYTHONASYNCIODEBUG: 1
       PYTHONWARNINGS: always
-      PYTHONFAULTHANDLER: 1
+      # PYTHONFAULTHANDLER: 1
 
     steps:
       - uses: actions/checkout@v4
