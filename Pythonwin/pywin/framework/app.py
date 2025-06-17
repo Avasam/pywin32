@@ -210,10 +210,10 @@ class CApp(WinApp):
                 from . import help
 
                 help.OpenHelpFile(helpFile, helpCmd)
-        except:
-            t, v, tb = sys.exc_info()
-            win32ui.MessageBox(f"Internal error in help file processing\r\n{t}: {v}")
-            tb = None  # Prevent a cycle
+        except Exception as e:
+            win32ui.MessageBox(
+                f"Internal error in help file processing\r\n{type(e)}: {e}"
+            )
 
     def DoLoadModules(self, modules):
         # XXX - this should go, but the debugger uses it :-(
