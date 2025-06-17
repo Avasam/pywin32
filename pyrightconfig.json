@@ -50,6 +50,6 @@
   "reportMissingModuleSource": "none",
   // External type stubs may not be completable, and this will require type stubs for dynamic modules.
   "reportMissingTypeStubs": "information",
-  // Use Flake8/Pycln/Ruff instead
+  // Use Pycln/Ruff instead
   "reportUnusedImport": "none",
 }

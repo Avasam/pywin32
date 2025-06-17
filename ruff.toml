@@ -46,6 +46,10 @@ extend-ignore = [
   # TODO: Consider passing exception around to ensure methods are only ever used within exception handlers
   "PLE0704", # misplaced-bare-raise
 
+  # Asking this rule to be configurable to reduce the scope and allow some delayed imports
+  # https://github.com/astral-sh/ruff/issues/18728
+  "PLC0415", # import-outside-top-level
+
   # No such concerns for stdlib
   "TC003", # typing-only-standard-library-import
 ]
