@@ -311,7 +311,7 @@ class DockingBar(window.Wnd):
     def OnNcLButtonDown(self, msg):
         if self.bTracking:
             return 0
-        nHitTest = wparam = msg[2]
+        nHitTest = msg[2]
         pt = msg[5]
 
         if nHitTest == win32con.HTSYSMENU and not self.IsFloating():
@@ -339,7 +339,7 @@ class DockingBar(window.Wnd):
         return 1
 
     def OnNcLButtonDblClk(self, msg):
-        nHitTest = wparam = msg[2]
+        nHitTest = msg[2]
         # UINT nHitTest, CPoint point)
         if self.dockBar is not None and nHitTest == win32con.HTCAPTION:
             # toggle docking
@@ -348,7 +348,6 @@ class DockingBar(window.Wnd):
         return 1
 
     def OnMouseMove(self, msg):
-        flags = wparam = msg[2]
         lparam = msg[3]
         if self.IsFloating() or not self.bTracking:
             return 1
@@ -492,7 +491,7 @@ class DockingBar(window.Wnd):
         self.OnInvertTracker(self.rectTracker)
 
     def OnCaptureChanged(self, msg):
-        hwnd = lparam = msg[3]
+        hwnd = msg[3]
         if self.bTracking and hwnd != self.GetSafeHwnd():
             self.StopTracking(0)  # cancel tracking
         return 1

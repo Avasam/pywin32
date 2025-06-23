@@ -580,13 +580,13 @@ def EnsureModule(
                 try:
                     pyModTime = os.stat(filePath)[8]
                     fModTimeSet = 1
-                except OSError as e:
+                except OSError:
                     # If .py file fails, try .pyc file
                     # print("Trying pyc stat", filePathPyc)
                     try:
                         pyModTime = os.stat(filePathPyc)[8]
                         fModTimeSet = 1
-                    except OSError as e:
+                    except OSError:
                         pass
                 # print("Trying stat typelib", pyModTime)
                 # print(typLibPath)
@@ -651,7 +651,7 @@ def EnsureDispatch(
             disp_clsid = ti.GetTypeAttr()[0]
             tlb, index = ti.GetContainingTypeLib()
             tla = tlb.GetLibAttr()
-            mod = EnsureModule(tla[0], tla[1], tla[3], tla[4], bForDemand=bForDemand)
+            EnsureModule(tla[0], tla[1], tla[3], tla[4], bForDemand=bForDemand)
             GetModuleForCLSID(disp_clsid)
             # Get the class from the module.
             from . import CLSIDToClass
