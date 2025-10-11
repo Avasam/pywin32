@@ -224,7 +224,6 @@ class BrowserView(pywin.mfc.docview.TreeView):
     def OnSize(self, params):
         lparam = params[3]
         w = win32api.LOWORD(lparam)
-        h = win32api.HIWORD(lparam)
         if w != 0:
             self.CheckMadeList()
         elif w == 0:

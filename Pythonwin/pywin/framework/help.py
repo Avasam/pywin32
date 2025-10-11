@@ -145,7 +145,6 @@ def SetHelpMenuOtherHelp(mainMenu):
             if desc in excludeList:
                 excludeFnames.append(fname)
 
-        helpDescs = []
         for desc, fname in firstList:
             if fname not in excludeFnames:
                 helpIDMap[cmdID] = (desc, fname)

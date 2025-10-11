@@ -61,7 +61,7 @@ class ScriptDispatch:
                     raise AttributeError(name)  # Not a property.
             except AttributeError:
                 raise COMException(scode=winerror.DISP_E_MEMBERNOTFOUND)
-            except COMException as instance:
+            except COMException:
                 raise
             except:
                 ret = self.engine.HandleException()
@@ -85,7 +85,7 @@ class StrictDynamicPolicy(win32com.server.policy.DynamicPolicy):
 
     def _getdispid_(self, name, fdex):
         try:
-            func = getattr(self._obj_.scriptNamespace, str(name))
+            getattr(self._obj_.scriptNamespace, str(name))
         except AttributeError:
             raise COMException(scode=winerror.DISP_E_MEMBERNOTFOUND)
         # if not isinstance(func, _CallableTypes):
