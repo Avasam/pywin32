@@ -646,14 +646,9 @@ def UseCommandLine(*classes, **flags):
         else:
             RegisterClasses(*classes, **flags)
     except win32api.error as exc:
-        # If we are on xp+ and have "access denied", retry using
-        # ShellExecuteEx with 'runas' verb to force elevation (vista) and/or
-        # admin login dialog (vista/xp)
-        if (
-            flags["unattended"]
-            or exc.winerror != winerror.ERROR_ACCESS_DENIED
-            or sys.getwindowsversion()[0] < 5
-        ):
+        # If we have "access denied", retry using
+        # ShellExecuteEx with 'runas' verb to force elevation
+        if flags["unattended"] or exc.winerror != winerror.ERROR_ACCESS_DENIED:
             raise
         ReExecuteElevated(flags)
 

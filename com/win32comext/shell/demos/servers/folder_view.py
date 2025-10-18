@@ -5,10 +5,12 @@
 # than our own.
 # XXX - sadly, it doesn't work quite like the original sample.  Oh well,
 # another day...
+import errno
 import os
 import pickle
 import random
-import sys
+import struct
+import winreg
 
 import commctrl
 import pythoncom
@@ -796,12 +798,6 @@ def get_schema_fname():
 
 
 def DllRegisterServer():
-    import winreg
-
-    if sys.getwindowsversion()[0] < 6:
-        print("This sample only works on Vista")
-        sys.exit(1)
-
     key = winreg.CreateKey(
         winreg.HKEY_LOCAL_MACHINE,
         "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\"
@@ -816,7 +812,6 @@ def DllRegisterServer():
     attr = (
         shellcon.SFGAO_FOLDER | shellcon.SFGAO_HASSUBFOLDER | shellcon.SFGAO_BROWSABLE
     )
-    import struct
 
     s = struct.pack("i", attr)
     winreg.SetValueEx(key, "Attributes", 0, winreg.REG_BINARY, s)
@@ -832,7 +827,6 @@ def DllRegisterServer():
 
 
 def DllUnregisterServer():
-    import winreg
 
     paths = [
         "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Desktop\\Namespace\\"
@@ -845,8 +839,6 @@ def DllUnregisterServer():
         try:
             winreg.DeleteKey(winreg.HKEY_LOCAL_MACHINE, path)
         except OSError as details:
-            import errno
-
             if details.errno != errno.ENOENT:
                 print(f"FAILED to remove {path}: {details}")
 
