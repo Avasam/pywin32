@@ -2201,8 +2201,7 @@ MyCopyEvent(PyObject *dict, WSANETWORKEVENTS *events, long event, int eventbit)
 
 // @pyswig dict|WSAEnumNetworkEvents|Return network events that caused the event associated with the socket to be signaled.
 // @rdesc A dictionary mapping network events that occurred for the specified socket since the last call to this function (e.g. FD_READ, FD_WRITE) to their associated error code, or 0 if the event occurred without an error. The events returned are a subset of events previously registered for this socket with WSAEventSelect.
-static PyObject*
-MyWSAEnumNetworkEvents(PyObject *self, PyObject *args)
+static PyObject* MyWSAEnumNetworkEvents(PyObject *self, PyObject *args)
 {
 	PyObject *socket, *event = NULL;
 	// @pyparm <o PySocket>|s||Socket to check for netork events, previously registered for network event notification with WSAEventSelect.
@@ -2938,14 +2937,11 @@ static SfcIsFileProtectedfunc pfnSfcIsFileProtected = NULL;
 
 // @pyswig string|SetVolumeMountPoint|Mounts the specified volume at the specified volume mount point.
 // @comm Accepts keyword args.
-static PyObject*
-py_SetVolumeMountPoint(PyObject	*self, PyObject	*args, PyObject *kwargs)
+static PyObject* py_SetVolumeMountPoint(PyObject *self, PyObject *args, PyObject *kwargs)
 {
 	// @ex Usage|SetVolumeMountPoint('h:\tmp\','c:\')
 	// @comm Note that both	parameters must	have trailing backslashes.
 	// @rdesc The result is	the	GUID of	the	volume mounted,	as a string.
-	CHECK_PFN(GetVolumeNameForVolumeMountPoint);
-	CHECK_PFN(SetVolumeMountPoint);
 	PyObject *ret=NULL;
 	PyObject *volume_obj = NULL, *mount_point_obj =	NULL;
 	WCHAR *volume =	NULL;
@@ -2974,13 +2970,11 @@ PyCFunction pfnpy_SetVolumeMountPoint=(PyCFunction)py_SetVolumeMountPoint;
 
 // @pyswig |DeleteVolumeMountPoint|Unmounts the volume from the specified volume mount point.
 // @comm Accepts keyword args.
-static PyObject*
-py_DeleteVolumeMountPoint(PyObject *self, PyObject *args, PyObject *kwargs)
+static PyObject* py_DeleteVolumeMountPoint(PyObject *self, PyObject *args, PyObject *kwargs)
 {
 	// @ex Usage|DeleteVolumeMountPoint('h:\tmp\')
 	// @comm Throws	an error if	it is not a	valid mount	point, returns None	on success.
 	// <nl>Use carefully - will	remove drive letter	assignment if no directory specified
-	CHECK_PFN(DeleteVolumeMountPoint);
 	PyObject *ret=NULL;
 	PyObject *mount_point_obj =	NULL;
 	WCHAR *mount_point = NULL;
@@ -3012,7 +3006,6 @@ static PyObject *py_GetVolumeNameForVolumeMountPoint(PyObject *self, PyObject *a
 
 	WCHAR *mount_point = NULL;
 	WCHAR volume_name[50];
-	CHECK_PFN(GetVolumeNameForVolumeMountPoint);
 	static char *keywords[]={"VolumeMountPoint", NULL};
 
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O:GetVolumeNameForVolumeMountPoint", keywords,
@@ -3041,7 +3034,6 @@ static PyObject *py_GetVolumePathName(PyObject *self, PyObject *args, PyObject *
 	PyObject *obpath = NULL;
 	WCHAR *path=NULL, *mount_point=NULL;
 	DWORD pathlen, bufsize=0;
-	CHECK_PFN(GetVolumePathName);
 	static char *keywords[]={"FileName","BufferLength", NULL};
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|l:GetVolumePathName", keywords,
 		&obpath,	// @pyparm string|FileName||File/dir for which to return volume mount point
@@ -3072,7 +3064,6 @@ static PyObject *py_GetVolumePathName(PyObject *self, PyObject *args, PyObject *
 PyCFunction pfnpy_GetVolumePathName=(PyCFunction)py_GetVolumePathName;
 
 // @pyswig [string,...]|GetVolumePathNamesForVolumeName|Returns mounted paths for a volume
-// @comm Requires WinXP or later
 // @comm Accepts keyword args
 static PyObject *py_GetVolumePathNamesForVolumeName(PyObject *self, PyObject *args, PyObject *kwargs)
 {
@@ -3081,7 +3072,6 @@ static PyObject *py_GetVolumePathNamesForVolumeName(PyObject *self, PyObject *ar
 	// Preallocate for most common case: 'x:\\' + 2 nulls
 	DWORD buf_len=5, reqd_len=0, err;
 	static char *keywords[]={"VolumeName", NULL};
-	CHECK_PFN(GetVolumePathNamesForVolumeName);
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O:GetVolumePathNamesForVolumeName", keywords,
 		&obvolume))		// @pyparm string|VolumeName||Name of a volume as returned by <om win32file.GetVolumeNameForVolumeMountPoint>
 		return NULL;
@@ -3115,8 +3105,7 @@ static PyObject *py_GetVolumePathNamesForVolumeName(PyObject *self, PyObject *ar
 PyCFunction pfnpy_GetVolumePathNamesForVolumeName=(PyCFunction)py_GetVolumePathNamesForVolumeName;
 
 // @pyswig |CreateHardLink|Establishes an NTFS hard link between an existing file and a new file.
-static PyObject*
-py_CreateHardLink(PyObject *self, PyObject *args, PyObject *kwargs)
+static PyObject* py_CreateHardLink(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     // @comm  An NTFS hard link is similar to a POSIX hard link.
     // <nl>This function creates a second directory entry for an existing file, can be different name in
@@ -3192,12 +3181,6 @@ static PyObject *py_CreateSymbolicLink(PyObject *self, PyObject *args, PyObject 
 		return NULL;
 	if (!PyWinObject_AsHANDLE(obtrans, &htrans))
 			return NULL;
-	if (htrans){
-		CHECK_PFN(CreateSymbolicLinkTransacted);
-		}
-	else{
-		CHECK_PFN(CreateSymbolicLink);
-		}
 
 	if (PyWinObject_AsWCHAR(oblinkname, &linkname, FALSE) && PyWinObject_AsWCHAR(obtargetname, &targetname, FALSE)){
 		BOOLEAN bsuccess;
@@ -3219,8 +3202,7 @@ static PyObject *py_CreateSymbolicLink(PyObject *self, PyObject *args, PyObject 
 PyCFunction pfnpy_CreateSymbolicLink=(PyCFunction)py_CreateSymbolicLink;
 
 // @pyswig |EncryptFile|Encrypts specified file (requires Win2k or higher and NTFS)
-static PyObject*
-py_EncryptFile(PyObject *self, PyObject *args)
+static PyObject* py_EncryptFile(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(EncryptFile);
 	// @pyparm string|filename||File to encrypt
@@ -3241,8 +3223,7 @@ py_EncryptFile(PyObject *self, PyObject *args)
 }
 
 // @pyswig |DecryptFile|Decrypts specified file (requires Win2k or higher and NTFS)
-static PyObject*
-py_DecryptFile(PyObject *self, PyObject *args)
+static PyObject* py_DecryptFile(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(DecryptFile);
 	// @pyparm string|filename||File to decrypt
@@ -3264,8 +3245,7 @@ py_DecryptFile(PyObject *self, PyObject *args)
 }
 
 // @pyswig |EncryptionDisable|Enables/disables encryption for a directory (requires Win2k or higher and NTFS)
-static PyObject*
-py_EncryptionDisable(PyObject *self, PyObject *args)
+static PyObject* py_EncryptionDisable(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(EncryptionDisable);
 	// @pyparm string|DirName||Directory to enable or disable
@@ -3292,10 +3272,8 @@ py_EncryptionDisable(PyObject *self, PyObject *args)
 // FILE_IS_ENCRYPTED, FILE_SYSTEM_ATTR, FILE_ROOT_DIR, FILE_SYSTEM_DIR,
 // FILE_UNKNOWN, FILE_SYSTEM_NOT_SUPPORT, FILE_USER_DISALLOWED,
 // or FILE_READ_ONLY
-static PyObject*
-py_FileEncryptionStatus(PyObject *self, PyObject *args)
+static PyObject* py_FileEncryptionStatus(PyObject *self, PyObject *args)
 {
-	CHECK_PFN(FileEncryptionStatus);
 	// @pyparm string|FileName||file to query
 	PyObject *ret=NULL, *obfname=NULL;
 	WCHAR *fname = NULL;
@@ -3584,8 +3562,7 @@ BOOL PyWinObject_AsPENCRYPTION_CERTIFICATE_HASH_LIST(PyObject *obhash_list, PENC
 
 
 // @pyswig (<o PySID>,bytes,string)|QueryUsersOnEncryptedFile|Returns list of users for an encrypted file as tuples of (SID, certificate hash blob, display info)
-static PyObject*
-py_QueryUsersOnEncryptedFile(PyObject *self, PyObject *args)
+static PyObject* py_QueryUsersOnEncryptedFile(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(QueryUsersOnEncryptedFile);
 	// @pyparm string|FileName||file to query
@@ -3615,8 +3592,7 @@ py_QueryUsersOnEncryptedFile(PyObject *self, PyObject *args)
 
 // @pyswig (<o PySID>,bytes,string)|QueryRecoveryAgentsOnEncryptedFile|Lists recovery agents for file as a tuple of tuples.
 // @rdesc The result is a tuple of tuples - ((SID, certificate hash blob, display info),....)
-static PyObject*
-py_QueryRecoveryAgentsOnEncryptedFile(PyObject *self, PyObject *args)
+static PyObject* py_QueryRecoveryAgentsOnEncryptedFile(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(QueryRecoveryAgentsOnEncryptedFile);
 	// @pyparm string|FileName||file to query
@@ -3645,8 +3621,7 @@ py_QueryRecoveryAgentsOnEncryptedFile(PyObject *self, PyObject *args)
 }
 
 // @pyswig |RemoveUsersFromEncryptedFile|Removes specified certificates from file - if certificate is not found, it is ignored
-static PyObject*
-py_RemoveUsersFromEncryptedFile(PyObject *self, PyObject *args)
+static PyObject* py_RemoveUsersFromEncryptedFile(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(RemoveUsersFromEncryptedFile);
 	// @pyparm string|FileName||File from which to remove users
@@ -3677,8 +3652,7 @@ py_RemoveUsersFromEncryptedFile(PyObject *self, PyObject *args)
 }
 
 // @pyswig |AddUsersToEncryptedFile|Allows user identified by SID and EFS certificate access to decrypt specified file
-static PyObject*
-py_AddUsersToEncryptedFile(PyObject *self, PyObject *args)
+static PyObject* py_AddUsersToEncryptedFile(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(AddUsersToEncryptedFile);
 	// @pyparm string|FileName||File that additional users will be allowed to decrypt
@@ -3712,11 +3686,9 @@ py_AddUsersToEncryptedFile(PyObject *self, PyObject *args)
 
 // @pyswig |DuplicateEncryptionInfoFile|Duplicates EFS encryption from one file to another
 // @pyseeapi DuplicateEncryptionInfoFile
-// @comm Requires Windows XP or later
 // @comm Accepts keyword arguments.
 static PyObject *py_DuplicateEncryptionInfoFile(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-	CHECK_PFN(DuplicateEncryptionInfoFile);
 	WCHAR *src=NULL, *dst=NULL;
 	PSECURITY_ATTRIBUTES psa;
 	PyObject *obsrc, *obdst, *obsa=Py_None, *ret=NULL;
@@ -3753,8 +3725,7 @@ PyCFunction pfnpy_DuplicateEncryptionInfoFile=(PyCFunction)py_DuplicateEncryptio
 // If Buffer is None, a new buffer will be created of size NbrOfBytesToRead that can be passed
 //	back in subsequent calls
 
-static PyObject*
-py_BackupRead(PyObject *self, PyObject *args)
+static PyObject* py_BackupRead(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(BackupRead);
 	// @pyparm <o PyHANDLE>|hFile||File handle opened by CreateFile
@@ -3805,8 +3776,7 @@ py_BackupRead(PyObject *self, PyObject *args)
 // @comm Function will only seek to end of current stream, used to seek past bad data
 //    or find beginning position for read of next stream
 // Returns number of bytes actually moved
-static PyObject*
-py_BackupSeek(PyObject *self, PyObject *args)
+static PyObject* py_BackupSeek(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(BackupSeek);
 	// @pyparm <o PyHANDLE>|hFile||File handle used by a BackupRead operation
@@ -3841,8 +3811,7 @@ py_BackupSeek(PyObject *self, PyObject *args)
 
 // @pyswig (int,int)|BackupWrite|Restores file data
 // @comm Returns number of bytes written and context pointer for next operation
-static PyObject*
-py_BackupWrite(PyObject *self, PyObject *args)
+static PyObject* py_BackupWrite(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(BackupWrite);
 	// @pyparm <o PyHANDLE>|hFile||File handle opened by CreateFile
@@ -3879,8 +3848,7 @@ py_BackupWrite(PyObject *self, PyObject *args)
 // @pyswig |SetFileShortName|Set the 8.3 name of a file
 // @comm This function is only available on WinXP and later
 // @comm File handle must be opened with FILE_FLAG_BACKUP_SEMANTICS, and SE_RESTORE_NAME privilege must be enabled
-static PyObject*
-py_SetFileShortName(PyObject *self, PyObject *args)
+static PyObject* py_SetFileShortName(PyObject *self, PyObject *args)
 {
 	CHECK_PFN(SetFileShortName);
 	HANDLE h;
@@ -3961,8 +3929,7 @@ DWORD CALLBACK CopyFileEx_ProgressRoutine(
 // @pyseeapi CopyFileTransacted
 // @comm Accepts keyword args.
 // @comm The Transaction arg can be passed to invoke CopyFileTransacted
-static PyObject*
-py_CopyFileEx(PyObject *self, PyObject *args, PyObject *kwargs)
+static PyObject* py_CopyFileEx(PyObject *self, PyObject *args, PyObject *kwargs)
 {
 	PyObject *obsrc, *obdst, *obcallback=Py_None, *obdata=Py_None, *ret=NULL;
 	PyObject *obtrans=Py_None;
@@ -3988,12 +3955,6 @@ py_CopyFileEx(PyObject *self, PyObject *args, PyObject *kwargs)
 
 	if (!PyWinObject_AsHANDLE(obtrans, &htrans))
 		return NULL;
-	if (htrans){
-		CHECK_PFN(CopyFileTransacted);
-		}
-	else{
-		CHECK_PFN(CopyFileEx);
-		}
 
 	if (obcallback!=Py_None){
 		if (!PyCallable_Check(obcallback)){
@@ -4032,8 +3993,7 @@ PyCFunction pfnpy_CopyFileEx=(PyCFunction)py_CopyFileEx;
 // @pyswig |MoveFileWithProgress|Moves a file, and reports progress to a callback function
 // @comm Accepts keyword arguments.
 // @comm The Transaction arg can be passed to invoke MoveFileTransacted
-static PyObject*
-py_MoveFileWithProgress(PyObject *self, PyObject *args, PyObject *kwargs)
+static PyObject* py_MoveFileWithProgress(PyObject *self, PyObject *args, PyObject *kwargs)
 {
 	PyObject *obsrc, *obdst, *obcallback=Py_None, *obdata=Py_None, *ret=NULL;
 	PyObject *obtrans=Py_None;
@@ -4099,10 +4059,8 @@ py_MoveFileWithProgress(PyObject *self, PyObject *args, PyObject *kwargs)
 PyCFunction pfnpy_MoveFileWithProgress=(PyCFunction)py_MoveFileWithProgress;
 
 // @pyswig |ReplaceFile|Replaces one file with another
-static PyObject*
-py_ReplaceFile(PyObject *self, PyObject *args)
+static PyObject* py_ReplaceFile(PyObject *self, PyObject *args)
 {
-	CHECK_PFN(ReplaceFile);
 	PyObject *obsrc, *obdst, *obbackup=Py_None, *obExclude=Py_None, *obReserved=Py_None, *ret=NULL;
 	WCHAR *src=NULL, *dst=NULL, *backup=NULL;
 	LPVOID Exclude=NULL, Reserved=NULL;
@@ -4158,11 +4116,8 @@ void encryptedfilecontextdestructor(PyObject *obctxt){
 // @rdesc Returns a PyCObject containing an operation context that can be passed to
 // <om win32file.ReadEncryptedFileRaw> or <om win32file.WriteEncryptedFileRaw>.  Context must be
 // destroyed using <om win32file.CloseEncryptedFileRaw>.
-static PyObject*
-py_OpenEncryptedFileRaw(PyObject *self, PyObject *args)
+static PyObject* py_OpenEncryptedFileRaw(PyObject *self, PyObject *args)
 {
-	CHECK_PFN(OpenEncryptedFileRaw);
-	CHECK_PFN(CloseEncryptedFileRaw);
 	PyObject *obfname, *ret=NULL;
 	DWORD flags, err;
 	WCHAR *fname=NULL;
@@ -4221,10 +4176,8 @@ DWORD WINAPI PyExportCallback(PBYTE file_data, PVOID callback_data, ULONG length
 }
 
 // @pyswig |ReadEncryptedFileRaw|Reads the encrypted bytes of a file for backup and restore purposes
-static PyObject*
-py_ReadEncryptedFileRaw(PyObject *self, PyObject *args)
+static PyObject* py_ReadEncryptedFileRaw(PyObject *self, PyObject *args)
 {
-	CHECK_PFN(ReadEncryptedFileRaw);
 	PyObject *obcallback, *obcallback_data, *obctxt;
 	PVOID ctxt;
 	PyObject *callback_objects[2];
@@ -4297,10 +4250,8 @@ DWORD WINAPI PyImportCallback(PBYTE file_data, PVOID callback_data, PULONG pleng
 }
 
 // @pyswig |WriteEncryptedFileRaw|Writes raw bytes to an encrypted file
-static PyObject*
-py_WriteEncryptedFileRaw(PyObject *self, PyObject *args)
+static PyObject* py_WriteEncryptedFileRaw(PyObject *self, PyObject *args)
 {
-	CHECK_PFN(WriteEncryptedFileRaw);
 	PyObject *obcallback, *obcallback_data, *obctxt;
 	PVOID ctxt;
 	PyObject *callback_objects[2];
@@ -4334,10 +4285,8 @@ py_WriteEncryptedFileRaw(PyObject *self, PyObject *args)
 }
 
 // @pyswig |CloseEncryptedFileRaw|Frees a context created by <om win32file.OpenEncryptedFileRaw>
-static PyObject*
-py_CloseEncryptedFileRaw(PyObject *self, PyObject *args)
+static PyObject* py_CloseEncryptedFileRaw(PyObject *self, PyObject *args)
 {
-	CHECK_PFN(CloseEncryptedFileRaw);
 	PyObject *obctxt;
 	if (!PyArg_ParseTuple(args, "O:CloseEncryptedFileRaw",
 		&obctxt))	// @pyparm PyCObject|Context||Context object returned from <om win32file.OpenEncryptedFileRaw>
@@ -4941,9 +4890,6 @@ PyCFunction pfnpy_FindStreams=(PyCFunction)py_FindStreams;
 // @comm If Transaction is specified, a transacted search is performed using FindFirstFileNameTransacted
 static PyObject *py_FindFileNames(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-	CHECK_PFN(FindFirstFileName);
-	CHECK_PFN(FindNextFileName);
-
 	PyObject *obfname, *obtrans=Py_None, *ret=NULL, *ret_item;
 	WCHAR *fname=NULL, *linkname=NULL;
 	HANDLE hfind=INVALID_HANDLE_VALUE, htrans=NULL;
@@ -5308,11 +5254,9 @@ PyCFunction pfnpy_GetFullPathName=(PyCFunction)py_GetFullPathName;
 
 // @pyswig int|Wow64DisableWow64FsRedirection|Disables file system redirection for 32-bit processes running on a 64-bit system
 // @rdesc Returns a state value to be passed to <om win32file.Wow64RevertWow64FsRedirection>
-// @comm Requires 64-bit XP or later
 static PyObject *py_Wow64DisableWow64FsRedirection(PyObject *self, PyObject *args)
 {
 	VOID *state;
-	CHECK_PFN(Wow64DisableWow64FsRedirection);
 	if (!PyArg_ParseTuple(args, ":Wow64DisableWow64FsRedirection"))
 		return NULL;
 	if (!(*pfnWow64DisableWow64FsRedirection)(&state))
@@ -5321,11 +5265,9 @@ static PyObject *py_Wow64DisableWow64FsRedirection(PyObject *self, PyObject *arg
 }
 
 // @pyswig |Wow64RevertWow64FsRedirection|Reenables file system redirection for 32-bit processes running on a 64-bit system
-// @comm Requires 64-bit XP or later
 static PyObject *py_Wow64RevertWow64FsRedirection(PyObject *self, PyObject *args)
 {
 	VOID *state;
-	CHECK_PFN(Wow64RevertWow64FsRedirection);
 	// @pyparm int|OldValue||State returned from Wow64DisableWow64FsRedirection
 	if (!PyArg_ParseTuple(args, "O&:Wow64RevertWow64FsRedirection", PyWinLong_AsVoidPtr, &state))
 		return NULL;
@@ -5351,9 +5293,6 @@ static PyObject *py_Wow64RevertWow64FsRedirection(PyObject *self, PyObject *args
 // @flag FileStreamInfo|Sequence of dicts representing FILE_STREAM_INFO structs
 static PyObject *py_GetFileInformationByHandleEx(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-	// According to MSDN, this function is in kernel32.lib in Vista or later, but I can't get it to link
-	//	with either Vista or Windows 7 sdks.
-	CHECK_PFN(GetFileInformationByHandleEx);
 	static char *keywords[] = {"File", "FileInformationClass", NULL};
 	HANDLE handle;
 	FILE_INFO_BY_HANDLE_CLASS info_class;
@@ -5566,7 +5505,6 @@ PyCFunction pfnpy_GetFileInformationByHandleEx=(PyCFunction)py_GetFileInformatio
 // @comm Accepts keyword args.
 static PyObject *py_SetFileInformationByHandle(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-	CHECK_PFN(SetFileInformationByHandle);
 	static char *keywords[] = {"File", "FileInformationClass", "Information", NULL};
 	HANDLE handle;
 	FILE_INFO_BY_HANDLE_CLASS info_class;
@@ -5718,7 +5656,6 @@ PyCFunction pfnpy_SetFileInformationByHandle=(PyCFunction)py_SetFileInformationB
 // @comm Accepts keyword args.
 static PyObject *py_ReOpenFile(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-	CHECK_PFN(ReOpenFile);
 	static char *keywords[] = {"OriginalFile", "DesiredAccess", "ShareMode", "Flags", NULL};
 	HANDLE horig, hret;
 	DWORD DesiredAccess, ShareMode, Flags;
@@ -5746,7 +5683,6 @@ PyCFunction pfnpy_ReOpenFile=(PyCFunction)py_ReOpenFile;
 // @comm Accepts keyword args.
 static PyObject *py_OpenFileById(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-	CHECK_PFN(OpenFileById);
 	static char *keywords[] = {"File", "FileID", "DesiredAccess", "ShareMode",
 		"Flags", "SecurityAttributes", NULL};
 	HANDLE hvol, hret;

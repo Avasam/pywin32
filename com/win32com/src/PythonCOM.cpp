@@ -1776,20 +1776,12 @@ static PyObject *pythoncom_ObjectFromLresult(PyObject *self, PyObject *args)
     if (obIID && !PyWinObject_AsIID(obIID, &iid))
         return NULL;
 
-    // GIL protects us from races here.
-    if (pfnObjectFromLresult == NULL) {
-        HMODULE hmod = LoadLibrary(_T("oleacc.dll"));
-        if (hmod)
-            pfnObjectFromLresult = (LPFNOBJECTFROMLRESULT)GetProcAddress(hmod, "ObjectFromLresult");
-    }
-    if (pfnObjectFromLresult == NULL)
-        return PyErr_Format(PyExc_NotImplementedError, "Not available on this platform");
-
     HRESULT hr;
     void *ret = 0;
-    Py_BEGIN_ALLOW_THREADS hr = (*pfnObjectFromLresult)(lresult, iid, wparam, &ret);
-    Py_END_ALLOW_THREADS if (FAILED(hr))
-    {
+    Py_BEGIN_ALLOW_THREADS;
+    hr = ObjectFromLresult(lresult, iid, wparam, &ret);
+    Py_END_ALLOW_THREADS;
+    if (FAILED(hr)) {
         PyCom_BuildPyException(hr);
         return NULL;
     }
