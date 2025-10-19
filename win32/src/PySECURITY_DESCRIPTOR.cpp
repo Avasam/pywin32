@@ -633,7 +633,7 @@ PyObject *PySECURITY_DESCRIPTOR::GetSecurityDescriptorControl(PyObject *self, Py
 
 // @pymethod |PySECURITY_DESCRIPTOR|SetSecurityDescriptorControl|Sets the control bit flags related to inheritance for a
 // security descriptor
-PyObject *PySECURITY_DESCRIPTOR::PySetSecurityDescriptorControl(PyObject *self, PyObject *args)
+PyObject *PySECURITY_DESCRIPTOR::SetSecurityDescriptorControl(PyObject *self, PyObject *args)
 {
     SECURITY_DESCRIPTOR_CONTROL ControlBitsOfInterest, ControlBitsToSet;
     PySECURITY_DESCRIPTOR *This = (PySECURITY_DESCRIPTOR *)self;
@@ -642,7 +642,7 @@ PyObject *PySECURITY_DESCRIPTOR::PySetSecurityDescriptorControl(PyObject *self, 
     if (!PyArg_ParseTuple(args, "ll:SetSecurityDescriptorControl", &ControlBitsOfInterest, &ControlBitsToSet))
         return NULL;
     PSECURITY_DESCRIPTOR psd = This->GetSD();
-    if (!SetSecurityDescriptorControl(psd, ControlBitsOfInterest, ControlBitsToSet))
+    if (!::SetSecurityDescriptorControl(psd, ControlBitsOfInterest, ControlBitsToSet))
         return PyWin_SetAPIError("SetSecurityDescriptorControl");
     Py_INCREF(Py_None);
     return Py_None;
@@ -695,7 +695,7 @@ struct PyMethodDef PySECURITY_DESCRIPTOR::methods[] = {
      1},  // @pymeth GetLength|Return length of security descriptor (GetSecurityDescriptorLength)
     {"IsSelfRelative", PySECURITY_DESCRIPTOR::IsSelfRelative,
      1},  // @pymeth IsSelfRelative|Returns true if SD is self-relative, false if absolute
-    {"SetSecurityDescriptorControl", PySECURITY_DESCRIPTOR::PySetSecurityDescriptorControl,
+    {"SetSecurityDescriptorControl", PySECURITY_DESCRIPTOR::SetSecurityDescriptorControl,
      1},  // @pymeth SetSecurityDescriptorControl|Sets control bitmask of a security descriptor
     {NULL}};
 
