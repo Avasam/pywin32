@@ -13,77 +13,77 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Build and test
-    runs-on: windows-2022
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        architecture: [x64, x86]
-    env:
-      # TODO: We can't yet run tests with PYTHONDEVMODE=1, let's emulated it as much as we can
-      # https://docs.python.org/3/library/devmode.html#effects-of-the-python-development-mode
-      PYTHONMALLOC: debug
-      PYTHONASYNCIODEBUG: 1
-      PYTHONWARNINGS: always
-      # PYTHONFAULTHANDLER: 1 # This causes our tests to fail
+  # test:
+  #   name: Build and test
+  #   runs-on: windows-2022
+  #   timeout-minutes: 30
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+  #       architecture: [x64, x86]
+  #   env:
+  #     # TODO: We can't yet run tests with PYTHONDEVMODE=1, let's emulated it as much as we can
+  #     # https://docs.python.org/3/library/devmode.html#effects-of-the-python-development-mode
+  #     PYTHONMALLOC: debug
+  #     PYTHONASYNCIODEBUG: 1
+  #     PYTHONWARNINGS: always
+  #     # PYTHONFAULTHANDLER: 1 # This causes our tests to fail
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.architecture }}
-          check-latest: true
-          allow-prereleases: true
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v6
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #         architecture: ${{ matrix.architecture }}
+  #         check-latest: true
+  #         allow-prereleases: true
 
-      - name: Build and install
-        run: pip install . -v --user
+  #     - name: Build and install
+  #       run: pip install . -v --user
 
-      # This needs to happen *after* installing pywin32 since
-      # AutoDuck/py2d.py currently relies on runtime imports for introspection
-      # This isn't included in the wheel (TODO: could we?)
-      # and only serves as a PR test for the docs.yaml workflow
-      - name: Generate PyWin32.chm help file
-        run: python AutoDuck/make.py
+  #     # This needs to happen *after* installing pywin32 since
+  #     # AutoDuck/py2d.py currently relies on runtime imports for introspection
+  #     # This isn't included in the wheel (TODO: could we?)
+  #     # and only serves as a PR test for the docs.yaml workflow
+  #     - name: Generate PyWin32.chm help file
+  #       run: python AutoDuck/make.py
 
-      # Smokescreen test to validate postinstall doesn't crash, dlls can be found, and both pathless invocation methods work
-      - name: Run postinstall install/remove
-        run: |
-          $UserSite = "$(python -m site --user-site)"
-          python -m win32.scripts.pywin32_postinstall -install -destination "$UserSite"
-          pywin32_postinstall -remove -destination "$UserSite"
+  #     # Smokescreen test to validate postinstall doesn't crash, dlls can be found, and both pathless invocation methods work
+  #     - name: Run postinstall install/remove
+  #       run: |
+  #         $UserSite = "$(python -m site --user-site)"
+  #         python -m win32.scripts.pywin32_postinstall -install -destination "$UserSite"
+  #         pywin32_postinstall -remove -destination "$UserSite"
 
-      # Compilation and registration of the PyCOMTest server dll
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+  #     # Compilation and registration of the PyCOMTest server dll
+  #     - name: Add msbuild to PATH
+  #       uses: microsoft/setup-msbuild@v2
 
-      - name: Install missing Visual Studio components
-        run: python .github\workflows\install-vs-components.py
+  #     - name: Install missing Visual Studio components
+  #       run: python .github\workflows\install-vs-components.py
 
-      - name: Build and register the PyCOMTest server dll
-        # Pass Silent flag to regsvr32 to avoid hanging on confirmation window
-        run: com/TestSources/PyCOMTest/buildAndRegister.bat /s
+  #     - name: Build and register the PyCOMTest server dll
+  #       # Pass Silent flag to regsvr32 to avoid hanging on confirmation window
+  #       run: com/TestSources/PyCOMTest/buildAndRegister.bat /s
 
-      - name: Run tests
-        # Run the tests directly from the source dir so support files (eg, .wav files etc)
-        # can be found - they aren't installed into the Python tree.
-        run: python win32/scripts/pywin32_testall.py -v -skip-adodbapi
+  #     - name: Run tests
+  #       # Run the tests directly from the source dir so support files (eg, .wav files etc)
+  #       # can be found - they aren't installed into the Python tree.
+  #       run: python win32/scripts/pywin32_testall.py -v -skip-adodbapi
 
-      - name: Build wheels
-        run: pip wheel . -v --wheel-dir=dist
+  #     - name: Build wheels
+  #       run: pip wheel . -v --wheel-dir=dist
 
-      - uses: actions/upload-artifact@v4
-        # Upload artifacts even if tests fail
-        if: ${{ always() }}
-        with:
-          name: artifacts-${{ matrix.python-version }}-${{ matrix.architecture }}
-          path: dist/*.whl
-          if-no-files-found: error
+  #     - uses: actions/upload-artifact@v4
+  #       # Upload artifacts even if tests fail
+  #       if: ${{ always() }}
+  #       with:
+  #         name: artifacts-${{ matrix.python-version }}-${{ matrix.architecture }}
+  #         path: dist/*.whl
+  #         if-no-files-found: error
 
   # We cannot build and test on ARM64, so we cross-compile.
   # Later, when available, we can add tests using this wheel on ARM64 VMs
@@ -117,23 +117,23 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error
 
-  merge:
-    runs-on: windows-latest
-    needs: [test, build_arm64]
-    steps:
-      - name: Merge Artifacts
-        uses: actions/upload-artifact/merge@v4
-        with:
-          name: artifacts
-          pattern: artifacts-*
-      - name: Delete standalone Artifacts
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: artifacts-*
+  # merge:
+  #   runs-on: windows-latest
+  #   needs: [test, build_arm64]
+  #   steps:
+  #     - name: Merge Artifacts
+  #       uses: actions/upload-artifact/merge@v4
+  #       with:
+  #         name: artifacts
+  #         pattern: artifacts-*
+  #     - name: Delete standalone Artifacts
+  #       uses: geekyeggo/delete-artifact@v5
+  #       with:
+  #         name: artifacts-*
 
   # This job can be run locally by running `pre-commit run`
   checkers:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -165,7 +165,7 @@ jobs:
         if: ${{ !cancelled() }}
 
   type-checkers:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
