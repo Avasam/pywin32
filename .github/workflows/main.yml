@@ -12,6 +12,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  # With uv, it's often faster to redownload binary wheels than caching them on GitHub.
+  # At this point, may as well not even bother with cache checks overhead.
+  # https://docs.astral.sh/uv/concepts/cache/#caching-in-continuous-integration
+  UV_NO_CACHE: 1
+  # However, this only works assuming all our dependencies provide a binary distribution
+  UV_NO_BUILD: 1
+
 jobs:
   test:
     name: Build and test
@@ -38,8 +46,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
-          cache: pip
-          cache-dependency-path: .github/workflows/main.yml
           check-latest: true
           allow-prereleases: true
 
@@ -102,23 +108,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
-          cache: pip
-          cache-dependency-path: .github/workflows/main.yml
-          check-latest: true
-          allow-prereleases: true
-
-      - name: Install build module
-        run: pip install --upgrade build
+          activate-environment: true
 
       - name: Obtain ARM64 library files
         run: python .github\workflows\download-arm64-libs.py .\arm64libs
 
       - name: Build wheels
-        run: python -m build --wheel --config-setting=--build-option=build_ext --config-setting=--build-option=-L.\arm64libs --config-setting=--build-option=--plat-name=win-arm64 --config-setting=--build-option=build --config-setting=--build-option=--plat-name=win-arm64 --config-setting=--build-option=bdist_wheel --config-setting=--build-option=--plat-name=win-arm64
+        run: uv build --wheel --config-setting=--build-option=build_ext --config-setting=--build-option=-L.\arm64libs --config-setting=--build-option=--plat-name=win-arm64 --config-setting=--build-option=build --config-setting=--build-option=--plat-name=win-arm64 --config-setting=--build-option=bdist_wheel --config-setting=--build-option=--plat-name=win-arm64
 
       - uses: actions/upload-artifact@v4
         with:
@@ -146,23 +145,23 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v6
+      - uses: astral-sh/setup-uv@v7
         with:
           # This job only needs to target the oldest supported version
           python-version: "3.8"
-          cache: pip
-          cache-dependency-path: .github/workflows/main.yml
-      - run: pip install clang-format==18.1.* pycln
+          activate-environment: true
+      - run: uv pip install --group=checkers
+
       # !cancelled(): Show issues even if the previous steps failed. But still fail the job
       - run: pycln . --config=pycln.toml --check
+
       - name: Run Ruff linter
         uses: astral-sh/ruff-action@v3
-        with:
-          version: "0.11.0"
         if: ${{ !cancelled() }}
       - name: Run Ruff formatter
         run: ruff format --check
         if: ${{ !cancelled() }}
+
       # Too many files to fit in a single command, also exclude vendored Scintilla and MAPIStubLibrary
       - run: |
           clang-format --Werror --dry-run $(git ls-files '*.cpp' ':!:com/win32comext/mapi/src/MAPIStubLibrary/')
@@ -182,20 +181,17 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v6
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: .github/workflows/main.yml
-          check-latest: true
-          allow-prereleases: true
-      - run: pip install types-setuptools PyOpenGL mypy==1.16.*
+          activate-environment: true
+      - run: uv pip install --group=type-checkers
 
       - run: mypy . --python-version=${{ matrix.python-version }}
 
       - uses: jakebailey/pyright-action@v2
         with:
           python-version: ${{ matrix.python-version }}
-          version: "1.1.401"
+          version: PATH
           annotate: errors
         if: ${{ !cancelled() }} # Show issues even if the previous steps failed. But still fail the job

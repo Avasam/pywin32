@@ -6,3 +6,26 @@ requires = [
   "setuptools <76.1; python_version <'3.9'",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pywin32"
+dynamic = ["version"]
+requires-python = ">=3.8"
+
+[dependency-groups]
+checkers = [ # Keep these in sync with .pre-commit-config.yaml
+  "clang-format ==18.1.8",
+  "pycln ==2.4.0",
+  "ruff ==0.11.0",
+]
+type-checkers = [
+  "types-setuptools",
+  "PyOpenGL",
+  "mypy ==1.16.*; python_version >='3.9'",
+  "pyright ==1.1.401",
+]
+dev = [
+  "pre-commit",
+  { include-group = "checkers" },
+  { include-group = "type-checkers" },
+]

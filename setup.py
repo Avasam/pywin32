@@ -2001,11 +2001,9 @@ classifiers = [
 ]
 
 dist = setup(
-    name="pywin32",
     version=build_id,
     description="Python for Window Extensions",
-    long_description=(Path(__file__).parent / "README.md").read_text(),
-    long_description_content_type="text/markdown",
+    readme="README.md",
     author="Mark Hammond (et al)",
     author_email="mhammond@skippinet.com.au",
     project_urls={
