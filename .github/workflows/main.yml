@@ -12,14 +12,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-env:
-  # With uv, it's often faster to redownload binary wheels than caching them on GitHub.
-  # At this point, may as well not even bother with cache checks overhead.
-  # https://docs.astral.sh/uv/concepts/cache/#caching-in-continuous-integration
-  UV_NO_CACHE: 1
-  # However, this only works assuming all our dependencies provide a binary distribution
-  UV_NO_BUILD: 1
-
 jobs:
   test:
     name: Build and test

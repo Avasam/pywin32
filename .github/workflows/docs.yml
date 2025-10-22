@@ -24,7 +24,6 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           activate-environment: true
-          enable-cache: false # Not installing any sdist dependency
 
       # We still need to install pywin32 because
       # AutoDuck/py2d.py currently relies on runtime imports for introspection
