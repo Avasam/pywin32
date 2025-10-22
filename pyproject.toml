@@ -7,11 +7,6 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "pywin32"
-dynamic = ["version"]
-requires-python = ">=3.8"
-
 [dependency-groups]
 checkers = [ # Keep these in sync with .pre-commit-config.yaml
   "clang-format ==18.1.8",
