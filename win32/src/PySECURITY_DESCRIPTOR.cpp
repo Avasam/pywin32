@@ -633,22 +633,16 @@ PyObject *PySECURITY_DESCRIPTOR::GetSecurityDescriptorControl(PyObject *self, Py
 
 // @pymethod |PySECURITY_DESCRIPTOR|SetSecurityDescriptorControl|Sets the control bit flags related to inheritance for a
 // security descriptor
-// @comm Only exists on Windows 2000 or later
 PyObject *PySECURITY_DESCRIPTOR::SetSecurityDescriptorControl(PyObject *self, PyObject *args)
 {
     SECURITY_DESCRIPTOR_CONTROL ControlBitsOfInterest, ControlBitsToSet;
     PySECURITY_DESCRIPTOR *This = (PySECURITY_DESCRIPTOR *)self;
-    PSECURITY_DESCRIPTOR psd;
-    if (setsecuritydescriptorcontrol == NULL) {
-        PyErr_SetString(PyExc_NotImplementedError, "SetSecurityDescriptorControl does not exist on this platform");
-        return NULL;
-    }
     // @pyparm int|ControlBitsOfInterest||Bitmask of flags to be modified
     // @pyparm int|ControlBitsToSet||Bitmask containing flag values to set
     if (!PyArg_ParseTuple(args, "ll:SetSecurityDescriptorControl", &ControlBitsOfInterest, &ControlBitsToSet))
         return NULL;
-    psd = This->GetSD();
-    if (!(*setsecuritydescriptorcontrol)(psd, ControlBitsOfInterest, ControlBitsToSet))
+    PSECURITY_DESCRIPTOR psd = This->GetSD();
+    if (!::SetSecurityDescriptorControl(psd, ControlBitsOfInterest, ControlBitsToSet))
         return PyWin_SetAPIError("SetSecurityDescriptorControl");
     Py_INCREF(Py_None);
     return Py_None;

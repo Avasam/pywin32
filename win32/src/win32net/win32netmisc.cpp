@@ -1353,7 +1353,6 @@ PyObject *PyNetServerComputerNameDel(PyObject *self, PyObject *args)
     return ret;
 }
 
-extern "C" NetValidateNamefunc pfnNetValidateName = NULL;
 // @pymethod |win32net|NetValidateName|Checks that domain/machine/workgroup name is valid for given context
 // @rdesc Returns none if valid, exception if not
 // @comm If Account and Password aren't passed, current logon credentials are used
@@ -1370,15 +1369,11 @@ PyObject *PyNetValidateName(PyObject *self, PyObject *args)
     WCHAR *Server = NULL, *Name = NULL, *Account = NULL, *Password = NULL;
     NET_API_STATUS err;
     NETSETUP_NAME_TYPE NameType;
-    if (pfnNetValidateName == NULL) {
-        PyErr_SetString(PyExc_NotImplementedError, "NetValidateName does not exist on this platform");
-        return NULL;
-    }
     if (!PyArg_ParseTuple(args, "OOl|OO", &obServer, &obName, &NameType, &obAccount, &obPassword))
         return NULL;
     if (PyWinObject_AsWCHAR(obServer, &Server, TRUE) && PyWinObject_AsWCHAR(obName, &Name, FALSE) &&
         PyWinObject_AsWCHAR(obAccount, &Account, TRUE) && PyWinObject_AsWCHAR(obPassword, &Password, TRUE)) {
-        err = (*pfnNetValidateName)(Server, Name, Account, Password, NameType);
+        err = NetValidateName(Server, Name, Account, Password, NameType);
         if (err == NERR_Success)
             ret = Py_None;
         else
@@ -1595,7 +1590,7 @@ PyObject *PyNetValidatePasswordPolicy(PyObject *self, PyObject *args)
     ALL_INS in_arg;
     memset(&in_arg, 0, sizeof(in_arg));
 
-    if (pfnNetValidateName == NULL || pfnNetValidatePasswordPolicyFree == NULL) {
+    if (pfnNetValidatePasswordPolicyFree == NULL) {
         PyErr_SetString(PyExc_NotImplementedError, "NetValidatePasswordPolicy does not exist on this platform");
         return NULL;
     }
