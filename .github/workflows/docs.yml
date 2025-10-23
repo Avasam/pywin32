@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: astral-sh/setup-uv@v7
+        uses: lazka/setup-uv@1cd7d041504854789a5da6f1df7ba8b84d8fbcd9
         with:
           activate-environment: true
 
