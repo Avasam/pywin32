@@ -911,11 +911,16 @@ class my_compiler(MSVCCompiler):
     def spawn(self, cmd: MutableSequence[str]) -> None:  # type: ignore[override] # More restrictive than supertype
         is_link = cmd[0].endswith("link.exe") or cmd[0].endswith('"link.exe"')
         if is_link:
-            # remove /MANIFESTFILE:... and add MANIFEST:NO
-            for i in range(len(cmd)):
-                if cmd[i].startswith(("/MANIFESTFILE:", "/MANIFEST:EMBED")):
-                    cmd[i] = "/MANIFEST:NO"
-                    break
+            # This is optional, but since we special-case MSVCCompiler, may as well do anyway.
+            # Solves some
+            # LINK : warning LNK4075: ignoring '...' due to '/MANIFEST:NO' specification
+            cmd = [
+                arg
+                for arg in cmd
+                if not arg.startswith(
+                    ("/MANIFESTFILE:", "/MANIFEST:EMBED", "/MANIFESTUAC:")
+                )
+            ]
         super().spawn(cmd)  # type: ignore[arg-type] # mypy variance issue, but pyright ok
 
     # CCompiler's implementations of these methods completely replace the values
