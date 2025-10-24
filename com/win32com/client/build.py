@@ -609,7 +609,6 @@ def _BuildArgList(fdesc, names):
     # 'names' - although we can't reproduce this, it would be insane to offer
     # more args than we have arg infos for - hence the upper limit on names...
     names = list(map(MakePublicAttributeName, names[1 : (numArgs + 1)]))
-    name_num = 0
     while len(names) < numArgs:
         names.append("arg%d" % (len(names),))
     # As per BuildCallList(), avoid huge lines.

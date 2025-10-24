@@ -445,7 +445,7 @@ class CScintillaEditInterface(ScintillaControlInterface):
         cr = struct.pack("ll", start, end)
         crBuff = array.array("b", cr)
         addressCrBuff = crBuff.buffer_info()[0]
-        rc = self.SendScintilla(EM_EXSETSEL, 0, addressCrBuff)
+        self.SendScintilla(EM_EXSETSEL, 0, addressCrBuff)
 
     def GetLineCount(self):
         return self.SendScintilla(win32con.EM_GETLINECOUNT)

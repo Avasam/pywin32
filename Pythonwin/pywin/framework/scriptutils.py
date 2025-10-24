@@ -47,13 +47,14 @@ class DlgRunScript(dialog.Dialog):
         self.bHaveDebugger = bHaveDebugger
 
     def OnInitDialog(self):
-        rc = dialog.Dialog.OnInitDialog(self)
+        rc = super().OnInitDialog()
         cbo = self.GetDlgItem(win32ui.IDC_COMBO1)
         for o in debugging_options:
             cbo.AddString(o)
         cbo.SetCurSel(self["debuggingType"])
         if not self.bHaveDebugger:
             cbo.EnableWindow(0)
+        return rc
 
     def OnBrowse(self, id, code):
         if code != 0:  # BN_CLICKED
@@ -512,7 +513,7 @@ def CheckFile():
     finally:
         f.close()
     try:
-        codeObj = compile(code, pathName, "exec")
+        compile(code, pathName, "exec")
         if RunTabNanny(pathName):
             win32ui.SetStatusText(
                 "Python and the TabNanny successfully checked the file '"

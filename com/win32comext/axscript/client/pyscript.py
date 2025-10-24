@@ -407,7 +407,7 @@ class PyScript(framework.COMScript):
                 self.globalNameSpaceModule.ax._Reset_()
             except AttributeError:
                 pass  # ???
-            globalNameSpaceModule = None
+            self.globalNameSpaceModule = None
 
 
 def DllRegisterServer():
