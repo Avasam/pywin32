@@ -5,7 +5,7 @@ import win32ui
 
 class Object:
     def __init__(self, initObj=None):
-        self.__dict__["_obj_"] = initObj
+        self._obj_ = initObj
         # 		self._obj_ = initObj
         if initObj is not None:
             initObj.AttachObject(self)
@@ -19,9 +19,8 @@ class Object:
         # During cleanup __dict__ is not available, causing recursive death.
         if not attr.startswith("__"):
             try:
-                o = self.__dict__["_obj_"]
-                if o is not None:
-                    return getattr(o, attr)
+                if self._obj_ is not None:
+                    return getattr(self._obj_, attr)
                 # Only raise this error for non "internal" names -
                 # Python may be calling __len__, __bool__, etc, so
                 # we don't want this exception
@@ -37,10 +36,9 @@ class Object:
         self._obj_ = None
 
     def close(self):
-        if "_obj_" in self.__dict__:
-            if self._obj_ is not None:
-                self._obj_.AttachObject(None)
-                self._obj_ = None
+        if self._obj_ is not None:
+            self._obj_.AttachObject(None)
+            self._obj_ = None
 
 
 class CmdTarget(Object):
