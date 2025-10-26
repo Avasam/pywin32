@@ -30,7 +30,7 @@ HTML_FILES = $(WIN32_HELP_DIR)\*.html \
 		$(WIN32COMEXT_DIR)/axscript/demos/client/ie/* \
 		$(ISAPI_DIR)/doc/*.html \
 		$(PYTHONWIN_DIR)/readme.html $(PYTHONWIN_DIR)/doc/* $(PYTHONWIN_DIR)/doc/debugger/* \
-		../CHANGES.txt \
+		../CHANGES.md \
 
 
 WIN32_SOURCE = $(WIN32_SOURCE_DIR)/*.cpp \
@@ -82,7 +82,6 @@ WIN32COM_SOURCE = \
 	  $(GENDIR)\PyIProfAdmin.d \
 	  $(GENDIR)\PyIProfSect.d \
 	  $(GENDIR)\exchange.d \
-	  $(GENDIR)\exchdapi.d \
 	  $(ADSI_DIR)\src\*.cpp \
 	  $(GENDIR)\adsi.d \
 	  $(GENDIR)\PyIADsContainer.d \
@@ -229,10 +228,6 @@ $(GENDIR)\PyIProfSect.d: $(MAPI_DIR)/src/$(*B).i
 
 # Exchange stuff.
 $(GENDIR)\exchange.d: $(MAPI_DIR)/src/$(*B).i
-	$(PYTHON) makedfromi.py -o$*.d $(MAPI_DIR)/src/$(*B).i
-
-# Exchange stuff.
-$(GENDIR)\exchdapi.d: $(MAPI_DIR)/src/$(*B).i
 	$(PYTHON) makedfromi.py -o$*.d $(MAPI_DIR)/src/$(*B).i
 
 # ADSI

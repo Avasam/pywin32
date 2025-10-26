@@ -283,14 +283,8 @@ BOOL PySECURITY_DESCRIPTOR::SetSD(PSECURITY_DESCRIPTOR psd)
     // replace security descriptor in object, always in relative format
     if (this->m_psd)
         free(this->m_psd);
-    DWORD sdsize = GetSecurityDescriptorLength(psd);
-    if (sdsize == 0) {
-        // GetSecurityDescriptorLength returns 0 on Win9x where the
-        // SECURITY_DESCRIPTOR stuff is not supported.
-        this->m_psd = NULL;
-        return TRUE;
-    }
-    else if (_IsSelfRelative(psd)) {
+    if (_IsSelfRelative(psd)) {
+        DWORD sdsize = GetSecurityDescriptorLength(psd);
         this->m_psd = malloc(sdsize);
         memcpy(this->m_psd, psd, sdsize);
         return TRUE;
@@ -451,7 +445,7 @@ PyObject *PySECURITY_DESCRIPTOR::GetSecurityDescriptorOwner(PyObject *self, PyOb
 PyObject *PySECURITY_DESCRIPTOR::SetSecurityDescriptorOwner(PyObject *self, PyObject *args)
 {
     // @pyparm <o PySID>|sid||The sid to be set as owner in the security descriptor.
-    // @pyparm int|bOwnerDefaulted||Normally set to false since this explicitely set the owner.
+    // @pyparm int|bOwnerDefaulted||Normally set to false since this explicitly set the owner.
     BOOL bOwnerDefaulted;
     PySECURITY_DESCRIPTOR *This = (PySECURITY_DESCRIPTOR *)self;
     PSID NewOwnerSid = NULL;
@@ -494,7 +488,7 @@ done:
 PyObject *PySECURITY_DESCRIPTOR::SetSecurityDescriptorGroup(PyObject *self, PyObject *args)
 {
     // @pyparm <o PySID>|sid||The group sid to be set in the security descriptor.
-    // @pyparm int|bOwnerDefaulted||Normally set to false since this explicitely set the owner.
+    // @pyparm int|bOwnerDefaulted||Normally set to false since this explicitly set the owner.
     BOOL bGroupDefaulted;
     PySECURITY_DESCRIPTOR *This = (PySECURITY_DESCRIPTOR *)self;
     PSECURITY_DESCRIPTOR psd = NULL;

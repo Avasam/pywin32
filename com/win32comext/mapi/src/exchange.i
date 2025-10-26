@@ -1,4 +1,4 @@
-/* File : exchdapi.i */
+/* File : exchange.i */
 
 /*
    This is designed to be an interface to the Exchange specific
@@ -26,8 +26,8 @@
 #include "PythonCOMServer.h"
 #include "PythonCOMRegister.h"
 
-#include "MAPIUTIL.H"
-#include "EDKMDB.H"
+#include "MAPIUtil.h"
+#include "EdkMdb.h"
 
 #define USES_IID_IExchangeManageStore
 #include <edkguid.h>
@@ -38,30 +38,6 @@
 
 %}
 
-/*
-   Only include Ex2KSdk.lib functions for 32-bit builds.
-*/
-#ifdef SWIG_PY32BIT
-%{
-#include "EDKMAPI.H"
-#include "EDKCFG.H"
-#include "EDKUTILS.H"
-
-// What is the correct story here??  The Exchange SDK story sucks - it seems
-// certain functions in the stand-alone version are simply commented out.
-#if defined(EXCHANGE_RE)
-#	define DONT_HAVE_MBLOGON
-#	define DONT_HAVE_ADDRLKUP
-#endif
-
-#if !defined(DONT_HAVE_ADDRLKUP)
-#	include "ADDRLKUP.H"
-#endif
-#if !defined(DONT_HAVE_MBLOGON)
-#	include "MBLOGON.H"
-#endif
-%}
-#endif
 
 %{
 static int AddIID(PyObject *dict, const char *key, REFGUID guid)
@@ -98,6 +74,12 @@ static int AddIID(PyObject *dict, const char *key, REFGUID guid)
    Only include Ex2KSdk.lib functions for 32-bit builds.
 */
 #ifdef SWIG_PY32BIT
+%{
+#include "EdkMAPI.h"
+#include "EdkCfg.h"
+#include "EdkUtils.h"
+%}
+
 // @pyswig int, int|HrGetExchangeStatus|Obtains the current state of the server on a computer.
 // @rdesc The result is a tuple of serviceState, serverState
 HRESULT HrGetExchangeStatus(
@@ -225,7 +207,7 @@ PyObject *MyHrMAPIFindSubfolderEx(
 // @pyswig <o PyIMsgStore>|HrMAPIFindSubfolderEx|Retrieves a subfolder in an information store using the hierarchical path name of the folder.
 %name(HrMAPIFindSubfolderEx) PyObject *MyHrMAPIFindSubfolderEx(
 	IMAPIFolder *INPUT, // @pyparm <o PyIMAPIFolder>|rootFolder||The root folder.
-	TCHAR chSep,	// @pyparm string/<o PyUnicode>|sep||The folder seperator character.
+	TCHAR chSep,	// @pyparm string/<o PyUnicode>|sep||The folder separator character.
 	TCHAR *INPUT // @pyparm string/<o PyUnicode>|name||The folder name
 );
 
@@ -281,7 +263,7 @@ PyObject *PyHrMAPIFindFolderEx(PyObject *self, PyObject *args)
 	PyObject *rc = NULL;
 	if (!PyArg_ParseTuple(args, "OOO:HrMAPIFindFolderEx",
 		&obMDB, // @pyparm <o PyIMsgStore>|msgStore||The folder to search
-		&obSep, // @pyparm string|sepString||The character seperating the folder names - eg '\'
+		&obSep, // @pyparm string|sepString||The character separating the folder names - eg '\'
 		&obPath))// @pyparm string|path||Path to the folder
 		return NULL;
 	TCHAR *szSep = NULL, *szPath = NULL;
@@ -407,55 +389,6 @@ done:
 %}
 
 
-%native (HrFindExchangeGlobalAddressList) PyHrFindExchangeGlobalAddressList;
-%{
-// @pyswig string|HrFindExchangeGlobalAddressList|Retrieves the entry identifier of the global address list (GAL) container in the address book.
-static PyObject *PyHrFindExchangeGlobalAddressList(PyObject *self, PyObject *args)
-{
-#ifdef DONT_HAVE_ADDRLKUP
-	return PyErr_Format(PyExc_NotImplementedError, "Not available with this version of the Exchange SDK");
-#else
-	PyObject *obAddrBook;
-	// @pyparm <o PyIAddrBook>|addrBook||The interface containing the address book
-	if (!PyArg_ParseTuple(args, "O:HrFindExchangeGlobalAddressList", &obAddrBook))
-		return NULL;
-
-	IAddrBook *pAB;
-	ULONG cb;
-	LPENTRYID peid;
-	if (!PyCom_InterfaceFromPyInstanceOrObject(obAddrBook, IID_IAddrBook, (void **)&pAB, 0))
-		return NULL;
-	HRESULT _result = HrFindExchangeGlobalAddressList(pAB, &cb, &peid);
-    if (FAILED(_result)) {
-           return OleSetOleError(_result);
-     }
-
-	PyObject *rc = PyBytes_FromStringAndSize((char *)peid, cb);
-	MAPIFreeBuffer(peid);
-	return rc;
-#endif
-}
-%}
-
-%{
-HRESULT MyHrMailboxLogon(
-    IN  LPMAPISESSION   lplhSession,                // ptr to MAPI session handle
-    IN  LPMDB           lpMDB,                      // ptr to message store
-    IN  LPSTR           lpszMsgStoreDN,             // ptr to message store DN
-    IN  LPSTR           lpszMailboxDN,              // ptr to mailbox DN
-    OUT LPMDB           *lppMailboxMDB)            // ptr to mailbox message store ptr
-{
-#if defined(DONT_HAVE_MBLOGON)
-	PyGILState_STATE gstate = PyGILState_Ensure();
-	PyErr_Warn(PyExc_RuntimeWarning, "Not available with this version of the Exchange SDK");
-	PyGILState_Release(gstate);
-	return E_NOTIMPL;
-#else
-	return HrMailboxLogon(lplhSession, lpMDB, lpszMsgStoreDN, lpszMailboxDN, lppMailboxMDB);
-#endif
-}
-%}
-
 // @pyswig <o PyIMsgStore>|HrMailboxLogon|Logs on a server and mailbox.
 %name(HrMailboxLogon) HRESULT MyHrMailboxLogon(
 	IMAPISession *INPUT, // @pyparm <o PyIMAPISession>|session||The session object
@@ -464,20 +397,6 @@ HRESULT MyHrMailboxLogon(
 	char *INPUT, // @pyparm string/<o PyUnicode>|mailboxDN||
 	IMsgStore **OUTPUT
 );
-
-%{
-HRESULT MyHrMailboxLogoff(IMsgStore **pp)
-{
-#if defined(DONT_HAVE_MBLOGON)
-	PyGILState_STATE gstate = PyGILState_Ensure();
-	PyErr_Warn(PyExc_RuntimeWarning, "Not available with this version of the Exchange SDK");
-	PyGILState_Release(gstate);
-	return E_NOTIMPL;
-#else
-	return HrMailboxLogoff(pp);
-#endif
-}
-%}
 
 // @pyswig |HrMailboxLogoff|Logs off a server and mailbox.
 %name(HrMailboxLogoff) HRESULT MyHrMailboxLogoff(
@@ -488,7 +407,7 @@ HRESULT MyHrMailboxLogoff(IMsgStore **pp)
 // @pyswig <o PyIMAPIFolder>|HrMAPIOpenFolderEx|Opens a folder in the information store from the hierarchical path name of the folder.
 %name(HrMAPIOpenFolderEx) HRESULT HrMAPIOpenFolderExW(
 	IMsgStore *INPUT_NULLOK, // @pyparm <o PyIMsgStore>|msgStore||
-	WCHAR INPUT, // @pyparm string/<o PyUnicode>|sep||The folder seperator character.
+	WCHAR INPUT, // @pyparm string/<o PyUnicode>|sep||The folder separator character.
 	WCHAR *INPUT, // @pyparm string/<o PyUnicode>|name||The folder name
 	IMAPIFolder **OUTPUT
 );

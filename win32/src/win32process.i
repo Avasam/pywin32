@@ -675,7 +675,6 @@ PyObject *MyCreateProcess(
 			// @flag CREATE_UNICODE_ENVIRONMENT|Indicates the format of the lpEnvironment parameter. If this flag is set, the environment block pointed to by lpEnvironment uses Unicode characters. Otherwise, the environment block uses ANSI characters.
 			// @flag DEBUG_PROCESS|If this flag is set, the calling process is treated as a debugger, and the new process is debugged. The system notifies the debugger of all debug events that occur in the process being debugged.
 			// If you create a process with this flag set, only the calling thread (the thread that called CreateProcess) can call the WaitForDebugEvent function.
-			// Windows 95/98: This flag is not valid if the new process is a 16-bit application.
 			// @flag DEBUG_ONLY_THIS_PROCESS|If this flag is not set and the calling process is being debugged, the new process becomes another process being debugged by the calling process's debugger. If the calling process is not a process being debugged, no debugging-related actions occur.
 			// @flag DETACHED_PROCESS|For console processes, the new process does not have access to the console of the parent process. The new process can call the AllocConsole function at a later time to create a new console. This flag cannot be used with the CREATE_NEW_CONSOLE flag.
 
@@ -751,7 +750,7 @@ PyObject *MyCreateProcessAsUser(
 	SECURITY_ATTRIBUTES *INPUT_NULLOK, // @pyparm <o PySECURITY_ATTRIBUTES>|threadAttributes||thread security attributes, or None
 	BOOL bInheritHandles, // @pyparm int|bInheritHandles||handle inheritance flag
 	DWORD dwCreationFlags, // @pyparm int|dwCreationFlags||creation flags
-	PyObject *env, // @pyparm None|newEnvironment||A dictionary of stringor Unicode pairs to define the environment for the process, or None to inherit the current environment.
+	PyObject *env, // @pyparm None|newEnvironment||A dictionary of string or Unicode pairs to define the environment for the process, or None to inherit the current environment.
 	TCHAR *INPUT_NULLOK, // @pyparm string|currentDirectory||current directory name, or None
 	STARTUPINFO *lpStartupInfo // @pyparm <o PySTARTUPINFO>|startupinfo||a STARTUPINFO object that specifies how the main window for the new process should appear.
 );
@@ -1686,23 +1685,18 @@ PyObject *PyWriteProcessMemory(PyObject *self, PyObject *args)
 	if (PyType_Ready(&PySTARTUPINFOType) == -1)
 		return NULL;
 
-	FARPROC fp=NULL;
-	HMODULE hmodule=NULL;
-	hmodule=GetModuleHandle(_T("Psapi.dll"));
-	if (hmodule==NULL)
-		hmodule=LoadLibrary(_T("Psapi.dll"));
-	if (hmodule!=NULL){
+	FARPROC fp = NULL;
+	HMODULE hmodule = PyWin_GetOrLoadLibraryHandle("psapi.dll");
+	if (hmodule != NULL) {
 		pfnEnumProcesses = (EnumProcessesfunc)GetProcAddress(hmodule, "EnumProcesses");
 		pfnEnumProcessModules = (EnumProcessModulesfunc)GetProcAddress(hmodule, "EnumProcessModules");
 		pfnEnumProcessModulesEx = (EnumProcessModulesExfunc)GetProcAddress(hmodule, "EnumProcessModulesEx");
 		pfnGetModuleFileNameEx = (GetModuleFileNameExfunc)GetProcAddress(hmodule, "GetModuleFileNameExW");
 		pfnGetProcessMemoryInfo = (GetProcessMemoryInfofunc)GetProcAddress(hmodule, "GetProcessMemoryInfo");
-		}
+	}
 
-	hmodule=GetModuleHandle(_T("Kernel32.dll"));
-	if (hmodule==NULL)
-		hmodule=LoadLibrary(_T("Kernel32.dll"));
-	if (hmodule!=NULL){
+	hmodule = PyWin_GetOrLoadLibraryHandle("kernel32.dll");
+	if (hmodule != NULL) {
 		pfnGetProcessTimes=(GetProcessTimesfunc)GetProcAddress(hmodule,"GetProcessTimes");
 		pfnGetProcessIoCounters=(GetProcessIoCountersfunc)GetProcAddress(hmodule,"GetProcessIoCounters");
 		pfnGetProcessShutdownParameters=(GetProcessShutdownParametersfunc)GetProcAddress(hmodule,"GetProcessShutdownParameters");
@@ -1720,15 +1714,13 @@ PyObject *PyWriteProcessMemory(PyObject *self, PyObject *args)
 		pfnSetProcessAffinityMask=(SetProcessAffinityMaskfunc)GetProcAddress(hmodule,"SetProcessAffinityMask");
 		pfnGetProcessId=(GetProcessIdfunc)GetProcAddress(hmodule, "GetProcessId");
 		pfnIsWow64Process=(IsWow64Processfunc)GetProcAddress(hmodule, "IsWow64Process");
-		}
+	}
 
-	hmodule=GetModuleHandle(_T("User32.dll"));
-	if (hmodule==NULL)
-		hmodule=LoadLibrary(_T("User32.dll"));
-	if (hmodule!=NULL){
+	hmodule = PyWin_GetOrLoadLibraryHandle("user32.dll");
+	if (hmodule != NULL) {
 		pfnGetProcessWindowStation=(GetProcessWindowStationfunc)GetProcAddress(hmodule,"GetProcessWindowStation");
 		pfnGetGuiResources=(GetGuiResourcesfunc)GetProcAddress(hmodule,"GetGuiResources");
-		}
+	}
 
 // *sob* - these symbols don't exist in the platform sdk needed to build
 // using Python 2.3
@@ -1770,10 +1762,9 @@ PyObject *PyWriteProcessMemory(PyObject *self, PyObject *args)
 #define CREATE_PRESERVE_CODE_AUTHZ_LEVEL CREATE_PRESERVE_CODE_AUTHZ_LEVEL
 #define CREATE_NO_WINDOW CREATE_NO_WINDOW
 
-
-#define DEBUG_PROCESS DEBUG_PROCESS // If this flag is set, the calling process is treated as a debugger, and the new process is a process being debugged. The system notifies the debugger of all debug events that occur in the process being debugged.
+// If this flag is set, the calling process is treated as a debugger, and the new process is a process being debugged. The system notifies the debugger of all debug events that occur in the process being debugged.
 // If you create a process with this flag set, only the calling thread (the thread that called CreateProcess) can call the WaitForDebugEvent function.
-// Windows 95 and Windows 98: This flag is not valid if the new process is a 16-bit application.
+#define DEBUG_PROCESS DEBUG_PROCESS
 
 #define DEBUG_ONLY_THIS_PROCESS DEBUG_ONLY_THIS_PROCESS // If not set and the calling process is being debugged, the new process becomes another process being debugged by the calling process's debugger. If the calling process is not a process being debugged, no debugging-related actions occur.
 

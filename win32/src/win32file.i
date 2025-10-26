@@ -2,7 +2,7 @@
 // @doc
 
 %module win32file // An interface to the win32 File API's
-// <nl>This module includes the tranactional NTFS operations introduced with
+// <nl>This module includes the transactional NTFS operations introduced with
 // Vista.  The transacted functions are not wrapped separately, but are invoked by
 // passing a transaction handle to the corresponding Unicode API function.
 // This makes it simple to convert a set of file operations into a transaction by
@@ -22,11 +22,6 @@
 //		<nl>RemoveDirectory / RemoveDirectoryTransacted
 
 %{
-//#define FAR
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0600
-#endif
-
 // We use the deprecated API
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
@@ -58,10 +53,6 @@
 #	undef socklen_t
 #endif
 #include "Ws2tcpip.h"
-// *sob* - msvc6 can't handle the _WSPIAPI_COUNTOF in later SDKs...
-#if _MSC_VER < 1300
-#define _WSPIAPI_COUNTOF(_Array) (sizeof(_Array) / sizeof(_Array[0]))
-#endif
 #include "Wspiapi.h" // for WspiapiGetAddrInfo/WspiapiFreeAddrInfo
 
 #define NEED_PYWINOBJECTS_H
@@ -242,7 +233,7 @@ PyHANDLE CreateFile(
 			// @flag OPEN_ALWAYS|Opens the file, if it exists. If the file does not exist, the function creates the file as if dwCreationDisposition were CREATE_NEW.
 			// @flag TRUNCATE_EXISTING|Opens the file. Once opened, the file is truncated so that its size is zero bytes. The calling process must open the file with at least GENERIC_WRITE access. The function fails if the file does not exist.
     DWORD dwFlagsAndAttributes,	// @pyparm int|flagsAndAttributes||file attributes
-    PyHANDLE INPUT_NULLOK // @pyparm <o PyHANDLE>|hTemplateFile||Specifies a handle with GENERIC_READ access to a template file. The template file supplies file attributes and extended attributes for the file being created.   Under Win95, this must be 0, else an exception will be raised.
+    PyHANDLE INPUT_NULLOK // @pyparm <o PyHANDLE>|hTemplateFile||Specifies a handle with GENERIC_READ access to a template file. The template file supplies file attributes and extended attributes for the file being created.
 );
 
 // CreateIoCompletionPort gets special treatment due to its special result
@@ -829,7 +820,7 @@ PyObject *MyGetFileSize(PyObject *self, PyObject *args)
 // Previous versions of the Windows extensions had a custom object for
 // holding a read buffer.  This has been replaced with the standard Python buffer object.
 // <nl>Python does not provide a method for creating a read-write buffer
-// of arbitary size, so currently this can only be created by <om win32file.AllocateReadBuffer>.
+// of arbitrary size, so currently this can only be created by <om win32file.AllocateReadBuffer>.
 %{
 // @pyswig <o PyOVERLAPPEDReadBuffer>|AllocateReadBuffer|Allocates a buffer which can be used with an overlapped Read operation using <om win32file.ReadFile>
 PyObject *MyAllocateReadBuffer(PyObject *self, PyObject *args)
@@ -1179,13 +1170,13 @@ static PyObject *myGetQueuedCompletionStatus(PyObject *self, PyObject *args)
 PyObject *myPostQueuedCompletionStatus(PyObject *self, PyObject *args)
 {
 	PyObject *obHandle, *obOverlapped = NULL, *obkey=Py_None;
-	DWORD bytesTransfered = 0;
+	DWORD bytesTransferred = 0;
 	ULONG_PTR key = 0;
 	// @pyparm <o PyHANDLE>|handle||handle to an I/O completion port
-	// @pyparm int|numberOfbytes|0|value to return via GetQueuedCompletionStatus' first result
+	// @pyparm int|numberOfBytes|0|value to return via GetQueuedCompletionStatus' first result
 	// @pyparm int|completionKey|0|value to return via GetQueuedCompletionStatus' second result
 	// @pyparm <o PyOVERLAPPED>|overlapped|None|value to return via GetQueuedCompletionStatus' third result
-	if (!PyArg_ParseTuple(args, "O|iOO", &obHandle, &bytesTransfered, &obkey, &obOverlapped))
+	if (!PyArg_ParseTuple(args, "O|iOO", &obHandle, &bytesTransferred, &obkey, &obOverlapped))
 		return NULL;
 	if (obkey!=Py_None)
 		if (!PyWinLong_AsVoidPtr(obkey, (void **)&key))
@@ -1198,7 +1189,7 @@ PyObject *myPostQueuedCompletionStatus(PyObject *self, PyObject *args)
 		return NULL;
 	BOOL ok;
 	Py_BEGIN_ALLOW_THREADS
-	ok = ::PostQueuedCompletionStatus(handle, bytesTransfered, key, pOverlapped);
+	ok = ::PostQueuedCompletionStatus(handle, bytesTransferred, key, pOverlapped);
 	Py_END_ALLOW_THREADS
 	if (!ok)
 		return PyWin_SetAPIError("PostQueuedCompletionStatus");
@@ -1286,7 +1277,7 @@ BOOLAPI MoveFileExW(
 #define MOVEFILE_COPY_ALLOWED MOVEFILE_COPY_ALLOWED // If the file is to be moved to a different volume, the function simulates the move by using the CopyFile and DeleteFile functions. Cannot be combined with the MOVEFILE_DELAY_UNTIL_REBOOT flag.
 #define MOVEFILE_DELAY_UNTIL_REBOOT MOVEFILE_DELAY_UNTIL_REBOOT // Windows NT only: The function does not move the file until the operating system is restarted. The system moves the file immediately after AUTOCHK is executed, but before creating any paging files. Consequently, this parameter enables the function to delete paging files from previous startups.
 #define MOVEFILE_REPLACE_EXISTING MOVEFILE_REPLACE_EXISTING // If a file of the name specified by lpNewFileName already exists, the function replaces its contents with those specified by lpExistingFileName.
-#define MOVEFILE_WRITE_THROUGH MOVEFILE_WRITE_THROUGH // Windows NT only: The function does not return until the file has actually been moved on the disk. Setting this flag guarantees that a move perfomed as a copy and delete operation is flushed to disk before the function returns. The flush occurs at the end of the copy operation.<nl>This flag has no effect if the MOVEFILE_DELAY_UNTIL_REBOOT flag is set.
+#define MOVEFILE_WRITE_THROUGH MOVEFILE_WRITE_THROUGH // Windows NT only: The function does not return until the file has actually been moved on the disk. Setting this flag guarantees that a move performed as a copy and delete operation is flushed to disk before the function returns. The flush occurs at the end of the copy operation.<nl>This flag has no effect if the MOVEFILE_DELAY_UNTIL_REBOOT flag is set.
 #define MOVEFILE_CREATE_HARDLINK MOVEFILE_CREATE_HARDLINK
 #define MOVEFILE_FAIL_IF_NOT_TRACKABLE MOVEFILE_FAIL_IF_NOT_TRACKABLE
 
@@ -2212,7 +2203,7 @@ MyCopyEvent(PyObject *dict, WSANETWORKEVENTS *events, long event, int eventbit)
 }
 
 // @pyswig dict|WSAEnumNetworkEvents|Return network events that caused the event associated with the socket to be signaled.
-// @rdesc A dictionary mapping network events that occured for the specified socket since the last call to this function (e.g. FD_READ, FD_WRITE) to their associated error code, or 0 if the event occured without an error. The events returned are a subset of events previously registered for this socket with WSAEventSelect.
+// @rdesc A dictionary mapping network events that occurred for the specified socket since the last call to this function (e.g. FD_READ, FD_WRITE) to their associated error code, or 0 if the event occurred without an error. The events returned are a subset of events previously registered for this socket with WSAEventSelect.
 static PyObject*
 MyWSAEnumNetworkEvents(PyObject *self, PyObject *args)
 {
@@ -2929,11 +2920,6 @@ static Wow64DisableWow64FsRedirectionfunc pfnWow64DisableWow64FsRedirection = NU
 typedef BOOL (WINAPI *Wow64RevertWow64FsRedirectionfunc)(PVOID);
 static Wow64RevertWow64FsRedirectionfunc pfnWow64RevertWow64FsRedirection = NULL;
 
-/* GetFileInformationByHandleEx and supporting structs are defined in SDK for Vista and later,
-	but can also be used on XP with a separate header and lib:
-	http://www.microsoft.com/en-us/download/details.aspx?id=22599
-	However, the filextd.lib included is static, so this module would have to be compiled for XP only.
-*/
 typedef BOOL (WINAPI *GetFileInformationByHandleExfunc)(HANDLE,FILE_INFO_BY_HANDLE_CLASS,LPVOID,DWORD);
 static GetFileInformationByHandleExfunc pfnGetFileInformationByHandleEx = NULL;
 typedef BOOL (WINAPI *SetFileInformationByHandlefunc)(HANDLE,FILE_INFO_BY_HANDLE_CLASS,LPVOID,DWORD);
@@ -3073,7 +3059,7 @@ static PyObject *py_GetVolumePathName(PyObject *self, PyObject *args, PyObject *
 	if (bufsize>0)
 		bufsize+=1;
 	else
-		bufsize=pathlen+2;  // enough to accomodate trailing null, and possibly extra backslash
+		bufsize=pathlen+2;  // enough to accommodate trailing null, and possibly extra backslash
 	mount_point=(WCHAR *)malloc(bufsize*sizeof(WCHAR));
 	if (mount_point==NULL)
 		PyErr_SetString(PyExc_MemoryError,"GetVolumePathName: Unable to allocate return buffer");
@@ -4168,7 +4154,7 @@ py_ReplaceFile(PyObject *self, PyObject *args)
 void encryptedfilecontextdestructor(PyObject *obctxt){
 	if (!PyCapsule_IsValid(obctxt, NULL))
 		return;	// should not happen, but maybe print a warning just in case ?
-	// Check if context has already been explicitely destroyed
+	// Check if context has already been explicitly destroyed
 	// The capsule's context is set to this value in CloseEncryptedFileRaw
 	if (PyCapsule_GetContext(obctxt) == INVALID_HANDLE_VALUE)
 		return;
@@ -5932,11 +5918,8 @@ PyCFunction pfnpy_OpenFileById=(PyCFunction)py_OpenFileById;
 			)
 			pmd->ml_flags = METH_VARARGS | METH_KEYWORDS;
 
-	HMODULE hmodule;
-	hmodule=GetModuleHandle(TEXT("AdvAPI32.dll"));
-	if (hmodule==NULL)
-		hmodule=LoadLibrary(TEXT("AdvAPI32.dll"));
-	if (hmodule){
+	HMODULE hmodule = PyWin_GetOrLoadLibraryHandle("advapi32.dll");
+	if (hmodule != NULL) {
 		pfnEncryptFile=(EncryptFilefunc)GetProcAddress(hmodule, "EncryptFileW");
 		pfnDecryptFile=(DecryptFilefunc)GetProcAddress(hmodule, "DecryptFileW");
 		pfnEncryptionDisable=(EncryptionDisablefunc)GetProcAddress(hmodule, "EncryptionDisable");
@@ -5952,12 +5935,10 @@ PyCFunction pfnpy_OpenFileById=(PyCFunction)py_OpenFileById;
 		pfnReadEncryptedFileRaw=(ReadEncryptedFileRawfunc)GetProcAddress(hmodule, "ReadEncryptedFileRaw");
 		pfnWriteEncryptedFileRaw=(WriteEncryptedFileRawfunc)GetProcAddress(hmodule, "WriteEncryptedFileRaw");
 		pfnCloseEncryptedFileRaw=(CloseEncryptedFileRawfunc)GetProcAddress(hmodule, "CloseEncryptedFileRaw");
-		}
+	}
 
-	hmodule=GetModuleHandle(TEXT("kernel32.dll"));
-	if (hmodule==NULL)
-		hmodule=LoadLibrary(TEXT("kernel32.dll"));
-	if (hmodule){
+	hmodule = PyWin_GetOrLoadLibraryHandle("kernel32.dll");
+	if (hmodule != NULL) {
 		pfnSetVolumeMountPoint=(SetVolumeMountPointfunc)GetProcAddress(hmodule, "SetVolumeMountPointW");
 		pfnDeleteVolumeMountPoint=(DeleteVolumeMountPointfunc)GetProcAddress(hmodule, "DeleteVolumeMountPointW");
 		pfnGetVolumeNameForVolumeMountPoint=(GetVolumeNameForVolumeMountPointfunc)GetProcAddress(hmodule, "GetVolumeNameForVolumeMountPointW");
@@ -6002,15 +5983,13 @@ PyCFunction pfnpy_OpenFileById=(PyCFunction)py_OpenFileById;
 		pfnWow64RevertWow64FsRedirection=(Wow64RevertWow64FsRedirectionfunc)GetProcAddress(hmodule, "Wow64RevertWow64FsRedirection");
 		pfnReOpenFile=(ReOpenFilefunc)GetProcAddress(hmodule, "ReOpenFile");
 		pfnOpenFileById=(OpenFileByIdfunc)GetProcAddress(hmodule, "OpenFileById");
-		}
+	}
 
-	hmodule=GetModuleHandle(TEXT("sfc.dll"));
-	if (hmodule==NULL)
-		hmodule=LoadLibrary(TEXT("sfc.dll"));
-	if (hmodule){
+	hmodule = PyWin_GetOrLoadLibraryHandle("sfc.dll");
+	if (hmodule != NULL) {
 		pfnSfcGetNextProtectedFile=(SfcGetNextProtectedFilefunc)GetProcAddress(hmodule, "SfcGetNextProtectedFile");
 		pfnSfcIsFileProtected=(SfcIsFileProtectedfunc)GetProcAddress(hmodule, "SfcIsFileProtected");
-		}
+	}
 
 %}
 
