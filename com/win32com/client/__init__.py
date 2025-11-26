@@ -247,7 +247,7 @@ def _event_setattr_(self, attr, val):
 # to the real object as the proxy dies.
 class EventsProxy:
     def __init__(self, ob):
-        self.__dict__["_obj_"] = ob
+        self._obj_ = ob
 
     def __del__(self):
         try:
@@ -538,7 +538,7 @@ class DispatchBaseClass:
                     if details.hresult != winerror.E_NOINTERFACE:
                         raise
 
-        self.__dict__["_oleobj_"] = oobj  # so we don't call __setattr__
+        self._oleobj_ = oobj  # so we don't call __setattr__
 
     def __dir__(self):
         attributes = chain(
@@ -628,15 +628,14 @@ class CoClassBaseClass:
     def __init__(self, oobj=None):
         if oobj is None:
             oobj = pythoncom.new(self.CLSID)
-        self.__dict__["_dispobj_"] = self.default_interface(oobj)
+        self._dispobj_ = self.default_interface(oobj)
 
     def __repr__(self):
         return f"<win32com.gen_py.{__doc__}.{self.__class__.__name__}>"
 
     def __getattr__(self, attr):
-        d = self.__dict__["_dispobj_"]
-        if d is not None:
-            return getattr(d, attr)
+        if self._dispobj_ is not None:
+            return getattr(self._dispobj_, attr)
         raise AttributeError(attr)
 
     def __setattr__(self, attr, value):
@@ -644,9 +643,8 @@ class CoClassBaseClass:
             self.__dict__[attr] = value
             return
         try:
-            d = self.__dict__["_dispobj_"]
-            if d is not None:
-                d.__setattr__(attr, value)
+            if self._dispobj_ is not None:
+                self._dispobj_.__setattr__(attr, value)
                 return
         except AttributeError:
             pass
@@ -659,22 +657,22 @@ class CoClassBaseClass:
     # with bool() in #1753 because the code initially implemented __nonzero__
     # instead of __bool__, which was pointed out in the conclusion of #1870.
     def __call__(self, *args, **kwargs):
-        return self.__dict__["_dispobj_"](*args, **kwargs)
+        return self._dispobj_(*args, **kwargs)
 
     def __str__(self, *args):
-        return str(self.__dict__["_dispobj_"])
+        return str(self._dispobj_)
 
     def __int__(self, *args):
-        return int(self.__dict__["_dispobj_"])
+        return int(self._dispobj_)
 
     def __iter__(self):
-        return iter(self.__dict__["_dispobj_"])
+        return iter(self._dispobj_)
 
     def __len__(self):
-        return len(self.__dict__["_dispobj_"])
+        return len(self._dispobj_)
 
     def __bool__(self):
-        return bool(self.__dict__["_dispobj_"])
+        return bool(self._dispobj_)
 
 
 # A very simple VARIANT class.  Only to be used with poorly-implemented COM
