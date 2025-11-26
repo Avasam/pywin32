@@ -132,8 +132,8 @@ def CheckRegisteredModules(verbose):
     # Check out all registered modules.
     k = regutil.BuildDefaultPythonKey() + "\\Modules"
     try:
-        keyhandle = win32api.RegOpenKey(regutil.GetRootKey(), k)
-        print("WARNING: 'Modules' registry entry is deprectated and evil!")
+        win32api.RegOpenKey(regutil.GetRootKey(), k)
+        print("WARNING: 'Modules' registry entry is deprecated and evil!")
     except win32api.error as exc:
         import winerror
 

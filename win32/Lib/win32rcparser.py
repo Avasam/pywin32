@@ -83,7 +83,6 @@ class DialogDef:
         # print("dialog def for ", self.name, self.id)
 
     def createDialogTemplate(self):
-        t = None
         self.template = [
             [
                 self.caption,
@@ -364,7 +363,7 @@ class RCParser:
         while 1:
             if self.token == "END":
                 break
-            s = self.getToken()
+            self.getToken()
 
     def parse_stringtable(self):
         while self.getToken() != "BEGIN":
