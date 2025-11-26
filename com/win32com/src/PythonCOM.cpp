@@ -92,7 +92,6 @@ extern LONG _PyCom_GetGatewayCount(void);
 typedef HRESULT(STDAPICALLTYPE *CreateURLMonikerExfunc)(LPMONIKER, LPCWSTR, LPMONIKER *, DWORD);
 static CreateURLMonikerExfunc pfnCreateURLMonikerEx = NULL;
 
-// Win2k or later
 typedef HRESULT(STDAPICALLTYPE *CoWaitForMultipleHandlesfunc)(DWORD dwFlags, DWORD dwTimeout, ULONG cHandles,
                                                               LPHANDLE pHandles, LPDWORD lpdwindex);
 static CoWaitForMultipleHandlesfunc pfnCoWaitForMultipleHandles = NULL;
@@ -104,7 +103,6 @@ typedef HRESULT(STDAPICALLTYPE *CoSetCancelObjectfunc)(IUnknown *);
 static CoSetCancelObjectfunc pfnCoSetCancelObject = NULL;
 
 // typedefs for the function pointers are in OleAcc.h
-// WinXP or later
 LPFNOBJECTFROMLRESULT pfnObjectFromLresult = NULL;
 
 typedef HRESULT(STDAPICALLTYPE *CoCreateInstanceExfunc)(REFCLSID, IUnknown *, DWORD, COSERVERINFO *, ULONG, MULTI_QI *);
@@ -1778,20 +1776,12 @@ static PyObject *pythoncom_ObjectFromLresult(PyObject *self, PyObject *args)
     if (obIID && !PyWinObject_AsIID(obIID, &iid))
         return NULL;
 
-    // GIL protects us from races here.
-    if (pfnObjectFromLresult == NULL) {
-        HMODULE hmod = LoadLibrary(_T("oleacc.dll"));
-        if (hmod)
-            pfnObjectFromLresult = (LPFNOBJECTFROMLRESULT)GetProcAddress(hmod, "ObjectFromLresult");
-    }
-    if (pfnObjectFromLresult == NULL)
-        return PyErr_Format(PyExc_NotImplementedError, "Not available on this platform");
-
     HRESULT hr;
     void *ret = 0;
-    Py_BEGIN_ALLOW_THREADS hr = (*pfnObjectFromLresult)(lresult, iid, wparam, &ret);
-    Py_END_ALLOW_THREADS if (FAILED(hr))
-    {
+    Py_BEGIN_ALLOW_THREADS;
+    hr = ObjectFromLresult(lresult, iid, wparam, &ret);
+    Py_END_ALLOW_THREADS;
+    if (FAILED(hr)) {
         PyCom_BuildPyException(hr);
         return NULL;
     }

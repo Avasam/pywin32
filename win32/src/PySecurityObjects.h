@@ -4,17 +4,6 @@
 typedef BOOL(WINAPI *addacefunc)(PACL, DWORD, DWORD, PSID);
 typedef BOOL(WINAPI *addaceexfunc)(PACL, DWORD, DWORD, DWORD, PSID);
 typedef BOOL(WINAPI *addobjectacefunc)(PACL, DWORD, DWORD, DWORD, GUID *, GUID *, PSID);
-extern addacefunc addaccessallowedace;
-extern addacefunc addaccessdeniedace;
-extern addaceexfunc addaccessallowedaceex;
-extern addaceexfunc addaccessdeniedaceex;
-extern addaceexfunc addmandatoryace;
-extern addobjectacefunc addaccessallowedobjectace;
-extern addobjectacefunc addaccessdeniedobjectace;
-extern BOOL(WINAPI *addauditaccessaceex)(PACL, DWORD, DWORD, DWORD, PSID, BOOL, BOOL);
-extern BOOL(WINAPI *addauditaccessobjectace)(PACL, DWORD, DWORD, DWORD, GUID *, GUID *, PSID, BOOL, BOOL);
-extern BOOL(WINAPI *setsecuritydescriptorcontrol)(PSECURITY_DESCRIPTOR, SECURITY_DESCRIPTOR_CONTROL,
-                                                  SECURITY_DESCRIPTOR_CONTROL);
 
 // To do - rationalize PySECURITY_ATTRIBUTES and SECURITY_DESCRIPTOR
 // objects.
