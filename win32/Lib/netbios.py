@@ -212,14 +212,14 @@ class NCBStruct:
 
     def _pack(self):
         vals = [self.__dict__.get(name) for format, name in self._items]
-
         self._buffer_[:] = struct.pack(self._format, *vals)
 
     def _unpack(self):
         items = struct.unpack(self._format, self._buffer_)
         assert len(items) == len(self._items), "unexpected number of items to unpack!"
-        for (format, name), val in zip(self._items, items):
-            self.__dict__[name] = val
+        self.__dict__.update(
+            {name: val for (format, name), val in zip(self._items, items)}
+        )
 
     def __setattr__(self, attr, val):
         if attr not in self.__dict__ and attr[0] != "_":

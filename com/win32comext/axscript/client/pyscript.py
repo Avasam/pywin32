@@ -58,7 +58,7 @@ class AXScriptAttribute:
     "An attribute in a scripts namespace."
 
     def __init__(self, engine):
-        self.__dict__["_scriptEngine_"] = engine
+        self._scriptEngine_ = engine
 
     def __getattr__(self, attr):
         if attr[1] == "_" and attr[:-1] == "_":
@@ -69,7 +69,7 @@ class AXScriptAttribute:
         return rc
 
     def _Close_(self):
-        self.__dict__["_scriptEngine_"] = None
+        self._scriptEngine_ = None
 
     def _DoFindAttribute_(self, obj, attr):
         try:
@@ -106,7 +106,7 @@ class NamedScriptAttribute:
     # objects.  Has a circular reference back to the item itself, which is
     # closed via _Close_()
     def __init__(self, scriptItem):
-        self.__dict__["_scriptItem_"] = scriptItem
+        self._scriptItem_ = scriptItem
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self._scriptItem_!r})"
@@ -133,7 +133,7 @@ class NamedScriptAttribute:
         raise AttributeError(attr)
 
     def _Close_(self):
-        self.__dict__["_scriptItem_"] = None
+        self._scriptItem_ = None
 
 
 class ScriptItem(framework.ScriptItem):
