@@ -78,7 +78,7 @@ MODIFYING_VK_KEYS_ALT = [
 # Due to a limitation in the Windows edit controls, we are limited to one view
 # per document, although nothing in this code assumes this (I hope!)
 
-isRichText = 1  # We are using the Rich Text control.  This has not been tested with value "0" for quite some time!
+isRichText = True  # We are using the Rich Text control.  This has not been tested with value "0" for quite some time!
 
 
 class EditorDocument(ParentEditorDocument):

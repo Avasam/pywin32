@@ -231,9 +231,9 @@ class PropertySheet(window.Wnd):
             oldRes = win32ui.SetResource(self.dll)
         try:  # try list style access
             pages[0]
-            isSeq = 1
+            isSeq = True
         except (TypeError, KeyError):
-            isSeq = 0
+            isSeq = False
         if isSeq:
             for page in pages:
                 self.DoAddSinglePage(page)
