@@ -40,13 +40,13 @@ def make_doc_summary(inFile, outFile):
     constants = []
     extra_tags = []
     lineNo = 0
-    bInRawBlock = 0
+    bInRawBlock = False
     while lineNo < len(lines):
         line = lines[lineNo]
         if bInRawBlock and len(line) > 2 and line[:2] == "%}":
-            bInRawBlock = 0
+            bInRawBlock = False
         if not bInRawBlock and len(line) > 2 and line[:2] == "%{":
-            bInRawBlock = 1
+            bInRawBlock = True
         try:
             if line[:7] == "%module":
                 extra = line.split("//")

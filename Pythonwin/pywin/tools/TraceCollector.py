@@ -58,7 +58,7 @@ class WindowOutput(winout.WindowOutput):
 
 def MakeOutputWindow():
     # Note that it will not show until the first string written or
-    # you pass bShow = 1
+    # you pass bShow = True
     global outputWindow
     if outputWindow is None:
         title = "Python Trace Collector"

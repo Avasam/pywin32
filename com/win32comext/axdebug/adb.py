@@ -146,7 +146,7 @@ class Adb(bdb.Bdb, gateways.RemoteDebugApplicationEvents):
             tracev("dispatch_return resetting sys.trace")
             sys.settrace(None)
             return
-        # self.bSetTrace = 0
+        # self.bSetTrace = False
         self.currentframe = frame.f_back
         return bdb.Bdb.dispatch_return(self, frame, arg)
 

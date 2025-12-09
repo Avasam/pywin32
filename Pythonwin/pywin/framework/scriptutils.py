@@ -170,7 +170,7 @@ def GetActiveEditorDocument():
     return (None, None)
 
 
-def GetActiveFileName(bAutoSave=1):
+def GetActiveFileName(bAutoSave=True):
     """Gets the file name for the active frame, saving it if necessary.
 
     Returns None if it can't be found, or raises KeyboardInterrupt.
@@ -211,7 +211,7 @@ lastArgs = ""
 lastDebuggingType = RS_DEBUGGER_NONE
 
 
-def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
+def RunScript(defName=None, defArgs=None, bShowDialog=True, debuggingType=None):
     global lastScript, lastArgs, lastDebuggingType
     _debugger_stop_frame_ = 1  # Magic variable so the debugger will hide me!
 
@@ -329,7 +329,7 @@ def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
     else:
         sys.path.insert(0, newPath0)
         insertedPath0 = 1
-    bWorked = 0
+    bWorked = False
     win32ui.DoWaitCursor(1)
     base = os.path.split(script)[1]
     # Allow windows to repaint before starting.
@@ -363,15 +363,15 @@ def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
         else:
             # Post mortem or no debugging
             exec(codeObject, __main__.__dict__)
-        bWorked = 1
+        bWorked = True
     except bdb.BdbQuit:
         # Don't print tracebacks when the debugger quit, but do print a message.
         print("Debugging session cancelled.")
         exitCode = 1
-        bWorked = 1
+        bWorked = True
     except SystemExit as code:
         exitCode = code
-        bWorked = 1
+        bWorked = True
     except KeyboardInterrupt:
         # Consider this successful, as we don't want the debugger.
         # (but we do want a traceback!)
@@ -380,7 +380,7 @@ def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
         traceback.print_exc()
         if interact.edit and interact.edit.currentView:
             interact.edit.currentView.AppendToPrompt([])
-        bWorked = 1
+        bWorked = True
     except:
         if interact.edit and interact.edit.currentView:
             interact.edit.currentView.EnsureNoPrompt()
@@ -454,11 +454,11 @@ def ImportFile():
             sys.path.append(newPath)
 
     if modName in sys.modules:
-        bNeedReload = 1
+        bNeedReload = True
         what = "reload"
     else:
         what = "import"
-        bNeedReload = 0
+        bNeedReload = False
 
     win32ui.SetStatusText(what.capitalize() + "ing module...", 1)
     win32ui.DoWaitCursor(1)
@@ -566,7 +566,7 @@ def _JumpToPosition(fileName, lineno, col=1):
     JumpToDocument(fileName, lineno, col)
 
 
-def JumpToDocument(fileName, lineno=0, col=1, nChars=0, bScrollToTop=0):
+def JumpToDocument(fileName, lineno=0, col=1, nChars=0, bScrollToTop=False):
     # Jump to the position in a file.
     # If lineno is <= 0, don't move the position - just open/restore.
     # if nChars > 0, select that many characters.
@@ -654,7 +654,7 @@ def FindTabNanny():
         del sys.path[0]
 
 
-def LocatePythonFile(fileName, bBrowseIfDir=1):
+def LocatePythonFile(fileName, bBrowseIfDir=True):
     "Given a file name, return a fully qualified file name, or None"
     # first look for the exact file as specified
     if not os.path.isfile(fileName):
