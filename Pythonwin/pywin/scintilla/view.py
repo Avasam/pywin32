@@ -157,9 +157,9 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
         self._tabWidth = (
             8  # Mirror of what we send to Scintilla - never change this directly
         )
-        self.bAutoCompleteAttributes = 1
-        self.bShowCallTips = 1
-        self.bMatchBraces = 0  # Editor option will default this to true later!
+        self.bAutoCompleteAttributes = True
+        self.bShowCallTips = True
+        self.bMatchBraces = False  # Editor option will default this to true later!
         self.bindings = bindings.BindingsManager(self)
 
         self.idle = IDLEenvironment.IDLEEditorWindow(self)
@@ -464,10 +464,10 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
     def _AutoComplete(self):
         self.SCIAutoCCancel()  # Cancel old auto-complete lists.
         # First try and get an object without evaluating calls
-        ob = self._GetObjectAtPos(bAllowCalls=0)
+        ob = self._GetObjectAtPos(bAllowCalls=False)
         # If that failed, try and process call or indexing to get the object.
         if ob is None:
-            ob = self._GetObjectAtPos(bAllowCalls=1)
+            ob = self._GetObjectAtPos(bAllowCalls=True)
         items_dict = {}
         if ob is not None:
             try:  # Catch unexpected errors when fetching attribute names from the object
@@ -640,7 +640,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
                     maxline = item_lineno
         return (minline, maxline, curclass)
 
-    def _GetObjectAtPos(self, pos=-1, bAllowCalls=0):
+    def _GetObjectAtPos(self, pos=-1, bAllowCalls=False):
         left, right = self._GetWordSplit(pos, bAllowCalls)
         if left:  # It is an attribute lookup
             # How is this for a hack!
@@ -663,7 +663,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
                 pass
         return None
 
-    def _GetWordSplit(self, pos=-1, bAllowCalls=0):
+    def _GetWordSplit(self, pos=-1, bAllowCalls=False):
         if pos == -1:
             pos = self.GetSel()[0] - 1  # Character before current one
         limit = self.GetTextLength()
@@ -818,14 +818,14 @@ def LoadConfiguration():
     configName = rc = win32ui.GetProfileVal("Editor", "Keyboard Config", "default")
     configManager = ConfigManager(configName)
     if configManager.last_error:
-        bTryDefault = 0
+        bTryDefault = False
         msg = "Error loading configuration '{}'\n\n{}".format(
             configName,
             configManager.last_error,
         )
         if configName != "default":
             msg += "\n\nThe default configuration will be loaded."
-            bTryDefault = 1
+            bTryDefault = True
         win32ui.MessageBox(msg)
         if bTryDefault:
             configManager = ConfigManager("default")

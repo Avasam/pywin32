@@ -12,7 +12,7 @@ import winerror
 from win32com.client import Dispatch
 from win32com.test.util import CheckClean
 
-bVisibleEventFired = 0
+bVisibleEventFired = False
 
 # These are errors we might see when this is run in automation (eg, on GitHub)
 # Not sure exactly what -2125463506 is, but google shows it's a common error
@@ -23,7 +23,7 @@ HRESULTS_IN_AUTOMATION = [-2125463506, winerror.MK_E_UNAVAILABLE]
 class ExplorerEvents:
     def OnVisible(self, visible):
         global bVisibleEventFired
-        bVisibleEventFired = 1
+        bVisibleEventFired = True
 
 
 def TestExplorerEvents():
@@ -46,7 +46,7 @@ def TestExplorerEvents():
     iexplore.Quit()
     iexplore = None
 
-    bVisibleEventFired = 0
+    bVisibleEventFired = False
     ie = win32com.client.Dispatch("InternetExplorer.Application")
     ie_events = win32com.client.DispatchWithEvents(ie, ExplorerEvents)
     ie.Visible = 1

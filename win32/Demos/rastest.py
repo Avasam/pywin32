@@ -138,7 +138,7 @@ def main():
         )
         return
 
-    bCallback = 0
+    bCallback = False
     if args or not opts:
         print(
             usage
@@ -151,7 +151,7 @@ def main():
         return
     for opt, val in opts:
         if opt == "-s":
-            bCallback = 1
+            bCallback = True
         if opt == "-l":
             ShowConnections()
         if opt == "-c":

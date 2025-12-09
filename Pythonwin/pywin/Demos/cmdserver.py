@@ -59,7 +59,7 @@ class flags:
     SERVER_PROCESS = 3
 
 
-def StartServer(cmd, title=None, bCloseOnEnd=0, serverFlags=flags.SERVER_BEST):
+def StartServer(cmd, title=None, bCloseOnEnd=False, serverFlags=flags.SERVER_BEST):
     out = winout.WindowOutput(title, None, winout.flags.WQ_IDLE)
     if not title:
         title = cmd
@@ -73,13 +73,13 @@ def ServerThread(myout, cmd, title, bCloseOnEnd):
     try:
         writer.register(myout)
         print('Executing "%s"\n' % cmd)
-        bOK = 1
+        bOK = True
         try:
             import __main__
 
             exec(cmd + "\n", __main__.__dict__)
         except:
-            bOK = 0
+            bOK = False
         if bOK:
             print("Command terminated without errors.")
         else:

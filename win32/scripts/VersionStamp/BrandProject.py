@@ -19,7 +19,7 @@ def BrandProject(
     filesToSubstitute,
     buildDesc=None,
     auto=0,
-    bRebrand=0,
+    bRebrand=False,
 ):
     # vssProjectName -- The name of the VSS project to brand.
     # descFile -- A test file containing descriptions of the files in the release.
@@ -69,19 +69,19 @@ if __name__ == "__main__":
         opts, args = getopt.getopt(sys.argv[1:], "af:d:r")
     except getopt.GetoptError as msg:
         usage(msg)
-    bAuto = bRebrand = 0
+    bAuto = bRebrand = False
     stampFiles = []
     desc = None
     for opt, val in opts:
         if opt == "-a":
-            bAuto = 1
+            bAuto = True
         if opt == "-f":
             infile, outfile = val.split("=", 2)
             stampFiles.append((infile, outfile))
         if opt == "-d":
             desc = val
         if opt == "-r":
-            bRebrand = 1
+            bRebrand = True
     if len(args) < 3:
         usage("You must specify the required arguments")
     vssProjectName = "$\\" + args[0]

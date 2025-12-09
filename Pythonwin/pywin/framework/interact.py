@@ -565,7 +565,7 @@ class InteractiveCore:
                 if self.interp.runsource(
                     source, "<interactive input>"
                 ):  # Need more input!
-                    bNeedIndent = 1
+                    bNeedIndent = True
                 else:
                     # If the last line isn't empty, append a newline
                     if self.history is not None:
@@ -812,7 +812,7 @@ class DockedInteractiveView(DockedInteractiveViewParent):
 
 class CDockedInteractivePython(CInteractivePython):
     def __init__(self, dockbar):
-        self.bFirstCreated = 0
+        self.bFirstCreated = False
         self.dockbar = dockbar
         CInteractivePython.__init__(self)
 
@@ -841,7 +841,7 @@ class CDockedInteractivePython(CInteractivePython):
             CreateDockedInteractiveWindow()
 
     def Create(self):
-        self.bCreating = 1
+        self.bCreating = True
         doc = InteractiveDocument(None, self.DoCreateDoc())
         view = DockedInteractiveView(doc)
         defRect = pywin.framework.app.LoadWindowSize("Interactive Window", "docked")
@@ -851,10 +851,10 @@ class CDockedInteractivePython(CInteractivePython):
         id = 1050  # win32ui.AFX_IDW_PANE_FIRST
         view.CreateWindow(self.dockbar, id, style, defRect)
         view.OnInitialUpdate()
-        self.bFirstCreated = 1
+        self.bFirstCreated = True
 
         self.currentView = doc.GetFirstView()
-        self.bCreating = 0
+        self.bCreating = False
         if self.title:
             doc.SetTitle(self.title)
 

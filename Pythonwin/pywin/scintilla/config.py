@@ -246,7 +246,7 @@ class ConfigManager:
     def report_warning(self, msg):
         print(f"Warning in {self.filename}: {msg}")
 
-    def _readline(self, fp, lineno, bStripComments=1):
+    def _readline(self, fp, lineno, bStripComments=True):
         line = fp.readline()
         lineno += 1
         if line:
@@ -258,7 +258,7 @@ class ConfigManager:
                 if pos >= 0:
                     line = line[:pos] + "\n"
         else:
-            bBreak = 1
+            bBreak = True
         return line, lineno, bBreak
 
     def get_data(self, name, default=None):
