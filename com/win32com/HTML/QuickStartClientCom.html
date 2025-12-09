@@ -29,7 +29,7 @@ o.property = "New Value"<BR>
 print(o.property)</P>
 </CODE><P>Example</P>
 <CODE><P>o = win32com.client.Dispatch("Excel.Application")<BR>
-o.Visible = 1<BR>
+o.Visible = True<BR>
 o.Workbooks.Add()<BR>
 o.Cells(1,1).Value = "Hello"</CODE> </P>
 <P>And we will see the word "Hello" appear in the top cell. </P>
@@ -70,7 +70,7 @@ o.Cells(1,1).Value = "Hello"</CODE> </P>
 <P>And that is it! Nothing more needed. No special import statements needed! Now, you simply need say</P>
 <CODE><P>&gt;&gt;&gt; import win32com.client</P>
 <P>&gt;&gt;&gt; w=win32com.client.Dispatch("Word.Application")</P>
-<P>&gt;&gt;&gt; w.Visible=1</P>
+<P>&gt;&gt;&gt; w.Visible = True</P>
 <P>&gt;&gt;&gt; w</P>
 <P>&lt;win32com.gen_py.Microsoft Word 8.0 Object Library._Application&gt;</P>
 </CODE><P>Note that now Python knows the explicit type of the object.</P>

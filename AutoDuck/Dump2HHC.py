@@ -281,7 +281,7 @@ def genCategoryHTML(output_dir, cats):
         _genOneCategoryHTML(output_dir, cat, "Constants", "_constants", cat.constants)
 
 
-def _genItemsFromDict(dict, cat, output, target, do_children=1):
+def _genItemsFromDict(dict, cat, output, target, do_children=True):
     CHM = "mk:@MSITStore:%s.chm::/" % target
     for k in sorted(dict):
         context = dict[k].context
@@ -397,7 +397,7 @@ def genTOC(cats, output, title, target):
                 <UL>""".format(**locals())
         )
         # Don't show 'children' for objects - params etc don't need their own child nodes!
-        _genItemsFromDict(cat.objects, cat, output, target, do_children=0)
+        _genItemsFromDict(cat.objects, cat, output, target, do_children=False)
         output.write(
             """
                 </UL>"""

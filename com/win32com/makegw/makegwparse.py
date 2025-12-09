@@ -161,8 +161,8 @@ class ArgFormatter:
     def DeclareParseArgTupleInputConverter(self):
         "Declare the variable used as the PyArg_ParseTuple param for a gateway"
         # Only declare it??
-        # if self.arg.indirectionLevel==0:
-        # 	return "\t%s %s;\n" % (self.arg.type, self.arg.name)
+        # if self.arg.indirectionLevel == 0:
+        #     return "\t%s %s;\n" % (self.arg.type, self.arg.name)
         # else:
         if DEBUG:
             return (
