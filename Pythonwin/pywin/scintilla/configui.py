@@ -152,9 +152,8 @@ class ScintillaFormatPropertyPage(dialog.PropertyPage):
 
     def OnButFixedOrDefault(self, id, code):
         if code == win32con.BN_CLICKED:
-            bUseFixed = id == win32ui.IDC_RADIO1
             self.GetDlgItem(win32ui.IDC_RADIO1).GetCheck() != 0
-            self.scintilla._GetColorizer().bUseFixed = bUseFixed
+            self.scintilla._GetColorizer().bUseFixed = id == win32ui.IDC_RADIO1
             self.scintilla.ApplyFormattingStyles(0)
             return 1
 

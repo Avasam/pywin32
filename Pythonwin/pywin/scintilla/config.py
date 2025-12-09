@@ -250,9 +250,8 @@ class ConfigManager:
         line = fp.readline()
         lineno += 1
         if line:
-            bBreak = (
-                get_section_header(line)[0] is not None
-            )  # A new section is starting
+            # A new section is starting
+            bBreak = get_section_header(line)[0] is not None
             if bStripComments and not bBreak:
                 pos = line.find("#")
                 if pos >= 0:

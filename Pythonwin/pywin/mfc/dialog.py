@@ -39,7 +39,7 @@ class Dialog(window.Wnd):
             dlg = win32ui.CreateDialog(id, self.dll)
         window.Wnd.__init__(self, dlg)
         self.HookCommands()
-        self.bHaveInit = None
+        self.bHaveInit = False
 
     def HookCommands(self):
         pass
@@ -62,7 +62,7 @@ class Dialog(window.Wnd):
         return 1  # I did NOT set focus to a child window.
 
     def OnDestroy(self, msg):
-        self.dll = None  # theoretically not needed if object destructs normally.
+        self.dll = False  # theoretically not needed if object destructs normally.
 
     # DDX support
     def AddDDX(self, *args):
@@ -120,7 +120,7 @@ class PrintDialog(Dialog):
         dlg = win32ui.CreatePrintDialog(dlgID, printSetupOnly, flags, parent, self.dll)
         window.Wnd.__init__(self, dlg)
         self.HookCommands()
-        self.bHaveInit = None
+        self.bHaveInit = False
         self.pInfo = pInfo
         # init values (if PrintSetup is called, values still available)
         flags = pInfo.GetFlags()

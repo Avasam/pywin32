@@ -42,8 +42,8 @@ def DumpRelations(db, bDeep=True):
         print(f"Relation {relation.Name} - {relation.Table}->{relation.ForeignTable}")
 
 
-#### This don't work.  TLB says it is a Fields collection, but apparently not!
-####            if bDeep: DumpFields(relation.Fields)
+# This don't work.  TLB says it is a Fields collection, but apparently not!
+# if bDeep: DumpFields(relation.Fields)
 
 
 def DumpAllContainers(db, bDeep=True):
