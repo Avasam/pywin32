@@ -120,7 +120,7 @@ def CopyTo(desc, src, dest):
     import win32api
     import win32con
 
-    while 1:
+    while True:
         try:
             win32api.CopyFile(src, dest, 0)
             return

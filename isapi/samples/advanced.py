@@ -89,7 +89,7 @@ class ReloadWatcherThread(threading.Thread):
 
     def run(self):
         last_time = os.stat(self.filename)[stat.ST_MTIME]
-        while 1:
+        while True:
             try:
                 rc = win32event.WaitForSingleObject(self.handle, win32event.INFINITE)
                 win32file.FindNextChangeNotification(self.handle)

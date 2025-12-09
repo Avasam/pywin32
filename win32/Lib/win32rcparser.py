@@ -228,7 +228,7 @@ class RCParser:
         # Handle quoted strings - pity shlex doesn't handle it.
         assert self.token.startswith('"'), self.token
         bits = [self.token]
-        while 1:
+        while True:
             tok = self.getToken()
             if not tok.startswith('"'):
                 self.ungetToken()
@@ -361,7 +361,7 @@ class RCParser:
     def parse_textinclude(self, res_id):
         while self.getToken() != "BEGIN":
             pass
-        while 1:
+        while True:
             if self.token == "END":
                 break
             s = self.getToken()
@@ -369,7 +369,7 @@ class RCParser:
     def parse_stringtable(self):
         while self.getToken() != "BEGIN":
             pass
-        while 1:
+        while True:
             self.getToken()
             if self.token == "END":
                 break

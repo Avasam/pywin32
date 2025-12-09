@@ -21,7 +21,7 @@ def CollectorThread(stopEvent, file):
     )
 
     try:
-        while 1:
+        while True:
             rc = win32event.WaitForMultipleObjects(
                 (handle, stopEvent), 0, win32event.INFINITE
             )

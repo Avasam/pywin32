@@ -83,7 +83,7 @@ class TestCase(unittest.TestCase):
     def testWNetEnumResource(self):
         handle = win32wnet.WNetOpenEnum(RESOURCE_GLOBALNET, RESOURCETYPE_ANY, 0, None)
         try:
-            while 1:
+            while True:
                 items = win32wnet.WNetEnumResource(handle, 0)
                 if len(items) == 0:
                     break
@@ -127,7 +127,7 @@ class TestCase(unittest.TestCase):
         nr.lpRemoteName = "\\\\" + win32api.GetComputerName()
 
         handle = win32wnet.WNetOpenEnum(RESOURCE_GLOBALNET, RESOURCETYPE_ANY, 0, nr)
-        while 1:
+        while True:
             items = win32wnet.WNetEnumResource(handle, 0)
             if len(items) == 0:
                 break
@@ -141,7 +141,7 @@ class TestCase(unittest.TestCase):
         ]
         handle = win32wnet.WNetOpenEnum(RESOURCE_REMEMBERED, RESOURCETYPE_DISK, 0, None)
         try:
-            while 1:
+            while True:
                 items = win32wnet.WNetEnumResource(handle, 0)
                 if len(items) == 0:
                     break

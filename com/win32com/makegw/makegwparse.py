@@ -843,7 +843,7 @@ class Argument:
                 self.indirectionLevel += 1
 
         typ = self.drop_rpc_metadata(typ)
-        while 1:
+        while True:
             try:
                 pos = typ.rindex("*")
                 self.indirectionLevel += 1
@@ -919,7 +919,7 @@ class Method:
                 )
             # 				raise error_not_supported,		if VERBOSE:
             print(f"     Method {self.result} {self.name}(")
-        while 1:
+        while True:
             arg = Argument(self.good_interface_names)
             try:
                 arg.BuildFromFile(file)
@@ -951,7 +951,7 @@ class Interface:
         # skip the next 2 lines.
         file.readline()
         file.readline()
-        while 1:
+        while True:
             try:
                 method = Method([self.name])
                 method.BuildFromFile(file)

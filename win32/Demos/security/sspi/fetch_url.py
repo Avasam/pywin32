@@ -48,7 +48,7 @@ def open_url(host, url):
         ca = ClientAuth("NTLM", auth_info=auth_info)
         auth_scheme = ca.pkg_info["Name"]
         data = None
-        while 1:
+        while True:
             err, out_buf = ca.authorize(data)
             data = out_buf[0].Buffer
             # Encode it as base64 as required by HTTP

@@ -51,7 +51,7 @@ def DumpClipboard():
                 stream = medium.data
                 stream.Seek(0, 0)
                 bytes = 0
-                while 1:
+                while True:
                     chunk = stream.Read(4096)
                     if not chunk:
                         break

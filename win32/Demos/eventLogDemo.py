@@ -12,7 +12,7 @@ def ReadLog(computer, logType="Application", dumpEachRecord=0):
     # print(f"There are {numRecords} records")
 
     num = 0
-    while 1:
+    while True:
         objects = win32evtlog.ReadEventLog(
             h,
             win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ,

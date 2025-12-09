@@ -66,7 +66,7 @@ class SSPISocketServer(socketserver.TCPServer):
     def verify_request(self, sock, ca):
         # Do the sspi auth dance
         self.sa.reset()
-        while 1:
+        while True:
             data = _get_msg(sock)
             if data is None:
                 return False
@@ -87,7 +87,7 @@ class SSPISocketServer(socketserver.TCPServer):
         self.sa.ctxt.ImpersonateSecurityContext()
         try:
             print("Having conversation with client as user", GetUserName())
-            while 1:
+            while True:
                 # we need to grab 2 bits of data - the encrypted data, and the
                 # 'key'
                 data = _get_msg(request)
@@ -114,7 +114,7 @@ def sspi_client():
     # Do the auth dance.
     ca = sspi.ClientAuth(options.package, targetspn=options.target_spn)
     data = None
-    while 1:
+    while True:
         err, out_buf = ca.authorize(data)
         _send_msg(c.sock, out_buf[0].Buffer)
         if err == 0:

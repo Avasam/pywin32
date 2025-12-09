@@ -600,7 +600,7 @@ class DesignatedWrapPolicy(MappedWrapPolicy):
         return 0, self._typeinfos_[index]
 
     def _allocnextdispid(self, last_dispid):
-        while 1:
+        while True:
             last_dispid += 1
             if (
                 last_dispid not in self._dispid_to_func_

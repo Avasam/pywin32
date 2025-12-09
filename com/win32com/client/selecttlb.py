@@ -69,7 +69,7 @@ class TypelibSpec:
 def EnumKeys(root):
     index = 0
     ret = []
-    while 1:
+    while True:
         try:
             item = win32api.RegEnumKey(root, index)
         except win32api.error:

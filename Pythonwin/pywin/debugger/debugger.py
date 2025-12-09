@@ -252,7 +252,7 @@ class DebuggerStackWindow(DebuggerWindow):
             handle = self.GetChildItem(0)
         except win32ui.error:
             return  # No items
-        while 1:
+        while True:
             item = self.list.ItemFromHandle(handle)
             col = self.list.GetBitmapColumn(item)
             selCol = self.list.GetSelectedBitmapColumn(item)
@@ -575,7 +575,7 @@ class Debugger(debugger_parent):
         # See if any break-points have been set in the editor
         for doc in editor.editorTemplate.GetDocumentList():
             lineNo = -1
-            while 1:
+            while True:
                 lineNo = doc.MarkerGetNext(lineNo + 1, MARKER_BREAKPOINT)
                 if lineNo <= 0:
                     break

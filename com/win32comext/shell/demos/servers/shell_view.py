@@ -665,7 +665,7 @@ class FileSystemView:
             # Determine the selected items.
             sel = []
             n = -1
-            while 1:
+            while True:
                 n = win32gui.SendMessage(
                     self.hwnd_child, commctrl.LVM_GETNEXTITEM, n, commctrl.LVNI_SELECTED
                 )
@@ -734,7 +734,7 @@ class FileSystemView:
         # Get the selected items.
         pidls = []
         n = -1
-        while 1:
+        while True:
             n = win32gui.SendMessage(
                 self.hwnd_child, commctrl.LVM_GETNEXTITEM, n, commctrl.LVNI_SELECTED
             )

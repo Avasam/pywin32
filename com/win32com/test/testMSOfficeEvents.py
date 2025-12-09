@@ -93,7 +93,7 @@ def TestWord():
 
 def _WaitForFinish(ob, timeout):
     end = time.time() + timeout
-    while 1:
+    while True:
         if msvcrt.kbhit():
             msvcrt.getch()
             break

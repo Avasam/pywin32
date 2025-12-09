@@ -158,7 +158,7 @@ class RegistryTreeView(docview.TreeView):
 
     def SearchSelectedItem(self):
         handle = self.hierList.GetChildItem(0)
-        while 1:
+        while True:
             # print("State is", self.hierList.GetItemState(handle, -1))
             if self.hierList.GetItemState(handle, commctrl.TVIS_SELECTED):
                 # print("Item is ", self.hierList.ItemFromHandle(handle))
@@ -187,7 +187,7 @@ class RegistryValueView(docview.ListView):
         try:
             valNum = 0
             ret = []
-            while 1:
+            while True:
                 try:
                     res = win32api.RegEnumValue(hkey, valNum)
                 except win32api.error:
@@ -358,7 +358,7 @@ class HLIRegistryKey(hierlist.HierListItem):
         try:
             keyNum = 0
             ret = []
-            while 1:
+            while True:
                 try:
                     key = win32api.RegEnumKey(hkey, keyNum)
                 except win32api.error:

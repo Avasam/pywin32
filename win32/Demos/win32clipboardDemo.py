@@ -96,7 +96,7 @@ def TestClipboardEnum():
     try:
         # Enumerate over the clipboard types
         enum = 0
-        while 1:
+        while True:
             enum = EnumClipboardFormats(enum)
             if enum == 0:
                 break

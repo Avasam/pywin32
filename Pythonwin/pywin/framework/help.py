@@ -93,7 +93,7 @@ def _ListAllHelpFilesInRoot(root):
         return retList
     try:
         keyNo = 0
-        while 1:
+        while True:
             try:
                 helpDesc = win32api.RegEnumKey(key, keyNo)
                 helpFile = win32api.RegQueryValue(key, helpDesc)

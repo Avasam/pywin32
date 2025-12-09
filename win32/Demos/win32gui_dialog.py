@@ -351,7 +351,7 @@ class DemoWindowBase:
 
     def OnSearchResult(self, hwnd, msg, wparam, lparam):
         try:
-            while 1:
+            while True:
                 params = self.result_queue.get(0)
                 self.AddListItem(*params)
         except queue.Empty:

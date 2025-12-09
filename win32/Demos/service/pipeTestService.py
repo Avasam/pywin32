@@ -134,7 +134,7 @@ class TestPipeService(win32serviceutil.ServiceFramework):
         )
 
         num_connections = 0
-        while 1:
+        while True:
             pipeHandle = CreateNamedPipe(
                 "\\\\.\\pipe\\PyPipeTest",
                 PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,

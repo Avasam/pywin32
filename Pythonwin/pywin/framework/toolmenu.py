@@ -33,7 +33,7 @@ def LoadToolMenuItems():
     # Load from the registry.
     items = []
     lookNo = 1
-    while 1:
+    while True:
         menu = win32ui.GetProfileVal("Tools Menu\\%s" % lookNo, "", "")
         if menu == "":
             break
@@ -55,7 +55,7 @@ def WriteToolMenuItems(items):
     except win32ui.error:
         toolKey = None
     if toolKey is not None:
-        while 1:
+        while True:
             try:
                 subkey = win32api.RegEnumKey(toolKey, 0)
             except win32api.error:
@@ -199,7 +199,7 @@ class ToolMenuPropPage(dialog.PropertyPage):
         # Write the menu back to the registry.
         items = []
         itemLook = 0
-        while 1:
+        while True:
             try:
                 text = self.listControl.GetItemText(itemLook, 0)
                 if not text:

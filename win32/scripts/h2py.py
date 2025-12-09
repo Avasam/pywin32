@@ -113,7 +113,7 @@ def pytify(body):
     body = p_char.sub("ord('\\1')", body)
     # Compute negative hexadecimal constants
     start = 0
-    while 1:
+    while True:
         m = p_signed_hex.search(body, start)
         if not m:
             break
@@ -129,7 +129,7 @@ def pytify(body):
 
 def process(fp, outfp, env={}):
     lineno = 0
-    while 1:
+    while True:
         line = fp.readline()
         if not line:
             break

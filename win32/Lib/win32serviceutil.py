@@ -455,7 +455,7 @@ def __FindSvcDeps(findName):
         win32con.HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services"
     )
     num = 0
-    while 1:
+    while True:
         try:
             svc = win32api.RegEnumKey(k, num)
         except win32api.error:

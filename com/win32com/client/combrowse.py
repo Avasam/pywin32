@@ -199,7 +199,7 @@ class HLIRegisteredTypeLibrary(HLICOM):
         win32ui.DoWaitCursor(1)
         try:
             num = 0
-            while 1:
+            while True:
                 try:
                     subKey = win32api.RegEnumKey(key, num)
                 except win32api.error:
@@ -221,7 +221,7 @@ class HLIRegisteredTypeLibrary(HLICOM):
                         lcidkey = win32api.RegOpenKey(key, subKey)
                         # Enumerate the platforms
                         lcidnum = 0
-                        while 1:
+                        while True:
                             try:
                                 platform = win32api.RegEnumKey(lcidkey, lcidnum)
                             except win32api.error:
@@ -545,7 +545,7 @@ class HLIHeadingRegisterdTypeLibs(HLICOM):
         win32ui.DoWaitCursor(1)
         try:
             num = 0
-            while 1:
+            while True:
                 try:
                     keyName = win32api.RegEnumKey(key, num)
                 except win32api.error:
@@ -556,7 +556,7 @@ class HLIHeadingRegisterdTypeLibs(HLICOM):
                 try:
                     subNum = 0
                     bestVersion = 0.0
-                    while 1:
+                    while True:
                         try:
                             versionStr = win32api.RegEnumKey(subKey, subNum)
                         except win32api.error:

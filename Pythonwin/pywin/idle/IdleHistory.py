@@ -43,7 +43,7 @@ class History:
             else:
                 pointer = -1
         nprefix = len(prefix)
-        while 1:
+        while True:
             if reverse:
                 pointer -= 1
             else:

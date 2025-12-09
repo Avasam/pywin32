@@ -125,7 +125,7 @@ def _FindIt(control, searchParams):
                 template = doc.GetDocTemplate()
                 alldocs = template.GetDocumentList()
                 mypos = lookpos = alldocs.index(doc)
-                while 1:
+                while True:
                     lookpos = (lookpos + 1) % len(alldocs)
                     if lookpos == mypos:
                         break
