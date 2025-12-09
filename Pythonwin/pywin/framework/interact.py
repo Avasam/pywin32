@@ -728,7 +728,7 @@ class InteractiveView(InteractiveCore, winout.WindowOutputView):
 
 class CInteractivePython(winout.WindowOutput):
     def __init__(self, makeDoc=None, makeFrame=None):
-        self.IsFinalDestroy = 0
+        self.IsFinalDestroy = False
         winout.WindowOutput.__init__(
             self,
             sectionProfile,
@@ -748,7 +748,7 @@ class CInteractivePython(winout.WindowOutput):
         winout.WindowOutput.OnViewDestroy(self, view)
 
     def Close(self):
-        self.IsFinalDestroy = 1
+        self.IsFinalDestroy = True
         winout.WindowOutput.Close(self)
 
 

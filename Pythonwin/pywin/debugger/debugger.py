@@ -569,7 +569,7 @@ class Debugger(debugger_parent):
         self.shownLineCallstack = None  # The last filename I highlighted.
         self.last_cmd_debugged = ""
         self.abortClosed = 0
-        self.isInitialBreakpoint = 0
+        self.isInitialBreakpoint = False
         debugger_parent.__init__(self)
 
         # See if any break-points have been set in the editor
@@ -715,7 +715,7 @@ class Debugger(debugger_parent):
 
     def stop_here(self, frame):
         if self.isInitialBreakpoint:
-            self.isInitialBreakpoint = 0
+            self.isInitialBreakpoint = False
             self.set_continue()
             return 0
         if frame is self.botframe and self.skipBotFrame == SKIP_RUN:
@@ -731,9 +731,9 @@ class Debugger(debugger_parent):
             raise TypeError("Only strings can be run")
         self.last_cmd_debugged = cmd
         if start_stepping:
-            self.isInitialBreakpoint = 0
+            self.isInitialBreakpoint = False
         else:
-            self.isInitialBreakpoint = 1
+            self.isInitialBreakpoint = True
         try:
             if globals is None:
                 import __main__

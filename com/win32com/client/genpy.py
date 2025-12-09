@@ -1035,7 +1035,7 @@ class Generator:
     def get_temp_filename(self, filename):
         return "%s.%d.temp" % (filename, os.getpid())
 
-    def generate(self, file, is_for_demand=0):
+    def generate(self, file, is_for_demand=False):
         if is_for_demand:
             self.generate_type = GEN_DEMAND_BASE
         else:

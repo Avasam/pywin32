@@ -251,10 +251,10 @@ class EventSink:
             mainTypeInfo = self.coDispatch.QueryInterface(
                 axscript.IID_IProvideMultipleClassInfo
             )
-            isMulti = 1
+            isMulti = True
             numTypeInfos = mainTypeInfo.GetMultiTypeInfoCount()
         except pythoncom.com_error:
-            isMulti = 0
+            isMulti = False
             numTypeInfos = 1
             try:
                 mainTypeInfo = self.coDispatch.QueryInterface(
@@ -310,7 +310,7 @@ class ScriptItem:
         self.eventSink = None
         self.subItems = {}
         self.createdConnections = 0
-        self.isRegistered = 0
+        self.isRegistered = False
 
     # 		trace("Creating ScriptItem", name, "of parent", parentItem,"with dispatch", dispatch)
 
@@ -343,7 +343,7 @@ class ScriptItem:
         self.Disconnect()
         if self.eventSink:
             self.eventSink.Reset()
-        self.isRegistered = 0
+        self.isRegistered = False
         for subItem in self.subItems.values():
             subItem.Reset()
 
@@ -373,7 +373,7 @@ class ScriptItem:
         #         print("*** No dispatch")
         #         return
         #     print("**** Made dispatch")
-        self.isRegistered = 1
+        self.isRegistered = True
         # Register the sub-items.
         for item in self.subItems.values():
             if not item.isRegistered:
@@ -502,7 +502,7 @@ class ScriptItem:
                         and elemdesc[0][1][0] == pythoncom.VT_USERDEFINED
                     )
                 except:
-                    isSubObject = 0
+                    isSubObject = False
                 if isSubObject:
                     try:
                         # We found a sub-object.
