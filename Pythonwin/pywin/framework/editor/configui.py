@@ -75,7 +75,7 @@ class EditorPropertyPage(dialog.PropertyPage):
     def _AddEditorOption(self, idd, typ, optionName, defaultVal):
         self.AddDDX(idd, optionName, typ)
         # some options are "derived" - ie, can be implied from others
-        # (eg, "view markers in background" is implied from "markerMarginWidth==0"
+        # (eg, "view markers in background" is implied from "markerMarginWidth == 0"
         # So we don't actually store these values, but they do still get DDX support.
         if defaultVal is not None:
             self[optionName] = GetEditorOption(optionName, defaultVal)

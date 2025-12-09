@@ -1,4 +1,7 @@
 """General Server side utilities"""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pythoncom
 import winerror
@@ -6,8 +9,15 @@ import winerror
 from . import policy
 from .exception import COMException
 
+if TYPE_CHECKING:
+    from win32com.server.dispatcher import DispatcherBase
 
-def wrap(ob, iid=None, usePolicy=None, useDispatcher=None):
+def wrap(
+    ob,
+    iid=None,
+    usePolicy=None,
+    useDispatcher: type[DispatcherBase] | bool | None = None,
+):
     """Wraps an object in a PyGDispatch gateway.
 
     Returns a client side PyI{iid} interface.
@@ -18,11 +28,11 @@ def wrap(ob, iid=None, usePolicy=None, useDispatcher=None):
     """
     if usePolicy is None:
         usePolicy = policy.DefaultPolicy
-    if useDispatcher == 1:  # True will also work here.
+    if useDispatcher == True:  # Override boolean only, not dispatcher instance
         import win32com.server.dispatcher
 
         useDispatcher = win32com.server.dispatcher.DefaultDebugDispatcher
-    if useDispatcher is None or useDispatcher == 0:
+    if not useDispatcher:  # False or None
         ob = usePolicy(ob)
     else:
         ob = useDispatcher(usePolicy, ob)

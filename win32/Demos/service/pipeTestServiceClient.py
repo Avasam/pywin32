@@ -23,18 +23,18 @@ from win32pipe import *  # nopycln: import
 verbose = 0
 
 # def ReadFromPipe(pipeName):
-# Could (Should?) use CallNamedPipe, but this technique allows variable size
-# messages (whereas you must supply a buffer size for CallNamedPipe!
-#       hPipe = CreateFile(pipeName, GENERIC_WRITE, 0, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
-#       more = 1
-#       while more:
-#               hr = ReadFile(hPipe, 256)
-#               if hr==0:
-#                       more = 0
-#               except win32api.error (hr, fn, desc):
-#                       if hr==winerror.ERROR_MORE_DATA:
-#                               data = dat
-#
+#     # Could (Should?) use CallNamedPipe, but this technique allows variable size
+#     # messages (whereas you must supply a buffer size for CallNamedPipe!
+#     hPipe = CreateFile(pipeName, GENERIC_WRITE, 0, None, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
+#     more = 1
+#     while more:
+#         hr = ReadFile(hPipe, 256)
+#         if hr == 0:
+#             more = 0
+#         except win32api.error as exc:
+#             (hr, fn, desc) = exc
+#             if hr == winerror.ERROR_MORE_DATA:
+#                 data = dat
 
 
 def CallPipe(fn, args):

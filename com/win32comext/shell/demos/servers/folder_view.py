@@ -603,7 +603,7 @@ class ShellFolder:
             raise COMException(hresult=winerror.E_NOTIMPL)
         child = ShellFolder(self.current_level + 1)
         # hrmph - not sure what multiple PIDLs here mean?
-        #        assert len(pidl)==1, pidl # expecting just relative child PIDL
+        # assert len(pidl) == 1, pidl  # expecting just relative child PIDL
         child.Initialize(self.pidl + pidl)
         return wrap(child, iid)
 
