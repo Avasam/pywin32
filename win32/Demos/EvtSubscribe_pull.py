@@ -13,15 +13,15 @@ s = win32evtlog.EvtSubscribe(
     Query=query_text,
 )
 
-while 1:
-    while 1:
+while True:
+    while True:
         events = win32evtlog.EvtNext(s, 10)
         if len(events) == 0:
             break
         ##for event in events:
         ##	print(win32evtlog.EvtRender(event, win32evtlog.EvtRenderEventXml))
         print("retrieved %s events" % len(events))
-    while 1:
+    while True:
         print("waiting...")
         w = win32event.WaitForSingleObjectEx(h, 2000, True)
         if w == win32con.WAIT_OBJECT_0:

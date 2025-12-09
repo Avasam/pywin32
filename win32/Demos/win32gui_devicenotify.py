@@ -91,7 +91,7 @@ def TestDeviceNotifications(dir_names):
         print("(Note you can also pass paths to watch on the command-line - eg,")
         print("pass the root of an inserted USB stick to see events specific to")
         print("that volume)")
-    while 1:
+    while True:
         win32gui.PumpWaitingMessages()
         time.sleep(0.01)
     win32gui.DestroyWindow(hwnd)

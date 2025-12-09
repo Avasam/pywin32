@@ -115,7 +115,7 @@ ctxt = 0
 win32_stream_id_buf = (
     None  ## gets rebound to a writable buffer on first call and reused
 )
-while 1:
+while True:
     bytes_read, win32_stream_id_buf, ctxt = win32file.BackupRead(
         h, win32_stream_id_size, win32_stream_id_buf, False, True, ctxt
     )

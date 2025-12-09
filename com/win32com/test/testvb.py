@@ -220,7 +220,7 @@ def _DoTestCollection(vbtest, col_name, expected):
     # Check we can do it with our old "Skip/Next" methods.
     c = getattr(vbtest, col_name)._NewEnum()
     check = []
-    while 1:
+    while True:
         n = c.Next()
         if not n:
             break

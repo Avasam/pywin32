@@ -45,7 +45,7 @@ def demo(delay=1000, stop=10):
     # To run a message loop while waiting for our timers
     # to expire.
     start_time = time.time()
-    while 1:
+    while True:
         # We can't simply give a timeout of 30 seconds, as
         # we may continouusly be recieving other input messages,
         # and therefore never expire.

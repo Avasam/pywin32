@@ -230,7 +230,7 @@ class HLIRoot(hierlist.HierListItem):
             ret = []
             ret.append(HLIProjectRoot("", "Standard Python Library"))  # The core path.
             index = 0
-            while 1:
+            while True:
                 try:
                     ret.append(HLIProjectRoot(win32api.RegEnumKey(hKey, index)))
                     index += 1

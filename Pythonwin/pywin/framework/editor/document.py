@@ -349,7 +349,7 @@ class FileWatchingThread(pywin.mfc.thread.WinThread):
         win32event.SetEvent(self.stopEvent)
 
     def Run(self):
-        while 1:
+        while True:
             handles = [self.stopEvent, self.adminEvent]
             if self.watchEvent is not None:
                 handles.append(self.watchEvent)

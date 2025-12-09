@@ -102,7 +102,7 @@ def test(fn):
 
     events = fn(4, cookie)
     numFinished = 0
-    while 1:
+    while True:
         try:
             rc = win32event.MsgWaitForMultipleObjects(
                 events, 0, 2000, win32event.QS_ALLINPUT

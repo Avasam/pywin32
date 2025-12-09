@@ -202,7 +202,7 @@ class TestMultipleThreadsWriting(unittest.TestCase):
         return bucketsAreFull
 
     def read(self):
-        while 1:
+        while True:
             readString = win32trace.blockingread()
             for ch in readString:
                 integer = int(ch)
@@ -314,7 +314,7 @@ class TestOutofProcess(unittest.TestCase):
         return bucketsAreFull
 
     def read(self):
-        while 1:
+        while True:
             readString = win32trace.blockingread()
             for ch in readString:
                 integer = int(ch)

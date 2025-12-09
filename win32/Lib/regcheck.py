@@ -62,7 +62,7 @@ def CheckPythonPaths(verbose):
     )
     try:
         keyNo = 0
-        while 1:
+        while True:
             try:
                 appName = win32api.RegEnumKey(key, keyNo)
                 appPath = win32api.RegQueryValue(key, appName)
@@ -104,7 +104,7 @@ def CheckHelpFiles(verbose):
 
     try:
         keyNo = 0
-        while 1:
+        while True:
             try:
                 helpDesc = win32api.RegEnumKey(key, keyNo)
                 helpFile = win32api.RegQueryValue(key, helpDesc)

@@ -216,7 +216,7 @@ def FeedEventLogRecords(
         )
     h = win32evtlog.OpenEventLog(machineName, logName)
     try:
-        while 1:
+        while True:
             objects = win32evtlog.ReadEventLog(h, readFlags, 0)
             if not objects:
                 break

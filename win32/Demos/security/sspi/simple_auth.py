@@ -35,7 +35,7 @@ sspiserver = sspi.ServerAuth(pkg_name)
 # Perform the authentication dance, each loop exchanging more information
 # on the way to completing authentication.
 sec_buffer = None
-while 1:
+while True:
     err, sec_buffer = sspiclient.authorize(sec_buffer)
     err, sec_buffer = sspiserver.authorize(sec_buffer)
     if err == 0:

@@ -201,7 +201,7 @@ class Parser:
         # Peeking back worked; look forward until _synchre no longer
         # matches.
         i = pos + 1
-        while 1:
+        while True:
             m = _synchre(str, i)
             if m:
                 s, i = m.span()

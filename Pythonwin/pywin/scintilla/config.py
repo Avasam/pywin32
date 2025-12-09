@@ -269,7 +269,7 @@ class ConfigManager:
 
     def _load_general(self, sub_section, fp, lineno):
         map = {}
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno)
             if bBreak:
                 break
@@ -289,7 +289,7 @@ class ConfigManager:
         # (scancode, flags) = event_name
         main_map = self.get_data("keys", {})
         map = main_map.get(sub_section, {})
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno)
             if bBreak:
                 break
@@ -309,7 +309,7 @@ class ConfigManager:
     def _load_extensions(self, sub_section, fp, lineno):
         start_lineno = lineno
         lines = []
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno, 0)
             if bBreak:
                 break
@@ -335,7 +335,7 @@ class ConfigManager:
         if extension_map is None:
             extension_map = {}
         extensions = []
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno)
             if bBreak:
                 break

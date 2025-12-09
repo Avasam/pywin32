@@ -482,7 +482,7 @@ class ScriptItem:
             )
             defaultType = self.GetDefaultSourceTypeInfo(typeinfo)
             index = 0
-            while 1:
+            while True:
                 try:
                     fdesc = defaultType.GetFuncDesc(index)
                 except pythoncom.com_error:

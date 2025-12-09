@@ -96,7 +96,7 @@ def make_doc_summary(inFile, outFile):
     max_methods = 999
     method_num = 0
     chunk_number = 0
-    while 1:
+    while True:
         these_methods = methods[method_num : method_num + max_methods]
         if not these_methods:
             break

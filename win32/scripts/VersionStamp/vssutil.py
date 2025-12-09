@@ -56,7 +56,7 @@ def SubstituteInFile(inName, outName, evalEnv):
     try:
         outFile = open(outName, "w")
         try:
-            while 1:
+            while True:
                 line = inFile.read()
                 if not line:
                     break

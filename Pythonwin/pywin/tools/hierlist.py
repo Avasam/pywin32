@@ -187,7 +187,7 @@ class HierList(object.Object):
         ret = []
         try:
             handle = self.listControl.GetChildItem(handle)
-            while 1:
+            while True:
                 ret.append(handle)
                 handle = self.listControl.GetNextItem(handle, commctrl.TVGN_NEXT)
         except win32ui.error:

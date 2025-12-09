@@ -333,7 +333,7 @@ class TestOverlapped(unittest.TestCase):
             testName, desiredAccess, 0, None, win32file.OPEN_EXISTING, 0, 0
         )
         buffer = win32file.AllocateReadBuffer(0xFFFF)
-        while 1:
+        while True:
             try:
                 hr, data = win32file.ReadFile(h, buffer, overlapped)
                 win32event.WaitForSingleObject(overlapped.hEvent, win32event.INFINITE)
@@ -637,7 +637,7 @@ class TestDirectoryChanges(unittest.TestCase):
         #   managed)
         # Which ends up with no way to kill the thread!
         flags = win32con.FILE_NOTIFY_CHANGE_FILE_NAME
-        while 1:
+        while True:
             try:
                 print("waiting", dh)
                 changes = win32file.ReadDirectoryChangesW(
@@ -656,7 +656,7 @@ class TestDirectoryChanges(unittest.TestCase):
         buf = win32file.AllocateReadBuffer(8192)
         overlapped = pywintypes.OVERLAPPED()
         overlapped.hEvent = win32event.CreateEvent(None, 0, 0, None)
-        while 1:
+        while True:
             win32file.ReadDirectoryChangesW(
                 dh,
                 buf,

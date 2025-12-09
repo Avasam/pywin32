@@ -9,7 +9,7 @@ possible_shares = []
 
 def _doDumpHandle(handle, level=0):
     indent = " " * level
-    while 1:
+    while True:
         items = win32wnet.WNetEnumResource(handle, 0)
         if len(items) == 0:
             break
@@ -54,7 +54,7 @@ def findUnusedDriveLetter():
     ]
     handle = win32wnet.WNetOpenEnum(RESOURCE_REMEMBERED, RESOURCETYPE_DISK, 0, None)
     try:
-        while 1:
+        while True:
             items = win32wnet.WNetEnumResource(handle, 0)
             if len(items) == 0:
                 break

@@ -115,7 +115,7 @@ class ThreadInterpCase(InterpCase):
         # print(f"The main thread is {win32api.GetCurrentThreadId()}")
         threads, events = fn(2)
         numFinished = 0
-        while 1:
+        while True:
             try:
                 if bCoWait:
                     rc = pythoncom.CoWaitForMultipleHandles(0, 2000, events)

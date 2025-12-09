@@ -49,7 +49,7 @@ def DispExTest(ob):
     )
     dispids = []
     dispid = -1
-    while 1:
+    while True:
         try:
             dispid = ob.GetNextDispID(0, dispid)
             dispids.append(dispid)
