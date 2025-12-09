@@ -38,7 +38,6 @@ def Connect(rasEntryName, numRetries=5):
     while retryCount > 0:
         rasHandle, errCode = win32ras.Dial(None, None, dial_params, None)
         if win32ras.IsHandleValid(rasHandle):
-            bValid = True
             break
         print("Retrying...")
         win32api.Sleep(5000)

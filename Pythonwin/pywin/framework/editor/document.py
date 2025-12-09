@@ -169,9 +169,8 @@ class EditorDocumentBase(ParentEditorDocument):
                     self.GetPathName()
                 )
             )
-            self.bReportedFileNotFound = (
-                0  # Once found again we want to start complaining.
-            )
+            # Once found again we want to start complaining.
+            self.bReportedFileNotFound = False
         changed = (
             (self.fileStat is None)
             or self.fileStat[0] != newstat[0]

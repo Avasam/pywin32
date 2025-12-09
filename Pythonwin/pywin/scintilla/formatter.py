@@ -200,7 +200,7 @@ class FormatterBase:
         self.baseFormatProp = eval(
             self.LoadPreference("Base Format Proportional", str(self.baseFormatProp))
         )
-        self.bUseFixed = int(self.LoadPreference("Use Fixed", 1))
+        self.bUseFixed = bool(int(self.LoadPreference("Use Fixed", True)))
 
         for style in self.styles.values():
             new = self.LoadPreference(style.name, str(style.format))
