@@ -18,6 +18,7 @@ As of build 305, installation .exe files have been deprecated; see
 Coming in build 312, as yet unreleased
 --------------------------------------
 
+* Fixed `verbose` and `silent` flags of `pywin32_postinstall` as well as an incorrect "Registered help file" message when the `PyWin32.chm` file can't be found (mhammond#XXXX, [@Avasam][Avasam])
 * Fixed missing version stamp on built `.dll` and `.exe` files (mhammond#2647, [@Avasam][Avasam])
 * Removed considerations for Windows 95/98/ME (mhammond#2400, [@Avasam][Avasam])
   This removes the following constants:

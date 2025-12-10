@@ -11,13 +11,8 @@ import sysconfig
 import tempfile
 import winreg
 
-tee_f = open(
-    os.path.join(
-        tempfile.gettempdir(),  # Send output somewhere so it can be found if necessary...
-        "pywin32_postinstall.log",
-    ),
-    "w",
-)
+# Send output somewhere so it can be found if necessary...
+tee_f = open(os.path.join(tempfile.gettempdir(), "pywin32_postinstall.log"), "w")
 
 
 class Tee:
@@ -45,7 +40,7 @@ sys.stderr = Tee(sys.stderr)
 sys.stdout = Tee(sys.stdout)
 
 com_modules = [
-    # module_name,                      class_names
+    # (module_name, class_names)
     ("win32com.servers.interp", "Interpreter"),
     ("win32com.servers.dictionary", "DictionaryPolicy"),
     ("win32com.axscript.client.pyscript", "PyScript"),
@@ -53,10 +48,10 @@ com_modules = [
 
 # Is this a 'silent' install - ie, avoid all dialogs.
 # Different than 'verbose'
-silent = 0
+silent = False
 
 # Verbosity of output messages.
-verbose = 1
+verbose = True
 
 root_key_name = "Software\\Python\\PythonCore\\" + sys.winver
 
@@ -484,7 +479,7 @@ def install(lib_dir):
         print("Failed to register help file")
         traceback.print_exc()
     else:
-        if verbose:
+        if verbose and chm_file:
             print("Registered help file")
 
     # misc other fixups.
@@ -652,6 +647,7 @@ def verify_destination(location: str) -> str:
 
 
 def main():
+    global verbose, silent
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""A post-install script for the pywin32 extensions.
