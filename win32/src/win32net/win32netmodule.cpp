@@ -32,8 +32,6 @@ conversion is required.
 
 #include "assert.h"
 
-NetGetJoinInformationfunc pfnNetGetJoinInformation = NULL;
-
 /*****************************************************************************/
 /* error helpers */
 
@@ -950,22 +948,18 @@ static PyObject *PyNetGetJoinInformation(PyObject *self, PyObject *args)
 {
     PyObject *obServer = Py_None;
     WCHAR *server = NULL;
-    ;
     WCHAR *result = NULL;
     PyObject *ret = NULL;
     NET_API_STATUS err;
     NETSETUP_JOIN_STATUS status;
     if (!PyArg_ParseTuple(args, "|O:NetGetJoinInformation", &obServer))
         return NULL;
-    if (pfnNetGetJoinInformation == NULL) {
-        PyErr_SetString(PyExc_NotImplementedError, "NetGetJoinInformation does not exist on this platform");
-        goto done;
-    }
     if (!PyWinObject_AsWCHAR(obServer, &server, TRUE))
         goto done;
-    Py_BEGIN_ALLOW_THREADS err = (*pfnNetGetJoinInformation)(server, &result, &status);
-    Py_END_ALLOW_THREADS if (err)
-    {
+    Py_BEGIN_ALLOW_THREADS;
+    err = NetGetJoinInformation(server, &result, &status);
+    Py_END_ALLOW_THREADS;
+    if (err) {
         ReturnNetError("NetGetJoinInformation", err);
         goto done;
     }
@@ -1204,8 +1198,6 @@ PYWIN_MODULE_INIT_FUNC(win32net)
 
     HMODULE hmodule = PyWin_GetOrLoadLibraryHandle("netapi32.dll");
     if (hmodule != NULL) {
-        pfnNetValidateName = (NetValidateNamefunc)GetProcAddress(hmodule, "NetValidateName");
-        pfnNetGetJoinInformation = (NetGetJoinInformationfunc)GetProcAddress(hmodule, "NetGetJoinInformation");
         pfnNetValidatePasswordPolicy =
             (NetValidatePasswordPolicyfunc)GetProcAddress(hmodule, "NetValidatePasswordPolicy");
         pfnNetValidatePasswordPolicyFree =
