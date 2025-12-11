@@ -403,14 +403,6 @@ def _write_gw_cpp(f, interface):
         gname = "PyG" + interface.name[1:]
     else:
         gname = "PyG" + interface.name
-    name = interface.name
-    if interface.base == "IUnknown" or interface.base == "IDispatch":
-        base_name = "PyGatewayBase"
-    else:
-        if interface.base[0] == "I":
-            base_name = "PyG" + interface.base[1:]
-        else:
-            base_name = "PyG" + interface.base
     f.write(
         """\
 // ---------------------------------------------------
@@ -420,11 +412,7 @@ def _write_gw_cpp(f, interface):
     )
 
     for method in interface.methods:
-        f.write(
-            f"""\
-STDMETHODIMP {gname}::{method.name}(
-"""
-        )
+        f.write(f"STDMETHODIMP {gname}::{method.name}(\n")
 
         if method.args:
             for arg in method.args[:-1]:

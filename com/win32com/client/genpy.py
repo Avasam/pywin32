@@ -260,7 +260,6 @@ class VTableItem(build.VTableItem, WritableItem):
         for v in self.vtableFuncs:
             names, dispid, desc = v
             assert desc.desckind == pythoncom.DESCKIND_FUNCDESC
-            arg_reprs = []
             # more hoops so we don't generate huge lines.
             item_num = 0
             print("\t((", end=" ", file=stream)

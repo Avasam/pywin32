@@ -42,7 +42,7 @@ class ReloadWatcherThread(threading.Thread):
         last_time = os.stat(self.filename)[stat.ST_MTIME]
         while 1:
             try:
-                rc = win32event.WaitForSingleObject(self.handle, win32event.INFINITE)
+                win32event.WaitForSingleObject(self.handle, win32event.INFINITE)
                 win32file.FindNextChangeNotification(self.handle)
             except win32event.error as details:
                 # handle closed - thread should terminate.

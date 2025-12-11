@@ -228,8 +228,6 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
         self.HookFormatter()
 
     def OnInitialUpdate(self):
-        doc = self.GetDocument()
-
         # Enable Unicode
         self.SendScintilla(scintillacon.SCI_SETCODEPAGE, scintillacon.SC_CP_UTF8, 0)
         self.SendScintilla(scintillacon.SCI_SETKEYSUNICODE, 1, 0)
@@ -247,9 +245,8 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
         )
         self.SendScintilla(scintillacon.SCI_SETMARGINSENSITIVEN, 2, 1)
 
-        self.GetDocument().HookViewNotifications(
-            self
-        )  # is there an MFC way to grab this?
+        # is there an MFC way to grab this?
+        self.GetDocument().HookViewNotifications(self)
         self.HookHandlers()
 
         # Load the configuration information.
@@ -257,9 +254,8 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
 
         self.SetSel()
 
-        self.GetDocument().FinalizeViewCreation(
-            self
-        )  # is there an MFC way to grab this?
+        # is there an MFC way to grab this?
+        self.GetDocument().FinalizeViewCreation(self)
 
     def _GetSubConfigNames(self):
         return None  # By default we use only sections without sub-sections.
@@ -711,12 +707,12 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
             dc.SetMapMode(win32con.MM_TEXT)
 
     def OnPreparePrinting(self, pInfo):
-        flags = (
-            win32ui.PD_USEDEVMODECOPIES | win32ui.PD_ALLPAGES | win32ui.PD_NOSELECTION
-        )  # Don't support printing just a selection.
-        # NOTE: Custom print dialogs are stopping the user's values from coming back :-(
-        # 		self.prtDlg = PrintDialog(pInfo, PRINTDLGORD, flags)
-        # 		pInfo.SetPrintDialog(self.prtDlg)
+        # flags = (  # Don't support printing just a selection.
+        #     win32ui.PD_USEDEVMODECOPIES | win32ui.PD_ALLPAGES | win32ui.PD_NOSELECTION
+        # )
+        # # NOTE: Custom print dialogs are stopping the user's values from coming back :-(
+        # self.prtDlg = PrintDialog(pInfo, PRINTDLGORD, flags)
+        # pInfo.SetPrintDialog(self.prtDlg)
         pInfo.SetMinPage(1)
         # max page remains undefined for now.
         pInfo.SetFromPage(1)

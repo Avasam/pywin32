@@ -121,10 +121,8 @@ class Method:
     def __init__(self, method_info, isEventSink=0):
         all_names, dispid, desc = method_info
         name = all_names[0]
-        names = all_names[1:]
         invkind = desc[4]
         arg_defs = desc[2]
-        ret_def = desc[8]
 
         self.dispid = dispid
         self.invkind = invkind

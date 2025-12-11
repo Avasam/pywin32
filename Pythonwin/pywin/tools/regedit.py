@@ -70,7 +70,7 @@ class SplitterFrame(window.MDIChildWnd):
 
 class RegistryTreeView(docview.TreeView):
     def OnInitialUpdate(self):
-        rc = self._obj_.OnInitialUpdate()
+        self._obj_.OnInitialUpdate()
         self.frame = self.GetParent().GetParent()
         self.hierList = hierlist.HierListWithItems(
             self.GetHLIRoot(), win32ui.IDB_HIERFOLDERS, win32ui.AFX_IDW_PANE_FIRST
@@ -186,7 +186,6 @@ class RegistryValueView(docview.ListView):
         hkey = win32api.RegOpenKey(item.keyRoot, item.keyName)
         try:
             valNum = 0
-            ret = []
             while 1:
                 try:
                     res = win32api.RegEnumValue(hkey, valNum)

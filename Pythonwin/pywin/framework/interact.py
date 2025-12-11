@@ -525,7 +525,6 @@ class InteractiveCore:
 
         self.SCICancel()
         # First, check for an error message
-        haveGrabbedOutput = 0
         if self.HandleSpecialLine():
             return 0
 
@@ -784,7 +783,7 @@ class DockedInteractiveView(DockedInteractiveViewParent):
 
     def OnKillFocus(self, msg):
         # If we are losing focus to another in this app, reset the main frame's active view.
-        hwnd = wparam = msg[2]
+        hwnd = msg[2]
         try:
             wnd = win32ui.CreateWindowFromHandle(hwnd)
             reset = wnd.GetTopLevelFrame() == self.GetTopLevelFrame()

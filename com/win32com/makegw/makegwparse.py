@@ -539,7 +539,6 @@ class ArgFormatterGeneric(ArgFormatterPythonCOM):
         return f"\tPyObject_Free{self.arg.type}({self.arg.name});\n"
 
     def GetBuildForInterfacePreCode(self):
-        notdirected = self.GetIndirectedArgName(None, 1)
         return "\tob{} = PyObject_From{}({});\n".format(
             self.arg.name,
             self.arg.type,
@@ -560,7 +559,6 @@ class ArgFormatterIDLIST(ArgFormatterPythonCOM):
         return f"\tPyObject_FreePIDL({self.arg.name});\n"
 
     def GetBuildForInterfacePreCode(self):
-        notdirected = self.GetIndirectedArgName(None, 1)
         return "\tob{} = PyObject_FromPIDL({});\n".format(
             self.arg.name,
             self.GetIndirectedArgName(None, 1),
@@ -577,7 +575,6 @@ class ArgFormatterHANDLE(ArgFormatterPythonCOM):
         )
 
     def GetBuildForInterfacePreCode(self):
-        notdirected = self.GetIndirectedArgName(None, 1)
         return "\tob{} = PyWinObject_FromHANDLE({});\n".format(
             self.arg.name,
             self.GetIndirectedArgName(None, 0),

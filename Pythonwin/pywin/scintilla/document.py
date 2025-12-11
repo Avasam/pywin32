@@ -63,7 +63,7 @@ class CScintillaDocument(ParentScintillaDocument):
                     self._LoadTextFromFile(f)
                 finally:
                     f.close()
-            except OSError as e:
+            except OSError:
                 rc = win32ui.MessageBox("Cannot create the file %s" % filename)
         return 1
 

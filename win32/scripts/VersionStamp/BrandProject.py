@@ -9,7 +9,6 @@ import sys
 
 import bulkstamp
 import vssutil
-import win32api
 
 
 def BrandProject(
@@ -21,11 +20,13 @@ def BrandProject(
     auto=0,
     bRebrand=0,
 ):
-    # vssProjectName -- The name of the VSS project to brand.
-    # descFile -- A test file containing descriptions of the files in the release.
-    # stampPath -- The full path to where the files referenced in descFile can be found.
-    path = win32api.GetFullPathName(stampPath)
+    """
+    vssProjectName -- The name of the VSS project to brand.
 
+    descFile -- A test file containing descriptions of the files in the release.
+
+    stampPath -- The full path to where the files referenced in descFile can be found.
+    """
     build = vssutil.MakeNewBuildNo(vssProjectName, buildDesc, auto, bRebrand)
     if build is None:
         print("Cancelled")

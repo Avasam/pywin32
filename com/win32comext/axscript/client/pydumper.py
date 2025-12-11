@@ -40,15 +40,12 @@ def Register():
     if "-d" in sys.argv:
         dispatcher = "DispatcherWin32trace"
         debug_desc = " (" + dispatcher + ")"
-        debug_option = "Yes"
     else:
         dispatcher = None
         debug_desc = ""
-        debug_option = ""
 
     categories = [axscript.CATID_ActiveScript, axscript.CATID_ActiveScriptParse]
     clsid = PyDump_CLSID
-    lcid = 0x0409  # // english
     policy = None  # "win32com.axscript.client.axspolicy.AXScriptPolicy"
 
     print("Registering COM server%s..." % debug_desc)

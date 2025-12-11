@@ -463,9 +463,9 @@ class ReplaceDialog(FindReplaceDialog):
     def CheckButtonStates(self):
         # We can do a "Replace" or "Replace All" if the current selection
         # is the same as the search text.
-        ft = self.editFindText.GetWindowText()
+        # ft = self.editFindText.GetWindowText()
         control = _GetControl()
-        # 		bCanReplace = len(ft)>0 and control.GetSelText() == ft
+        # bCanReplace = len(ft)>0 and control.GetSelText() == ft
         bCanReplace = control is not None and lastSearch.sel == control.GetSel()
         self.butReplace.EnableWindow(bCanReplace)
 

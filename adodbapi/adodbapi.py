@@ -249,7 +249,7 @@ class Connection:
             self.connection_string = (
                 kwargs["connection_string"] % kwargs
             )  # insert keyword arguments
-        except Exception as e:
+        except Exception:
             self._raiseConnectionError(
                 KeyError, "Python string format error in connection string->"
             )
@@ -334,7 +334,7 @@ class Connection:
         self.messages = []
         try:
             self._closeAdoConnection()  # v2.1 Rose
-        except Exception as e:
+        except Exception:
             self._raiseConnectionError(sys.exc_info()[0], sys.exc_info()[1])
 
         self.connector = None  # v2.4.2.2 fix subtle timeout bug

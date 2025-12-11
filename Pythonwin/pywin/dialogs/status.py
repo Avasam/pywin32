@@ -27,16 +27,17 @@ def MakeProgressDlgTemplate(caption, staticText=""):
 
     dlg = [
         [caption, (0, 0, w, h), style, None, (8, "MS Sans Serif")],
+        [130, staticText, 1000, (7, 7, w - 7, h - 32), cs | win32con.SS_LEFT],
     ]
 
-    s = win32con.WS_TABSTOP | cs
-
-    dlg.append([130, staticText, 1000, (7, 7, w - 7, h - 32), cs | win32con.SS_LEFT])
-
-    #    dlg.append([128,
-    # 		"Cancel",
-    # 		win32con.IDCANCEL,
-    # 		(w - 60, h - 18, 50, 14), s | win32con.BS_PUSHBUTTON])
+    # s = win32con.WS_TABSTOP | cs
+    # dlg.append([
+    #     128,
+    #     "Cancel",
+    #     win32con.IDCANCEL,
+    #     (w - 60, h - 18, 50, 14),
+    #     s | win32con.BS_PUSHBUTTON,
+    # ])
 
     return dlg
 
