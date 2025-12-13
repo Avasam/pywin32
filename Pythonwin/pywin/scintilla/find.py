@@ -16,14 +16,14 @@ FOUND_NEXT_FILE = 3
 class SearchParams:
     def __init__(self, other=None):
         if other is None:
-            self.__dict__["findText"] = ""
-            self.__dict__["replaceText"] = ""
-            self.__dict__["matchCase"] = 0
-            self.__dict__["matchWords"] = 0
-            self.__dict__["acrossFiles"] = 0
-            self.__dict__["remember"] = 1
-            self.__dict__["sel"] = (-1, -1)
-            self.__dict__["keepDialogOpen"] = 0
+            self.findText = ""
+            self.replaceText = ""
+            self.matchCase = 0
+            self.matchWords = 0
+            self.acrossFiles = 0
+            self.remember = 1
+            self.sel = (-1, -1)
+            self.keepDialogOpen = 0
         else:
             self.__dict__.update(other.__dict__)
 

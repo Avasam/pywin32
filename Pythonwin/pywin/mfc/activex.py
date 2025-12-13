@@ -12,7 +12,7 @@ class Control(window.Wnd):
     """
 
     def __init__(self):
-        self.__dict__["_dispobj_"] = None
+        self._dispobj_ = None
         window.Wnd.__init__(self)
 
     def _GetControlCLSID(self):
@@ -26,13 +26,13 @@ class Control(window.Wnd):
 
     def CreateControl(self, windowTitle, style, rect, parent, id, lic_string=None):
         clsid = str(self._GetControlCLSID())
-        self.__dict__["_obj_"] = win32ui.CreateControl(
+        self._obj_ = win32ui.CreateControl(
             clsid, windowTitle, style, rect, parent, id, None, False, lic_string
         )
         klass = self._GetDispatchClass()
         dispobj = klass(win32uiole.GetIDispatchForWindow(self._obj_))
         self.HookOleEvents()
-        self.__dict__["_dispobj_"] = dispobj
+        self._dispobj_ = dispobj
 
     def HookOleEvents(self):
         dict = self._GetEventMap()

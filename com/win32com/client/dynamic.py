@@ -188,14 +188,14 @@ class CDispatch:
     def __init__(self, IDispatch, olerepr, userName=None, lazydata=None):
         if userName is None:
             userName = "<unknown>"
-        self.__dict__["_oleobj_"] = IDispatch
-        self.__dict__["_username_"] = userName
-        self.__dict__["_olerepr_"] = olerepr
-        self.__dict__["_mapCachedItems_"] = {}
-        self.__dict__["_builtMethods_"] = {}
-        self.__dict__["_enum_"] = None
-        self.__dict__["_unicode_to_string_"] = None
-        self.__dict__["_lazydata_"] = lazydata
+        self._oleobj_ = IDispatch
+        self._username_ = userName
+        self._olerepr_ = olerepr
+        self._mapCachedItems_ = {}
+        self._builtMethods_ = {}
+        self._enum_ = None
+        self._unicode_to_string_ = None
+        self._lazydata_ = lazydata
 
     def __call__(self, *args):
         "Provide 'default dispatch' COM functionality - allow instance to be called"
@@ -306,9 +306,9 @@ class CDispatch:
         # Improved __getitem__ courtesy Syver Enstad
         # Must check _NewEnum before Item, to ensure b/w compat.
         if isinstance(index, int):
-            if self.__dict__["_enum_"] is None:
-                self.__dict__["_enum_"] = self._NewEnum()
-            if self.__dict__["_enum_"] is not None:
+            if self._enum_ is None:
+                self._enum_ = self._NewEnum()
+            if self._enum_ is not None:
                 return self._get_good_object_(self._enum_.__getitem__(index))
         # See if we have an "Item" method/property we can use (goes hand in hand with Count() above!)
         invkind, dispid = self._find_dispatch_type_("Item")
@@ -435,9 +435,9 @@ class CDispatch:
         self._mapCachedItems_ = {}
         if self._oleobj_:
             self._oleobj_.Release()
-            self.__dict__["_oleobj_"] = None
+            self._oleobj_ = None
         if self._olerepr_:
-            self.__dict__["_olerepr_"] = None
+            self._olerepr_ = None
         self._enum_ = None
 
     def _proc_(self, name, *args):
