@@ -122,7 +122,7 @@ class DebugManager:
         if iid in self._debugger_interfaces_:
             return self.activeScriptDebug
         trace("DebugManager QI - unknown IID", iid)
-        return 0
+        return None
 
     def OnEnterScript(self):
         trace("OnEnterScript")

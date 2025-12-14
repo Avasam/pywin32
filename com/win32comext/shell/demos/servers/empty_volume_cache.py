@@ -144,7 +144,6 @@ class EmptyVolumeCache:
 
     def Deactivate(self):
         print("Deactivate called")
-        return 0
 
 
 def DllRegisterServer():

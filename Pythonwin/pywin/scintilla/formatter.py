@@ -51,7 +51,7 @@ class Style:
     # default format, restore the format to the "simple" format.
     def NormalizeAgainstDefault(self, defaultFormat):
         if self.IsBasedOnDefault():
-            return 0  # No more to do, and not changed.
+            return False  # No more to do, and not changed.
         bIsDefault = (
             self.format[7] == defaultFormat[7] and self.format[2] == defaultFormat[2]
         )

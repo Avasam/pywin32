@@ -533,7 +533,7 @@ def RunTabNanny(filename):
     tabnanny = FindTabNanny()
     if tabnanny is None:
         win32ui.MessageBox("The TabNanny is not around, so the children can run amok!")
-        return
+        return False
 
     # Capture the tab-nanny output
     newout = io.StringIO()
@@ -558,8 +558,8 @@ def RunTabNanny(filename):
         except (IndexError, TypeError, ValueError):
             print("The tab nanny complained, but I can't see where!")
             print(data)
-        return 0
-    return 1
+        return False
+    return True
 
 
 def _JumpToPosition(fileName, lineno, col=1):

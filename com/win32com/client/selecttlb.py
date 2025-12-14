@@ -51,10 +51,10 @@ class TypelibSpec:
 
     def Resolve(self):
         if self.dll is None:
-            return 0
+            return False
         tlb = pythoncom.LoadTypeLib(self.dll)
         self.FromTypelib(tlb, None)
-        return 1
+        return True
 
     def FromTypelib(self, typelib, dllName=None):
         la = typelib.GetLibAttr()

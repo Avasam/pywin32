@@ -13,11 +13,11 @@ from . import hierlist
 def SafeApply(fn, args, err_desc=""):
     try:
         fn(*args)
-        return 1
+        return True
     except win32api.error as exc:
         msg = "Error " + err_desc + "\r\n\r\n" + exc.strerror
         win32ui.MessageBox(msg)
-        return 0
+        return False
 
 
 class SplitterFrame(window.MDIChildWnd):
@@ -311,7 +311,6 @@ class RegDocument(docview.Document):
 
     def OnOpenDocument(self, name):
         raise TypeError("This template can not open files")
-        return 0
 
 
 class HLIRegistryKey(hierlist.HierListItem):

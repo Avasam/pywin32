@@ -49,7 +49,7 @@ class flags:
 
 class WindowOutputDocument(WindowOutputDocumentParent):
     def SaveModified(self):
-        return 1  # say it is OK to destroy my document
+        return True  # say it is OK to destroy my document
 
     def OnSaveDocument(self, fileName):
         win32ui.SetStatusText("Saving file...", 1)
@@ -240,7 +240,7 @@ class WindowOutputViewRTF(docview.RichEditView, WindowOutputViewImpl):
 
     def _StreamRTFOut(self, data):
         self.template.killBuffer.append(data)
-        return 1  # keep em coming!
+        return True  # keep em coming!
 
     def _StreamRTFIn(self, bytes):
         try:
@@ -476,13 +476,11 @@ class WindowOutput(docview.DocTemplate):
     def NeedRecreateWindow(self):
         try:
             if self.currentView is not None and self.currentView.IsWindow():
-                return 0
-        except (
-            win32ui.error,
-            AttributeError,
-        ):  # Attribute error if the win32ui object has died.
+                return False
+        except (win32ui.error, AttributeError):
+            # Attribute error if the win32ui object has died.
             pass
-        return 1
+        return True
 
     # Returns true if the Window is OK (either cos it was, or because it was recreated
     def CheckRecreateWindow(self):
@@ -496,22 +494,22 @@ class WindowOutput(docview.DocTemplate):
         # Returns true if the queue is empty after the flush
         # 		debug("Queueflush - %d, %d\n" % (max, self.outputQueue.qsize()))
         if self.bCreating:
-            return 1
+            return True
         items = []
-        rc = 0
+        rc = False
         while max is None or max > 0:
             try:
                 item = self.outputQueue.get_nowait()
                 items.append(item)
             except queue.Empty:
-                rc = 1
+                rc = True
                 break
             if max is not None:
                 max -= 1
         if len(items) != 0:
             if not self.CheckRecreateWindow():
                 debug(":Recreate failed!\n")
-                return 1  # In trouble - so say we have nothing to do.
+                return True  # In trouble - so say we have nothing to do.
             win32ui.PumpWaitingMessages()  # Pump paint messages
             self.currentView.dowrite("".join(items))
         return rc

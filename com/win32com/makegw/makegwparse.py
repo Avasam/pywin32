@@ -221,7 +221,7 @@ class ArgFormatter:
 
     def NeedUSES_CONVERSION(self):
         "Determines if this arg forces a USES_CONVERSION macro"
-        return 0
+        return False
 
 
 # Special formatter for floats since they're smaller than Python floats.

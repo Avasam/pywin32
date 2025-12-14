@@ -106,13 +106,13 @@ def _WaitForFinish(ob, timeout):
             if not ob.Visible:
                 # Gone invisible - we need to pretend we timed
                 # out, so the app is quit.
-                return 0
+                return False
         except pythoncom.com_error:
             # Excel is busy (eg, editing the cell) - ignore
             pass
         if time.time() > end:
-            return 0
-    return 1
+            return False
+    return True
 
 
 def _CheckSeenEvents(o, events):

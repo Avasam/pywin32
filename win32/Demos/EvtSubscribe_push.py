@@ -16,7 +16,6 @@ def c(reason, context, evt):
     else:
         print("??? Unknown action ???", reason)
     context.append(win32evtlog.EvtRender(evt, win32evtlog.EvtRenderEventXml))
-    return 0
 
 
 evttext: list[str] = []

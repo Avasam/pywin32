@@ -160,7 +160,7 @@ class EditorDocument(ParentEditorDocument):
 
 # 	def StreamTextOut(self, data): ### This seems unreliable???
 # 		self.saveFileHandle.write(data)
-# 		return 1 # keep em coming!
+# 		return True # keep em coming!
 
 
 class EditorView(ParentEditorView):
@@ -295,7 +295,7 @@ class EditorView(ParentEditorView):
     def BlockDent(self, isIndent, startLine, endLine):
         "Indent/Undent all lines specified"
         if not self.GetDocument().CheckMakeDocumentWritable():
-            return 0
+            return
         tabSize = self.tabSize  # hard-code for now!
         info = self._PrepareUserStateChange()
         try:

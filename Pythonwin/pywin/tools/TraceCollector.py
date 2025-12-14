@@ -33,7 +33,7 @@ def CollectorThread(stopEvent, file):
                 break
     finally:
         win32trace.TermRead()
-        print("Thread dieing")
+        print("Thread dying")
 
 
 class WindowOutput(winout.WindowOutput):

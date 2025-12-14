@@ -182,7 +182,7 @@ def BrowseCallBackDemo(counters):
             "Added '%s' on object '%s' (machine %s), instance %s(%d)-parent of %s"
             % (counterName, object, machine, instance, index, parentInstance)
         )
-    return 0
+    return False
 
 
 def browse(

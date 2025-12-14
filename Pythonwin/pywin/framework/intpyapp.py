@@ -185,14 +185,14 @@ class InteractivePythonApp(app.CApp):
                 if connection is not None:
                     connection.Exec("self.Activate()")
                     if self.ProcessArgs(sys.argv, connection) is None:
-                        return 1
+                        return True
             except:
                 # It is too early to 'print' an exception - we
                 # don't have stdout setup yet!
                 win32ui.DisplayTraceback(
                     sys.exc_info(), " - error in DDE conversation with Pythonwin"
                 )
-                return 1
+                return True
 
     def InitInstance(self):
         # Allow "/nodde" and "/new" to optimize this!
@@ -203,7 +203,7 @@ class InteractivePythonApp(app.CApp):
             and "-new" not in sys.argv
         ):
             if self.InitDDE():
-                return 1  # A remote DDE client is doing it for us!
+                return True  # A remote DDE client is doing it for us!
         else:
             self.ddeServer = None
 

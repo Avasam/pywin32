@@ -108,12 +108,12 @@ class Adb(bdb.Bdb, gateways.RemoteDebugApplicationEvents):
         traceenter("stop_here", _dumpf(frame), _dumpf(self.stopframe))
         # As per bdb.stop_here, except for logicalbotframe
         # if self.stopframe is None:
-        #     return 1
+        #     return True
         if frame is self.stopframe:
-            return 1
+            return True
 
         tracev("stop_here said 'No'!")
-        return 0
+        return False
 
     def break_here(self, frame):
         traceenter("break_here", self.breakFlags, _dumpf(frame))
@@ -134,7 +134,7 @@ class Adb(bdb.Bdb, gateways.RemoteDebugApplicationEvents):
         traceenter("break_anywhere", _dumpf(frame))
         if self.breakFlags == axdebug.APPBREAKFLAG_DEBUGGER_HALT:
             self.breakReason = axdebug.BREAKREASON_DEBUGGER_HALT
-            return 1
+            return True
         rc = bdb.Bdb.break_anywhere(self, frame)
         tracev("break_anywhere", _dumpf(frame), "returning", rc)
         return rc

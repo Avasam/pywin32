@@ -14,7 +14,7 @@ def Connect(rasEntryName, numRetries=5):
     """Make a connection to the specified RAS entry.
 
     Returns a tuple of (bool, handle) on success.
-    - bool is 1 if a new connection was established, or 0 is a connection already existed.
+    - bool is True if a new connection was established, or False is a connection already existed.
     - handle is a RAS HANDLE that can be passed to Disconnect() to end the connection.
 
     Raises a ConnectionError if the connection could not be established.
@@ -23,7 +23,7 @@ def Connect(rasEntryName, numRetries=5):
     for info in win32ras.EnumConnections():
         if info[1].lower() == rasEntryName.lower():
             print("Already connected to", rasEntryName)
-            return 0, info[0]
+            return False, info[0]
 
     dial_params, have_pw = win32ras.GetEntryDialParams(None, rasEntryName)
     if not have_pw:
@@ -45,7 +45,7 @@ def Connect(rasEntryName, numRetries=5):
 
     if errCode:
         raise ConnectionError(errCode, win32ras.GetErrorString(errCode))
-    return 1, rasHandle
+    return True, rasHandle
 
 
 def Disconnect(handle):

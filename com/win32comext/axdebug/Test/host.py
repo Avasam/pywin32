@@ -33,7 +33,7 @@ def DelegatedExternalConnectionQI(iid):
     # PyIExternalConnection (do I need this?  Keep getting QI'd for it, anyway?)
     if iid == pythoncom.IID_IExternalConnection:
         return wrappedExternalConnectionManager
-    return 0
+    return None
 
 
 class PySourceModuleDebugDocumentHost(gateways.DebugDocumentHost):
@@ -50,7 +50,7 @@ class PySourceModuleDebugDocumentHost(gateways.DebugDocumentHost):
         trace(
             f"PySourceModuleDebugDocumentHost QI with {IIDToInterfaceName(iid)} ({iid})"
         )
-        return 0
+        return None
 
     def _GetCodeContainer(self):
         if self.codeContainer is None:

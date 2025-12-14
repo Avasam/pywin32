@@ -641,8 +641,8 @@ class COMScript:
     def _query_interface_(self, iid):
         if self.debugManager:
             return self.debugManager._query_interface_for_debugger_(iid)
-        # 		trace("ScriptEngine QI - unknown IID", iid)
-        return 0
+        # trace("ScriptEngine QI - unknown IID", iid)
+        return None
 
     # IActiveScriptParse
     def InitNew(self):
@@ -1117,7 +1117,7 @@ class COMScript:
         self, codeBlock: AXScriptCodeBlock, type, realCode=None
     ):
         if codeBlock.codeObject is not None:  # already compiled
-            return 1
+            return True
         if realCode is None:
             code = codeBlock.codeText
         else:
@@ -1128,7 +1128,7 @@ class COMScript:
             try:
                 codeObject = self._CompileInScriptedSection(RemoveCR(code), name, type)
                 codeBlock.codeObject = codeObject
-                return 1
+                return True
             finally:
                 if self.debugManager:
                     self.debugManager.OnLeaveScript()

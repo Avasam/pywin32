@@ -477,15 +477,15 @@ class CDispatch:
                 debug_attr_print(
                     f"{self._username_}.__LazyMap__({attr}) added something"
                 )
-                return 1
+                return True
         except AttributeError:
-            return 0
+            return False
 
     # Using the typecomp, lazily create a new attribute definition.
     def _LazyAddAttr_(self, attr):
         if self._lazydata_ is None:
-            return 0
-        res = 0
+            return False
+        res = False
         typeinfo, typecomp = self._lazydata_
         olerepr = self._olerepr_
         # We need to explicitly check each invoke type individually - simply
@@ -512,7 +512,7 @@ class CDispatch:
                         olerepr._propMapPutCheck_(key, item)
                     elif map == olerepr.propMapGet:
                         olerepr._propMapGetCheck_(key, item)
-                    res = 1
+                    res = True
             except:
                 pass
         return res

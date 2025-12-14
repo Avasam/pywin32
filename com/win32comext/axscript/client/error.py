@@ -53,7 +53,7 @@ class IActiveScriptError:
 
     def _query_interface_(self, iid):
         print("IActiveScriptError QI - unknown IID", iid)
-        return 0
+        return None
 
     def _SetExceptionInfo(self, exc: AXScriptException):
         self.exception = exc

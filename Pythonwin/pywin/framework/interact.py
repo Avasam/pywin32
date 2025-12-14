@@ -818,18 +818,18 @@ class CDockedInteractivePython(CInteractivePython):
 
     def NeedRecreateWindow(self):
         if self.bCreating:
-            return 0
+            return False
         try:
             frame = win32ui.GetMainFrame()
             if frame.closing:
-                return 0  # Dieing!
+                return False  # Dying!
         except (win32ui.error, AttributeError):
-            return 0  # The app is dieing!
+            return False  # The app is dying!
         try:
             cb = frame.GetControlBar(ID_DOCKED_INTERACTIVE_CONTROLBAR)
             return not cb.IsWindowVisible()
         except win32ui.error:
-            return 1  # Control bar does not exist!
+            return True  # Control bar does not exist!
 
     def RecreateWindow(self):
         try:

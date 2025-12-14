@@ -116,7 +116,7 @@ class BindingsManager:
 
     def fire(self, event, event_param=None):
         # Fire the specified event.  Result is native Pythonwin result
-        # (ie, 1==pass one, 0 or None==handled)
+        # (ie, True|1==pass one, False|0|None==handled)
 
         # First look up the event directly - if there, we are set.
         binding = self.bindings.get(event)

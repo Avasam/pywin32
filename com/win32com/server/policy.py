@@ -270,7 +270,7 @@ class BasicWrapPolicy:
         there, it calls the derived helper _query_interface_
         """
         if iid in self._com_interfaces_:
-            return 1
+            return True
         return self._query_interface_(iid)
 
     def _query_interface_(self, iid):
@@ -279,7 +279,7 @@ class BasicWrapPolicy:
 
         Returns a result to the COM framework indicating the interface is not supported.
         """
-        return 0
+        return False
 
     # "Invoke" handling.
     def _Invoke_(self, dispid, lcid, wFlags, args):

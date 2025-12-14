@@ -420,7 +420,7 @@ def main():
         usage()
 
     if not doit:
-        return 0
+        return
     if len(args) == 0:
         rc = selecttlb.SelectTlb()
         if rc is None:

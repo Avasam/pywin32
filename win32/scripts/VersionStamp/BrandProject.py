@@ -29,12 +29,12 @@ def BrandProject(
     build = vssutil.MakeNewBuildNo(vssProjectName, buildDesc, auto, bRebrand)
     if build is None:
         print("Cancelled")
-        return
+        return False
 
     bulkstamp.scan(build, stampPath, descFile)
     for infile, outfile in filesToSubstitute:
         vssutil.SubstituteVSSInFile(vssProjectName, infile, outfile)
-    return 1
+    return True
 
 
 def usage(msg):

@@ -120,7 +120,6 @@ def main():
             % (arg, status, win32api.FormatMessage(status).strip())
         )
 
-    return 0
 
 
 if __name__ == "__main__":

@@ -76,8 +76,7 @@ class ListEnumerator:
         self._iid_ = iid
 
     def _query_interface_(self, iid):
-        if iid == self._iid_:
-            return 1
+        return iid == self._iid_
 
     def Next(self, count):
         result = self._list_[self.index : self.index + count]

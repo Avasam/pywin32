@@ -459,7 +459,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
         doc = self.GetDocument()
         doc._SaveTextToFile(self, filename, encoding=encoding)
         doc.SetModifiedFlag(0)
-        return 1
+        return True
 
     def _AutoComplete(self):
         self.SCIAutoCCancel()  # Cancel old auto-complete lists.

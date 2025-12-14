@@ -1,3 +1,5 @@
+import sys
+
 import win32api  # To translate NT Sids to account names.
 import win32con
 import win32evtlog
@@ -93,7 +95,7 @@ def test():
             computer = val
         if opt in ["-h", "-?"]:
             usage()
-            return
+            return 0
         if opt == "-r":
             do_read = 0
         if opt == "-w":
@@ -135,4 +137,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    sys.exit(test())

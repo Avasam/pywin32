@@ -321,8 +321,8 @@ class GrepDocument(docview.RichEditDoc):
                         win32ui.GetApp().DeleteIdleHandler(self.SearchFile)
                     except:
                         pass
-                    return 0
-        return 1
+                    return False
+        return True
 
     def GetParams(self):
         return "{}\t{}\t{}\t{!r}\t{!r}\t{!r}".format(
