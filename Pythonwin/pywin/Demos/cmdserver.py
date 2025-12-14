@@ -86,7 +86,6 @@ def ServerThread(myout, cmd, title, bCloseOnEnd):
             t, v, tb = sys.exc_info()
             print(t, ": ", v)
             traceback.print_tb(tb)
-            tb = None  # prevent a cycle
             print("Command terminated with an unhandled exception")
         writer.unregister()
         if bOK and bCloseOnEnd:
