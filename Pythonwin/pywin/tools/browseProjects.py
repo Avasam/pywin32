@@ -106,7 +106,7 @@ class HLIModuleItem(hierlist.HierListItem):
         return os.path.split(self.path)[1] + " (module)"
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def TakeDefaultAction(self):
         win32ui.GetApp().OpenDocumentFile(self.path)
@@ -174,7 +174,7 @@ class HLIDirectoryItem(hierlist.HierListItem):
             self.displayName = path
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetText(self):
         return self.displayName
@@ -204,7 +204,7 @@ class HLIProjectRoot(hierlist.HierListItem):
         return self.displayName
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetSubList(self):
         paths = regutil.GetRegisteredNamedPath(self.projectName)
@@ -221,7 +221,7 @@ class HLIRoot(hierlist.HierListItem):
         hierlist.HierListItem.__init__(self)
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetSubList(self):
         keyStr = regutil.BuildDefaultPythonKey() + "\\PythonPath"

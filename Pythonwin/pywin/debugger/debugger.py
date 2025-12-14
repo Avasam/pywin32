@@ -81,7 +81,7 @@ class HierFrameItem(HierListItem):
         return ret
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def TakeDefaultAction(self):
         # Set the default frame to be this frame.
@@ -103,7 +103,7 @@ class NoStackAvailableItem(HierListItem):
         HierListItem.__init__(self, None, why)
 
     def IsExpandable(self):
-        return 0
+        return False
 
     def GetText(self):
         return self.name
@@ -145,7 +145,7 @@ class HierStackRoot(HierListItem):
         return "root item"
 
     def IsExpandable(self):
-        return 1
+        return True
 
 
 class HierListDebugger(hierlist.HierListWithItems):

@@ -56,7 +56,7 @@ class HLICOM(browser.HLIPythonObject):
         return self.name
 
     def CalculateIsExpandable(self):
-        return 1
+        return True
 
 
 class HLICLSID(HLICOM):
@@ -72,7 +72,7 @@ class HLICLSID(HLICOM):
         HLICOM.__init__(self, myobject, name)
 
     def CalculateIsExpandable(self):
-        return 0
+        return False
 
     def GetSubList(self):
         return []
@@ -91,7 +91,7 @@ class HLI_Enum(HLI_Interface):
             rc = len(self.myobject.Next(1)) > 0
             self.myobject.Reset()
         else:
-            rc = 0
+            rc = False
         return rc
 
 
@@ -165,7 +165,7 @@ class HLICategory(HLICOM):
 
 class HLIHelpFile(HLICOM):
     def CalculateIsExpandable(self):
-        return 0
+        return False
 
     def GetText(self):
         import os

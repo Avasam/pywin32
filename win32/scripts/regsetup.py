@@ -14,9 +14,9 @@ def FileExists(fname):
 
     try:
         os.stat(fname)
-        return 1
+        return True
     except OSError as details:
-        return 0
+        return False
 
 
 def IsPackageDir(path, packageName, knownFileName):

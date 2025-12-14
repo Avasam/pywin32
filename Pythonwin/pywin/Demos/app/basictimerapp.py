@@ -172,12 +172,11 @@ class TimerIntervaler:
         now = time.time()
         if self.nextTime is None:
             self.nextTime = self.SetFirstTime(now)
-        ret = 0
         if now >= self.nextTime:
-            ret = 1
-            self.nextTime = self.SetNextTime(self.nextTime, now)
             # do the work.
-        return ret
+            self.nextTime = self.SetNextTime(self.nextTime, now)
+            return True
+        return False
 
 
 class EachAnyIntervaler(TimerIntervaler):

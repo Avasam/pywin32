@@ -377,23 +377,23 @@ def get_mask(mask):
 
 
 def is_group(sys_id):
-    #get the server for the domain -- it has to be a primary dc
-    group=0
-    resume=0
-    sys_id=sys_id.strip()
+    # get the server for the domain -- it has to be a primary dc
+    group = False
+    resume = False
+    sys_id = sys_id.strip()
     if D_group.has_key(sys_id):
-        group=1
+        group = True
     elif D_except.has_key(sys_id):
-        group=0
+        group = False
     else:
         try:
             #info returns a dictionary of information
             info = win32net.NetGroupGetInfo(Server, sys_id, 0)
-            group=1
+            group = True
         except:
             try:
-                win32net.NetLocalGroupGetMembers(Server, sys_id, 0,resume,4096)
-                group=1
+                win32net.NetLocalGroupGetMembers(Server, sys_id, 0, resume, 4096)
+                group = True
             except:
                 pass
     return group

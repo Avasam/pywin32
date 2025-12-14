@@ -156,9 +156,7 @@ class IDLEEditorWindow:
         # This assumes the colorizer has got to this point!
         text_index = self.text._getoffset(text_index)
         c = self.text.edit._GetColorizer()
-        if c and c.GetStringStyle(text_index) is None:
-            return 0
-        return 1
+        return not (c and c.GetStringStyle(text_index) is None)
 
     # If a selection is defined in the text widget, return
     # (start, end) as Tkinter text indices, otherwise return

@@ -32,7 +32,7 @@ class HierListCLBRModule(hierlist.HierListItem):
         return ret
 
     def IsExpandable(self):
-        return 1
+        return True
 
 
 class HierListCLBRItem(hierlist.HierListItem):
@@ -127,12 +127,12 @@ class HierListCLBRErrorItem(hierlist.HierListItem):
         return [HierListCLBRErrorItem(self.text)]
 
     def IsExpandable(self):
-        return 0
+        return False
 
 
 class HierListCLBRErrorRoot(HierListCLBRErrorItem):
     def IsExpandable(self):
-        return 1
+        return True
 
 
 class BrowserView(pywin.mfc.docview.TreeView):

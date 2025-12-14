@@ -35,8 +35,8 @@ class Stdin:
         return getattr(self.real_file, name)
 
     def isatty(self):
-        """Return 1 if the file is connected to a tty(-like) device, else 0."""
-        return 1
+        """Return `True` if the file is connected to a tty(-like) device, else `False`."""
+        return True
 
     def read(self, size=-1):
         """Read at most size bytes from the file (less if the read

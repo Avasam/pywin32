@@ -343,14 +343,13 @@ class HLIRegistryKey(hierlist.HierListItem):
 
     def IsExpandable(self):
         # All keys are expandable, even if they currently have zero children.
-        return 1
-
-    ##		hkey = win32api.RegOpenKey(self.keyRoot, self.keyName)
-    ##		try:
-    ##			keys, vals, dt = win32api.RegQueryInfoKey(hkey)
-    ##			return (keys>0)
-    ##		finally:
-    ##			win32api.RegCloseKey(hkey)
+        return True
+        # hkey = win32api.RegOpenKey(self.keyRoot, self.keyName)
+        # try:
+        #     keys, vals, dt = win32api.RegQueryInfoKey(hkey)
+        #     return keys > 0
+        # finally:
+        #     win32api.RegCloseKey(hkey)
 
     def GetSubList(self):
         hkey = win32api.RegOpenKey(self.keyRoot, self.keyName)

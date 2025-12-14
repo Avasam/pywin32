@@ -92,10 +92,10 @@ def IsOnPythonPath(path):
         try:
             # sys.path can have an empty entry.
             if syspath and win32ui.FullPath(syspath) == path:
-                return 1
+                return True
         except win32ui.error as details:
             print(f"Warning: The sys.path entry '{syspath}' is invalid\n{details}")
-    return 0
+    return False
 
 
 def GetPackageModuleName(fileName):
