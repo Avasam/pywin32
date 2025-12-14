@@ -302,7 +302,7 @@ class MainWindow:
                 print("Can't find a default!")
             # and just pretend it came from the menu
             self.OnCommand(hwnd, win32con.WM_COMMAND, cmd, 0)
-        return 1
+        return True
 
     def OnCommand(self, hwnd, msg, wparam, lparam):
         id = LOWORD(wparam)

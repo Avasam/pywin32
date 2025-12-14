@@ -110,7 +110,7 @@ class MainWindow:
                 menu, win32con.TPM_LEFTALIGN, pos[0], pos[1], 0, self.hwnd, None
             )
             win32gui.PostMessage(self.hwnd, win32con.WM_NULL, 0, 0)
-        return 1
+        return True
 
     def OnCommand(self, hwnd, msg, wparam, lparam):
         id = win32api.LOWORD(wparam)

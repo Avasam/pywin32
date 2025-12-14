@@ -780,7 +780,7 @@ class DockedInteractiveView(DockedInteractiveViewParent):
 
     def OnSetFocus(self, msg):
         self.GetParentFrame().SetActiveView(self)
-        return 1
+        return True
 
     def OnKillFocus(self, msg):
         # If we are losing focus to another in this app, reset the main frame's active view.
@@ -792,7 +792,7 @@ class DockedInteractiveView(DockedInteractiveViewParent):
             reset = 0  # Not my window
         if reset:
             self.GetParentFrame().SetActiveView(None)
-        return 1
+        return True
 
     def OnDestroy(self, msg):
         newSize = self.GetWindowPlacement()[4]

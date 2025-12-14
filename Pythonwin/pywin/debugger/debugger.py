@@ -187,10 +187,10 @@ class DebuggerWindow(window.Wnd):
     def OnKeyDown(self, msg):
         key = msg[2]
         if key in (13, 27, 32):
-            return 1
+            return True
         if key in (46, 8):  # delete/BS key
             self.DeleteSelected()
-            return 0
+            return False
         view = scriptutils.GetActiveView()
         try:
             firer = view.bindings.fire_key_event
@@ -199,7 +199,7 @@ class DebuggerWindow(window.Wnd):
         if firer is not None:
             return firer(msg)
         else:
-            return 1
+            return True
 
     def DeleteSelected(self):
         win32api.MessageBeep()
@@ -313,7 +313,7 @@ class DebuggerListViewWindow(DebuggerWindow):
         # If someone starts typing, they probably are trying to edit the text!
         if chr(key) in string.ascii_uppercase:
             self.EditSelected()
-            return 0
+            return False
         return DebuggerWindow.OnKeyDown(self, msg)
 
     def OnItemDoubleClick(self, notify_data, extra):

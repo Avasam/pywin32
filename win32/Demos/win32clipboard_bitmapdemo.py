@@ -54,7 +54,7 @@ class ViewerWindow:
                 win32gui.EndPaint(hwnd, ps)
         finally:
             win32clipboard.CloseClipboard()
-        return 0
+        return False
 
     def OnDrawClipboard(self, hwnd, msg, wp, lp):
         win32gui.InvalidateRect(hwnd, None, True)

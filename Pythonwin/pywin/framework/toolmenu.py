@@ -219,7 +219,7 @@ class ToolMenuPropPage(dialog.PropertyPage):
             newText = self.editMenuCommand.GetWindowText()
             self.listControl.SetItemText(itemNo, 1, newText)
 
-        return 0
+        return False
 
     def OnNotifyListControlEndLabelEdit(self, id, cmd):
         newText = self.listControl.GetEditControl().GetWindowText()
@@ -240,7 +240,7 @@ class ToolMenuPropPage(dialog.PropertyPage):
         finally:
             self.bImChangingEditControls = False
 
-        return 0  # we have handled this!
+        return False  # we have handled this!
 
     def OnButtonNew(self, id, cmd):
         if cmd == win32con.BN_CLICKED:

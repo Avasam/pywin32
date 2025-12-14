@@ -143,19 +143,19 @@ class ScintillaFormatPropertyPage(dialog.PropertyPage):
     def OnButDefaultFixedFont(self, id, code):
         if code == win32con.BN_CLICKED:
             self._DoButDefaultFont(win32con.CF_FIXEDPITCHONLY, "baseFormatFixed")
-            return 1
+            return True
 
     def OnButDefaultPropFont(self, id, code):
         if code == win32con.BN_CLICKED:
             self._DoButDefaultFont(win32con.CF_SCALABLEONLY, "baseFormatProp")
-            return 1
+            return True
 
     def OnButFixedOrDefault(self, id, code):
         if code == win32con.BN_CLICKED:
             self.GetDlgItem(win32ui.IDC_RADIO1).GetCheck() != 0
             self.scintilla._GetColorizer().bUseFixed = id == win32ui.IDC_RADIO1
             self.scintilla.ApplyFormattingStyles(0)
-            return 1
+            return True
 
     def OnButThisFont(self, id, code):
         if code == win32con.BN_CLICKED:
@@ -173,7 +173,7 @@ class ScintillaFormatPropertyPage(dialog.PropertyPage):
             if d.DoModal() == win32con.IDOK:
                 style.format = d.GetCharFormat()
                 self.scintilla.ApplyFormattingStyles(0)
-            return 1
+            return True
 
     def OnButUseDefaultFont(self, id, code):
         if code == win32con.BN_CLICKED:
@@ -199,7 +199,7 @@ class ScintillaFormatPropertyPage(dialog.PropertyPage):
             if d.DoModal() == win32con.IDOK:
                 style.background = d.GetColor()
                 self.scintilla.ApplyFormattingStyles(0)
-            return 1
+            return True
 
     def OnButUseDefaultBackground(self, id, code):
         if code == win32con.BN_CLICKED:
@@ -219,7 +219,7 @@ class ScintillaFormatPropertyPage(dialog.PropertyPage):
         if code == win32con.LBN_SELCHANGE:
             style = self.GetSelectedStyle()
             self.UpdateUIForStyle(style)
-        return 1
+        return True
 
     def UpdateUIForStyle(self, style):
         format = style.format
@@ -251,8 +251,8 @@ class ScintillaFormatPropertyPage(dialog.PropertyPage):
             style = self.GetSelectedStyle()
             self.ApplyUIFormatToStyle(style)
             self.scintilla.ApplyFormattingStyles(0)
-            return 0
-        return 1
+            return False
+        return True
 
     def ApplyUIFormatToStyle(self, style):
         format = style.format
@@ -280,7 +280,7 @@ class ScintillaFormatPropertyPage(dialog.PropertyPage):
 
     def OnOK(self):
         self.scintilla._GetColorizer().SavePreferences()
-        return 1
+        return True
 
 
 def test():

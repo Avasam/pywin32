@@ -157,7 +157,7 @@ class OpenGLView(OpenGLViewParent):
         self.DrawScene()
 
     def OnEraseBkgnd(self, dc):
-        return 1
+        return True
 
     # The OpenGL helpers
     def _SetupPixelFormat(self):

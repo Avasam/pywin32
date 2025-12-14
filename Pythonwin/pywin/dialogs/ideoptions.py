@@ -103,7 +103,7 @@ class OptionsPropPage(dialog.PropertyPage):
         # And the other options.
         win32ui.WriteProfileVal("Settings", "Recent File List Size", self["MRUSize"])
 
-        return 1
+        return True
 
     def ChangeFormat(self, fmtAttribute, fmt):
         dlg = win32ui.CreateFontDialog(fmt)

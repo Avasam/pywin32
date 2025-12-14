@@ -1,9 +1,12 @@
 # intpyapp.py  - Interactive Python application class
 #
+from __future__ import annotations
+
 import os
 import sys
 import traceback
 from collections.abc import Sequence
+from typing import Literal
 
 import __main__
 import commctrl
@@ -32,7 +35,7 @@ docview.DocTemplate._SetupSharedMenu_ = _SetupSharedMenu_  # type: ignore[method
 
 
 class MainFrame(app.MainFrame):
-    def OnCreate(self, createStruct):
+    def OnCreate(self, createStruct) -> Literal[-1, 0, 1] | None:
         self.closing = 0
         if app.MainFrame.OnCreate(self, createStruct) == -1:
             return -1
@@ -67,6 +70,7 @@ class MainFrame(app.MainFrame):
         from pywin.framework import help
 
         help.SetHelpMenuOtherHelp(menu)
+        return None
 
     def OnClose(self):
         try:
@@ -115,7 +119,7 @@ class MainFrame(app.MainFrame):
             )  # Raise an exception if none - good - then we want default handling
             # Main frame _does_ have a current view (ie, a docking view) - see if it wants it.
             if v.OnCommand(wparam, lparam):
-                return 1
+                return True
         except (win32ui.error, AttributeError):
             pass
         return self._obj_.OnCommand(wparam, lparam)

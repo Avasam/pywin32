@@ -60,7 +60,7 @@ class TimerAppDialog(dlgappcore.AppDialog):
         self.timerManager = TimerManager(self)
         self.ProcessArgs(sys.argv[self.argOff :])
         self.timerManager.go()
-        return 1
+        return True
 
     def OnDestroy(self, msg):
         dlgappcore.AppDialog.OnDestroy(self, msg)

@@ -231,7 +231,7 @@ class DockingBar(window.Wnd):
 
     def OnWindowPosChanged(self, msg):
         if self.GetSafeHwnd() == 0 or self.dialog is None:
-            return 0
+            return False
         lparam = msg[3]
         """ LPARAM used with WM_WINDOWPOSCHANGED:
             typedef struct {
@@ -250,7 +250,7 @@ class DockingBar(window.Wnd):
         if self.bInRecalcNC:
             rc = self.GetClientRect()
             self.dialog.MoveWindow(rc)
-            return 0
+            return False
         # Find on which side are we docked
         nDockBarID = self.GetParent().GetDlgCtrlID()
         # Return if dropped at same location
@@ -277,7 +277,7 @@ class DockingBar(window.Wnd):
             self.SetWindowPos(0, (0, 0, 0, 0), swpflags)
         finally:
             self.bInRecalcNC = False
-        return 0
+        return False
 
     # This is a virtual and not a message hook.
     def OnSetCursor(self, window, nHitTest, wMouseMsg):
@@ -288,14 +288,14 @@ class DockingBar(window.Wnd):
             win32api.SetCursor(win32api.LoadCursor(0, win32con.IDC_SIZENS))
         else:
             win32api.SetCursor(win32api.LoadCursor(0, win32con.IDC_SIZEWE))
-        return 1
+        return True
 
     # Mouse Handling
     def OnLButtonUp(self, msg):
         if not self.bTracking:
-            return 1  # pass it on.
+            return True  # pass it on.
         self.StopTracking(1)
-        return 0  # Don't pass on
+        return False  # Don't pass on
 
     def OnLButtonDown(self, msg):
         # UINT nFlags, CPoint point)
@@ -305,12 +305,12 @@ class DockingBar(window.Wnd):
             pt = msg[5]
             pt = self.ClientToScreen(pt)
             self.dockContext.StartDrag(pt)
-            return 0
-        return 1
+            return False
+        return True
 
     def OnNcLButtonDown(self, msg):
         if self.bTracking:
-            return 0
+            return False
         nHitTest = wparam = msg[2]
         pt = msg[5]
 
@@ -327,16 +327,16 @@ class DockingBar(window.Wnd):
         elif nHitTest == win32con.HTSIZE and not self.IsFloating():
             self.StartTracking()
         else:
-            return 1
-        return 0
+            return True
+        return False
 
     def OnLButtonDblClk(self, msg):
         # only toggle docking if clicked in "void" space
         if self.dockBar is not None:
             # toggle docking
             self.dockContext.ToggleDocking()
-            return 0
-        return 1
+            return False
+        return True
 
     def OnNcLButtonDblClk(self, msg):
         nHitTest = wparam = msg[2]
@@ -344,14 +344,14 @@ class DockingBar(window.Wnd):
         if self.dockBar is not None and nHitTest == win32con.HTCAPTION:
             # toggle docking
             self.dockContext.ToggleDocking()
-            return 0
-        return 1
+            return False
+        return True
 
     def OnMouseMove(self, msg):
         flags = wparam = msg[2]
         lparam = msg[3]
         if self.IsFloating() or not self.bTracking:
-            return 1
+            return True
 
         # Convert unsigned 16 bit to signed 32 bit.
         x = win32api.LOWORD(lparam)
@@ -374,9 +374,9 @@ class DockingBar(window.Wnd):
                 self.rectTracker = OffsetRect(self.rectTracker, (pt[0] - cpt[0], 0))
                 self.OnInvertTracker(self.rectTracker)
 
-        return 0  # Don't pass it on.
+        return False  # Don't pass it on.
 
-    # 	def OnBarStyleChange(self, old, new):
+    # def OnBarStyleChange(self, old, new):
 
     def OnNcCalcSize(self, bCalcValid, size_info):
         (rc0, rc1, rc2, pos) = size_info
@@ -439,7 +439,7 @@ class DockingBar(window.Wnd):
             self.rectBorder = 0, 0, 0, 0
 
         self.SetBarStyle(dwBorderStyle)
-        return 0
+        return False
 
     def OnNcPaint(self, msg):
         self.EraseNonClient()
@@ -452,11 +452,11 @@ class DockingBar(window.Wnd):
 
         rect = self.GetClientRect()
         self.InvalidateRect(rect, 1)
-        return 0
+        return False
 
     def OnNcHitTest(self, pt):  # A virtual, not a hooked message.
         if self.IsFloating():
-            return 1
+            return True
 
         ptOrig = pt
         rect = self.GetWindowRect()
@@ -495,7 +495,7 @@ class DockingBar(window.Wnd):
         hwnd = lparam = msg[3]
         if self.bTracking and hwnd != self.GetSafeHwnd():
             self.StopTracking(0)  # cancel tracking
-        return 1
+        return True
 
     def StopTracking(self, bAccept):
         self.OnInvertTracker(self.rectTracker)
@@ -530,7 +530,7 @@ class DockingBar(window.Wnd):
         else:
             self.sizeVert = newsize, self.sizeVert[1]
         self.dockSite.RecalcLayout()
-        return 0
+        return False
 
     def OnInvertTracker(self, rect):
         assert rect[2] - rect[0] > 0 and rect[3] - rect[1] > 0, "rect is empty"

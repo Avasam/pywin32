@@ -29,11 +29,11 @@ class BitmapDocument(docview.Document):
                 self.bitmap.LoadBitmapFile(f)
             except OSError:
                 win32ui.MessageBox("Could not load the bitmap from %s" % filename)
-                return 0
+                return False
         finally:
             f.close()
         self.size = self.bitmap.GetSize()
-        return 1
+        return True
 
     def DeleteContents(self):
         self.bitmap = None
@@ -104,7 +104,7 @@ class BitmapFrame(window.MDIChildWnd):
         # 			height = clientWindowSize[1]
         # 		self.frame.MoveWindow((left, top, left+width, top+height),0)
         window.MDIChildWnd.OnCreateClient(self, createparams, context)
-        return 1
+        return True
 
 
 class BitmapTemplate(docview.DocTemplate):

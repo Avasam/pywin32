@@ -83,7 +83,7 @@ class EditorDocumentBase(ParentEditorDocument):
             self.SaveFile(fileName)
         except OSError as details:
             win32ui.MessageBox("Error - could not save file\r\n\r\n%s" % details)
-            return 0
+            return False
         except (UnicodeEncodeError, LookupError) as details:
             rc = win32ui.MessageBox(
                 "Encoding failed: \r\n%s" % details
@@ -102,16 +102,16 @@ class EditorDocumentBase(ParentEditorDocument):
                     win32ui.MessageBox(
                         "Error - could not save file\r\n\r\n%s" % details
                     )
-                    return 0
+                    return False
             else:
-                return 0
+                return False
         self.SetModifiedFlag(0)  # No longer dirty
         self.bDeclinedReload = False  # They probably want to know if it changes again!
         win32ui.AddToRecentFileList(fileName)
         self.SetPathName(fileName)
         win32ui.SetStatusText("Ready")
         self._DocumentStateChanged()
-        return 1
+        return True
 
     def FinalizeViewCreation(self, view):
         ParentEditorDocument.FinalizeViewCreation(self, view)

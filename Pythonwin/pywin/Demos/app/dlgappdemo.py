@@ -29,7 +29,7 @@ class TestAppDialog(dlgappcore.AppDialog):
         print("args are:", end=" ")
         for arg in sys.argv:
             print(arg)
-        return 1
+        return True
 
     def PreDoModal(self):
         sys.stdout = sys.stderr = self

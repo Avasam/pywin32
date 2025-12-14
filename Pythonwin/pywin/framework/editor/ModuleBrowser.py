@@ -229,7 +229,7 @@ class BrowserView(pywin.mfc.docview.TreeView):
             self.CheckMadeList()
         elif w == 0:
             self.DestroyList()
-        return 1
+        return True
 
     def _UpdateUIForState(self):
         self.bDirty = True

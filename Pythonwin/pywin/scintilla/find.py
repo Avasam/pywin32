@@ -251,10 +251,10 @@ class FindReplaceDialog(dialog.Dialog):
         if code != 0:  # BN_CLICKED
             # 3d controls (python.exe + start_pythonwin.pyw) send
             # other notification codes
-            return 1  #
+            return True
         if not self.editFindText.GetWindowText():
             win32api.MessageBeep()
-            return 1
+            return True
         if self.DoFindNext() != FOUND_NOTHING:
             if not self.butKeepDialogOpen.GetCheck():
                 self.DestroyWindow()
@@ -479,19 +479,19 @@ class ReplaceDialog(FindReplaceDialog):
 
     def OnFindNext(self, id, code):
         if code != 0:
-            return 1
+            return True
         self.DoFindNext()
         self.CheckButtonStates()
 
     def OnReplace(self, id, code):
         if code != 0:
-            return 1
+            return True
         lastSearch.replaceText = self.editReplaceText.GetWindowText()
         _ReplaceIt(None)
 
     def OnReplaceAll(self, id, code):
         if code != 0:
-            return 1
+            return True
         control = _GetControl(None)
         if control is not None:
             control.SetSel(0)

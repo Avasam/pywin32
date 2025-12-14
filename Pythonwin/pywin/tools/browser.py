@@ -448,7 +448,6 @@ class BrowserDocument(docview.Document):
 
     def OnOpenDocument(self, name):
         raise TypeError("This template can not open files")
-        return 0
 
 
 class BrowserView(docview.TreeView):

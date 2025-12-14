@@ -67,7 +67,7 @@ class MainFrame(window.MDIFrameWnd):
         win32ui.ID_INDICATOR_COLNUM,
     )
 
-    def OnCreate(self, cs) -> Literal[-1, 0, 1]:
+    def OnCreate(self, cs) -> Literal[-1, 0, 1] | None:
         self._CreateStatusBar()
         return 0
 
@@ -109,7 +109,7 @@ class MainFrame(window.MDIFrameWnd):
         rectNow = self.GetWindowPlacement()[4]
         if rectNow != self.startRect:
             SaveWindowSize(self.sectionPos, rectNow)
-        return 0
+        return False
 
 
 class CApp(WinApp):
@@ -161,7 +161,7 @@ class CApp(WinApp):
 
     def OnIdle(self, count):
         try:
-            ret = 0
+            ret = False
             handlers = self.idleHandlers[:]  # copy list, as may be modified during loop
             for handler in handlers:
                 try:
@@ -174,7 +174,7 @@ class CApp(WinApp):
                         self.DeleteIdleHandler(handler)
                     except ValueError:  # Item not in list.
                         pass
-                    thisRet = 0
+                    thisRet = False
                 ret = ret or thisRet
             return ret
         except KeyboardInterrupt:
@@ -254,7 +254,7 @@ class CApp(WinApp):
         # put up the entire FILE menu!
         menu = win32ui.LoadMenu(win32ui.IDR_TEXTTYPE).GetSubMenu(0)
         menu.TrackPopupMenu(params[5])  # track at mouse position.
-        return 0
+        return False
 
     def OnDropFiles(self, msg):
         "Handle a file being dropped from file manager"
@@ -268,7 +268,7 @@ class CApp(WinApp):
         finally:
             win32api.DragFinish(hDropInfo)
 
-        return 0
+        return False
 
     # No longer used by Pythonwin, as the C++ code has this same basic functionality
     # but handles errors slightly better.

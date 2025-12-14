@@ -59,7 +59,7 @@ class Dialog(window.Wnd):
         self.bHaveInit = True
         if self._obj_.data:
             self._obj_.UpdateData(0)
-        return 1  # I did NOT set focus to a child window.
+        return True  # I did NOT set focus to a child window.
 
     def OnDestroy(self, msg):
         self.dll = False  # theoretically not needed if object destructs normally.

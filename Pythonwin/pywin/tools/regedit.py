@@ -43,7 +43,7 @@ class SplitterFrame(window.MDIChildWnd):
         splitter.SetRowInfo(0, size[1], 0)
         # Setup items in the imagelist
 
-        return 1
+        return True
 
     def OnItemDoubleClick(self, info, extra):
         (hwndFrom, idFrom, code) = info
@@ -53,7 +53,7 @@ class SplitterFrame(window.MDIChildWnd):
         elif idFrom == win32ui.AFX_IDW_PANE_FIRST + 1:
             item = self.keysview.SelectedItem()
             self.valuesview.EditValue(item)
-            return 0
+            return False
             # List control
         else:
             return None  # Pass it on

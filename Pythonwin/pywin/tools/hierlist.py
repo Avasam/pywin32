@@ -137,7 +137,7 @@ class HierList(object.Object):
             return None
         item = self.itemHandleMap[self.listControl.GetSelectedItem()]
         self.TakeDefaultAction(item)
-        return 1
+        return True
 
     def OnTreeItemExpanding(self, info, extra):
         (hwndFrom, idFrom, code) = info
@@ -149,7 +149,7 @@ class HierList(object.Object):
             item = self.itemHandleMap[itemHandle]
             self.AddSubList(itemHandle, self.GetSubList(item))
             self.filledItemHandlesMap[itemHandle] = None
-        return 0
+        return False
 
     def OnTreeItemSelChanged(self, info, extra):
         (hwndFrom, idFrom, code) = info
@@ -159,7 +159,7 @@ class HierList(object.Object):
         itemHandle = itemNew[0]
         item = self.itemHandleMap[itemHandle]
         self.PerformItemSelected(item)
-        return 1
+        return True
 
     def AddSubList(self, parentHandle, subItems):
         for item in subItems:

@@ -42,7 +42,7 @@ def TestExcel():
                 print("You can not double-click there...")
                 # This function is a void, so the result ends up in
                 # the only ByRef - Cancel.
-                return 1
+                return True
 
     class WorkbookEvents:
         def OnActivate(self):

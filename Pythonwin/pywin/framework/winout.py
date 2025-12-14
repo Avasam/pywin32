@@ -57,9 +57,9 @@ class WindowOutputDocument(WindowOutputDocumentParent):
             self.SaveFile(fileName)
         except OSError as details:
             win32ui.MessageBox("Error - could not save file\r\n\r\n%s" % details)
-            return 0
+            return False
         win32ui.SetStatusText("Ready")
-        return 1
+        return True
 
 
 class WindowOutputFrame(window.MDIChildWnd):
@@ -91,7 +91,7 @@ class WindowOutputFrame(window.MDIChildWnd):
 
     def OnDestroy(self, message):
         self.template.OnFrameDestroy(self)
-        return 1
+        return True
 
 
 class WindowOutputViewImpl:
@@ -128,7 +128,7 @@ class WindowOutputViewImpl:
                 appendParams = (appendParams,)
             menu.AppendMenu(*appendParams)
         menu.TrackPopupMenu(params[5])  # track at mouse position.
-        return 0
+        return False
 
     # as this is often used as an output window, exeptions will often
     # be printed.  Therefore, we support this functionality at this level.
@@ -224,12 +224,11 @@ class WindowOutputViewRTF(docview.RichEditView, WindowOutputViewImpl):
         # Hook for finding and locating error messages
         self.HookMessage(self.OnLDoubleClick, win32con.WM_LBUTTONDBLCLK)
 
-    # 		docview.RichEditView.HookHandlers(self)
+        # docview.RichEditView.HookHandlers(self)
 
     def OnLDoubleClick(self, params):
-        if self.HandleSpecialLine():
-            return 0  # don't pass on
-        return 1  # pass it on by default.
+        # Don't pass on if HandleSpecialLine
+        return not self.HandleSpecialLine()
 
     def RestoreKillBuffer(self):
         if len(self.template.killBuffer):
@@ -284,13 +283,13 @@ class WindowOutputViewScintilla(
             self.OnScintillaDoubleClick, scintillacon.SCN_DOUBLECLICK
         )
 
-    ##		self.HookMessage(self.OnLDoubleClick,win32con.WM_LBUTTONDBLCLK)
+        # self.HookMessage(self.OnLDoubleClick,win32con.WM_LBUTTONDBLCLK)
 
     def OnScintillaDoubleClick(self, std, extra):
         self.HandleSpecialLine()
 
-    ##	def OnLDoubleClick(self,params):
-    ##			return 0	# never don't pass on
+    # def OnLDoubleClick(self, params):
+    #     return False  # never don't pass on
 
     def RestoreKillBuffer(self):
         assert len(self.template.killBuffer) in (0, 1), "Unexpected killbuffer contents"

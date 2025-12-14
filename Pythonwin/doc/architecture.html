@@ -56,7 +56,7 @@ object 'PyCDialog' - assoc is 002F3278, vf=True, ch=0, mh=2, kh=0<BR>
 <CODE><PRE>&gt;&gt;&gt; class MyDialog(dialog.Dialog):<BR>
 ...   def OnInitDialog(self, msg): <BR>
 ...     self.GetDlgItem(win32ui.IDC_PROMPT1).SetWindowText("Hello") <BR>
-...     return 1<BR>
+...     return True<BR>
 ... <BR>
 &gt;&gt;&gt; d=MyDialog(win32ui.IDD_SIMPLE_INPUT)<BR>
 &gt;&gt;&gt; d.DoModal()<BR>

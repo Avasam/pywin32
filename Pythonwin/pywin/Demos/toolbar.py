@@ -45,7 +45,7 @@ class GenericFrame(window.MDIChildWnd):
         parent.DockControlBar(tb)
         parent.LoadBarState("ToolbarTest")
         window.MDIChildWnd.OnCreateClient(self, cp, context)
-        return 1
+        return True
 
     def OnDestroy(self, msg):
         self.SaveBarState("ToolbarTest")

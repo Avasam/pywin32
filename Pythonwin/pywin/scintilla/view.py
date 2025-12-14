@@ -438,22 +438,22 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
             fileName = pywin.framework.scriptutils.LocatePythonFile(modName)
             if fileName is None:
                 win32ui.SetStatusText("Can't locate module %s" % modName)
-                return 1  # Let the default get it.
+                return True  # Let the default get it.
             else:
                 win32ui.GetApp().OpenDocumentFile(fileName)
         else:
             # Just to a "normal" locate - let the default handler get it.
-            return 1
-        return 0
+            return True
+        return False
 
     def OnCmdGotoLine(self, cmd, id):
         try:
             lineNo = int(input("Enter Line Number")) - 1
         except (ValueError, KeyboardInterrupt):
-            return 0
+            return False
         self.SCIEnsureVisible(lineNo)
         self.SCIGotoLine(lineNo)
-        return 0
+        return False
 
     def SaveTextFile(self, filename, encoding=None):
         doc = self.GetDocument()

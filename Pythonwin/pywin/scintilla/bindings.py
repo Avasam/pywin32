@@ -98,7 +98,7 @@ class BindingsManager:
         event = command_to_events.get(id)
         if event is None:
             self.report_error("No event associated with event ID %d" % id)
-            return 1
+            return True
         return self.fire(event)
 
     def _new_binding(self, event, handler_args_type):
@@ -128,7 +128,7 @@ class BindingsManager:
                 # Can't decide if I should report an error??
                 self.report_error("The event name '%s' can not be found." % event)
                 # Either way, just let the default handlers grab it.
-                return 1
+                return True
             binding = self._new_binding(handler, HANDLER_ARGS_NATIVE)
             # Cache it.
             self.bindings[event] = binding
@@ -151,15 +151,15 @@ class BindingsManager:
             if handler_args_type == HANDLER_ARGS_IDLE:
                 # Convert to our return code.
                 if rc in (None, "break"):
-                    rc = 0
+                    rc = False
                 else:
-                    rc = 1
+                    rc = True
         except:
             message = "Firing event '%s' failed." % event
             print(message)
             traceback.print_exc()
             self.report_error(message)
-            rc = 1  # Let any default handlers have a go!
+            rc = True  # Let any default handlers have a go!
         return rc
 
     def fire_key_event(self, msg):
@@ -176,5 +176,5 @@ class BindingsManager:
         # (XXX - which do not work :-(
         event = self.keymap.get(keyinfo)
         if event is None:
-            return 1
+            return True
         return self.fire(event, None)

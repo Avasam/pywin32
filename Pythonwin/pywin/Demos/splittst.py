@@ -39,7 +39,7 @@ class SplitterFrame(window.MDIChildWnd):
         self.v3.InsertItem(0, "Icon 1", 0)
         self.v3.InsertItem(0, "Icon 2", 1)
         self.v3.InsertItem(0, "Icon 3", 2)
-        return 1
+        return True
 
     def OnDestroy(self, msg):
         window.MDIChildWnd.OnDestroy(self, msg)

@@ -255,8 +255,8 @@ class GrepDocument(docview.RichEditDoc):
             self.verbose = d["verbose"]
             self.doSearch()
             self.saveInitParams()
-            return 1
-        return 0  # cancelled - return zero to stop frame creation.
+            return True
+        return False  # cancelled - return zero to stop frame creation.
 
     def doSearch(self):
         self.dp = dirpath(self.dirpattern, self.recurse)
@@ -342,7 +342,7 @@ class GrepDocument(docview.RichEditDoc):
         savefile.write(txt)
         savefile.close()
         self.SetModifiedFlag(0)
-        return 1
+        return True
 
 
 ID_OPEN_FILE = 0xE400
@@ -378,8 +378,8 @@ class GrepView(docview.RichEditView):
             fname = regexGrepResult.group(1)
             line = int(regexGrepResult.group(2))
             scriptutils.JumpToDocument(fname, line)
-            return 0  # don't pass on
-        return 1  # pass it on by default.
+            return False  # don't pass on
+        return True  # pass it on by default.
 
     def OnRClick(self, params):
         menu = win32ui.CreatePopupMenu()
@@ -407,7 +407,7 @@ class GrepView(docview.RichEditView):
         menu.AppendMenu(flags, win32con.MF_SEPARATOR)
         menu.AppendMenu(flags, ID_SAVERESULTS, "Sa&ve results")
         menu.TrackPopupMenu(params[5])
-        return 0
+        return False
 
     def OnCmdOpenFile(self, cmd, code):
         doc = win32ui.GetApp().OpenDocumentFile(self.fnm)
@@ -418,28 +418,28 @@ class GrepView(docview.RichEditView):
                 vw.GotoLine(int(self.lnnum))
             except:
                 pass
-        return 0
+        return False
 
     def OnCmdGrep(self, cmd, code):
         if code != 0:
-            return 1
+            return True
         curparamsstr = self.GetDocument().GetParams()
         params = curparamsstr.split("\t")
         params[2] = self.sel
         greptemplate.setParams("\t".join(params))
         greptemplate.OpenDocumentFile()
-        return 0
+        return False
 
     def OnTryAgain(self, cmd, code):
         if code != 0:
-            return 1
+            return True
         greptemplate.setParams(self.GetDocument().GetParams())
         greptemplate.OpenDocumentFile()
-        return 0
+        return False
 
     def OnCmdSave(self, cmd, code):
         if code != 0:
-            return 1
+            return True
         flags = win32con.OFN_OVERWRITEPROMPT
         dlg = win32ui.CreateFileDialog(
             0, None, None, flags, "Text Files (*.txt)|*.txt||", self
@@ -448,7 +448,7 @@ class GrepView(docview.RichEditView):
         if dlg.DoModal() == win32con.IDOK:
             pn = dlg.GetPathName()
             self._obj_.SaveTextFile(pn)
-        return 0
+        return False
 
     def Append(self, strng):
         numlines = self.GetLineCount()
@@ -591,12 +591,12 @@ class GrepDialog(dialog.Dialog):
 
     def OnMoreDirectories(self, cmd, code):
         if code != 0:
-            return 1
+            return True
         self.getMore("Grep\\Directories", "dirpattern")
 
     def OnMoreFiles(self, cmd, code):
         if code != 0:
-            return 1
+            return True
         self.getMore("Grep\\File Types", "filpattern")
 
     def getMore(self, section, key):
@@ -715,19 +715,19 @@ class GrepParamsDialog(dialog.Dialog):
 
     def OnAddItem(self, cmd, code):
         if code != 0:
-            return 1
+            return True
         eb = self.GetDlgItem(108)
         item = eb.GetLine(0)
         self.newitems.append(item)
         lb = self.GetDlgItem(107)
         i = lb.AddString(item)
         lb.SetSel(i, 1)
-        return 1
+        return True
 
     def OnListDoubleClick(self, cmd, code):
         if code == win32con.LBN_DBLCLK:
             self.OnOK()
-            return 1
+            return True
 
     def OnOK(self):
         lb = self.GetDlgItem(107)

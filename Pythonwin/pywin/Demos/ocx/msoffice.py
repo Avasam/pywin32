@@ -42,10 +42,10 @@ class OleClientItem(object.CmdTarget):
         #  COleClientItem::SetItemRects to move the item
         #  to the new position.
         if not self._obj_.OnChangeItemPosition(self, rect):
-            return 0
+            return False
 
         # TODO: update any cache you may have of the item's rectangle/extent
-        return 1
+        return True
 
 
 class OleDocument(object.CmdTarget):
@@ -88,14 +88,14 @@ class ExcelView(docview.ScrollView):
             wnd = item.GetInPlaceWindow()
             if wnd is not None:
                 wnd.SetFocus()
-            return 0  # Don't get the base version called.
-        return 1  # Call the base version.
+            return False  # Don't get the base version called.
+        return True  # Call the base version.
 
     def OnSize(self, params):
         item = self.GetDocument().GetInPlaceActiveItem(self)
         if item is not None:
             item.SetItemRects()
-        return 1  # do call the base!
+        return True  # do call the base!
 
 
 class OleTemplate(docview.DocTemplate):

@@ -57,17 +57,17 @@ class DlgRunScript(dialog.Dialog):
 
     def OnBrowse(self, id, code):
         if code != 0:  # BN_CLICKED
-            return 1
+            return True
         openFlags = win32con.OFN_OVERWRITEPROMPT | win32con.OFN_FILEMUSTEXIST
         dlg = win32ui.CreateFileDialog(
             1, None, None, openFlags, "Python Scripts (*.py)|*.py||", self
         )
         dlg.SetOFNTitle("Run Script")
         if dlg.DoModal() != win32con.IDOK:
-            return 0
+            return False
         self["script"] = dlg.GetPathName()
         self.UpdateData(0)
-        return 0
+        return False
 
 
 def GetDebugger():

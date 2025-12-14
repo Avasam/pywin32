@@ -201,14 +201,14 @@ class EditorPropertyPage(dialog.PropertyPage):
             pywin.scintilla.view.LoadConfiguration()
 
         # Now tell all views we have changed.
-        ##		for doc in editorTemplate.GetDocumentList():
-        ##			for view in doc.GetAllViews():
-        ##				try:
-        ##					fn = view.OnConfigChange
-        ##				except AttributeError:
-        ##					continue
-        ##				fn()
-        return 1
+        # for doc in editorTemplate.GetDocumentList():
+        #     for view in doc.GetAllViews():
+        #         try:
+        #             fn = view.OnConfigChange
+        #         except AttributeError:
+        #             continue
+        #         fn()
+        return True
 
 
 class EditorWhitespacePropertyPage(dialog.PropertyPage):
@@ -286,7 +286,7 @@ class EditorWhitespacePropertyPage(dialog.PropertyPage):
         c = paletteVGA[self.cbo.GetCurSel()]
         SetEditorOption("Tab Timmy Color", win32api.RGB(c[1], c[2], c[3]))
 
-        return 1
+        return True
 
 
 def testpp():

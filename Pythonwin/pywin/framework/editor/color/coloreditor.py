@@ -303,12 +303,12 @@ class SyntEditView(SyntEditViewParent):
             if self.SCIGetFoldLevel(line_click) & scintillacon.SC_FOLDLEVELHEADERFLAG:
                 # If a fold point.
                 self.SCIToggleFold(line_click)
-        return 1
+        return True
 
     def OnSetFocus(self, msg):
         # Even though we use file change notifications, we should be very sure about it here.
         self.OnCheckExternalDocumentUpdated(msg)
-        return 1
+        return True
 
     def OnCheckExternalDocumentUpdated(self, msg):
         if self.bCheckingFile:
@@ -350,7 +350,7 @@ class SyntEditView(SyntEditViewParent):
             win32con.TPM_LEFTALIGN | win32con.TPM_LEFTBUTTON | win32con.TPM_RIGHTBUTTON
         )
         menu.TrackPopupMenu(params[5], flags, self)
-        return 0
+        return False
 
     def OnCmdViewFold(self, cid, code):  # Handle the menu command
         if cid == win32ui.ID_VIEW_FOLD_EXPAND_ALL:
@@ -578,7 +578,7 @@ class SplitterFrame(EditorFrame):
 
     def OnWindowSplit(self, id, code):
         self.GetDlgItem(win32ui.AFX_IDW_PANE_FIRST).DoKeyboardSplit()
-        return 1
+        return True
 
 
 class SyntEditTemplate(EditorTemplateBase):
