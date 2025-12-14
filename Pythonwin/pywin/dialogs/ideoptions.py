@@ -81,7 +81,7 @@ class OptionsPropPage(dialog.PropertyPage):
                 cf = d.GetCharFormat()
                 editControl.SetDefaultCharFormat(cf)
                 self.SetModified(1)
-            return 0  # We handled this fully!
+            return False  # We handled this fully!
 
     def OnOK(self):
         # Handle the edit controls - get all the fonts, put them back into interact, then

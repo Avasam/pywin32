@@ -150,12 +150,12 @@ class WindowOutputViewImpl:
                 from . import help
 
                 help.OpenHelpFile(det[2][3], win32con.HELP_CONTEXT, det[2][4])
-                return 1
+                return True
             except win32api.error as details:
                 win32ui.SetStatusText(
                     "The help file could not be opened - %s" % details.strerror
                 )
-                return 1
+                return True
             except:
                 win32ui.SetStatusText(
                     "Line is a COM error, but no WinHelp details can be parsed"
@@ -173,7 +173,7 @@ class WindowOutputViewImpl:
             fileName = matchResult.group(1)
             if fileName[0] == "<":
                 win32ui.SetStatusText("Can not load this file")
-                return 1  # still was an error message.
+                return True  # still was an error message.
             else:
                 lineNoString = matchResult.group(2)
                 # Attempt to locate the file (in case it is a relative spec)
@@ -184,16 +184,16 @@ class WindowOutputViewImpl:
                     win32ui.SetStatusText(
                         "Can't locate the file '%s'" % (fileNameSpec), 0
                     )
-                    return 1
+                    return True
 
                 win32ui.SetStatusText(
                     "Jumping to line " + lineNoString + " of file " + fileName, 1
                 )
                 if not scriptutils.JumpToDocument(fileName, int(lineNoString)):
                     win32ui.SetStatusText("Could not open %s" % fileName)
-                    return 1  # still was an error message.
-                return 1
-        return 0  # not an error line
+                    return True  # still was an error message.
+                return True
+        return False  # not an error line
 
     def write(self, msg):
         return self.template.write(msg)
@@ -441,16 +441,16 @@ class WindowOutput(docview.DocTemplate):
     def RecreateWindow(self):
         if self.errorCantRecreate:
             debug("Error = not trying again")
-            return 0
+            return False
         try:
             # This will fail if app shutting down
             win32ui.GetMainFrame().GetSafeHwnd()
             self.Create()
-            return 1
+            return True
         except (win32ui.error, AttributeError):
             self.errorCantRecreate = 1
             debug("Winout can not recreate the Window!\n")
-            return 0
+            return False
 
     # this handles the idle message, and does the printing.
     def QueueIdleHandler(self, handler, count):
@@ -486,14 +486,11 @@ class WindowOutput(docview.DocTemplate):
 
     # Returns true if the Window is OK (either cos it was, or because it was recreated
     def CheckRecreateWindow(self):
-        if self.bCreating:
-            return 1
-        if not self.NeedRecreateWindow():
-            return 1
-        if self.bAutoRestore:
-            if self.RecreateWindow():
-                return 1
-        return 0
+        return (
+            self.bCreating
+            or not self.NeedRecreateWindow()
+            or (self.bAutoRestore and self.RecreateWindow())
+        )
 
     def QueueFlush(self, max=None):
         # Returns true if the queue is empty after the flush

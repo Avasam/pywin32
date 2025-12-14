@@ -86,7 +86,7 @@ class HierFrameItem(HierListItem):
     def TakeDefaultAction(self):
         # Set the default frame to be this frame.
         self.debugger.set_cur_frame(self.myobject)
-        return 1
+        return True
 
 
 class HierFrameDict(browser.HLIDict):

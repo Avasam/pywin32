@@ -527,7 +527,7 @@ class InteractiveCore:
         # First, check for an error message
         haveGrabbedOutput = 0
         if self.HandleSpecialLine():
-            return 0
+            return False
 
         lineNo = self.LineFromChar()
         start, end, isCode = self.GetBlockBoundary(lineNo)
@@ -592,7 +592,7 @@ class InteractiveCore:
                 indent = indent[:-1]
             # use ReplaceSel to ensure it goes at the cursor rather than end of buffer.
             self.ReplaceSel(sys.ps2 + indent)
-        return 0
+        return False
 
     # ESC key handler
     def ProcessEscEvent(self, event):
@@ -602,7 +602,7 @@ class InteractiveCore:
         else:
             win32ui.SetStatusText("Cancelled.")
             self.AppendToPrompt(("",))
-        return 0
+        return False
 
     def OnSelectBlock(self, command, code):
         lineNo = self.LineFromChar()

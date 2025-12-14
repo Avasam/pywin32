@@ -253,7 +253,7 @@ class EditorDocumentBase(ParentEditorDocument):
                 "Document is read-only, and no source-control system is configured"
             )
             win32api.MessageBeep()
-            return 0
+            return False
 
         # We have source control support - check if the user wants to use it.
         msg = "Would you like to check this file out?"
@@ -262,7 +262,7 @@ class EditorDocumentBase(ParentEditorDocument):
             msg += "\r\n\r\nALL CHANGES IN THE EDITOR WILL BE LOST"
             defButton = win32con.MB_YESNO
         if win32ui.MessageBox(msg, None, defButton) != win32con.IDYES:
-            return 0
+            return False
 
         if pretend_ss:
             print("We are only pretending to check it out!")
@@ -270,7 +270,7 @@ class EditorDocumentBase(ParentEditorDocument):
                 self.GetPathName(), win32con.FILE_ATTRIBUTE_NORMAL
             )
             self.ReloadDocument()
-            return 1
+            return True
 
         # Now call on the module to do it.
         if self.scModule is None:
@@ -281,17 +281,17 @@ class EditorDocumentBase(ParentEditorDocument):
             except:
                 traceback.print_exc()
                 print("Error loading source control module.")
-                return 0
+                return False
 
         if self.scModule.CheckoutFile(self.GetPathName()):
             self.ReloadDocument()
-            return 1
-        return 0
+            return True
+        return False
 
     def CheckMakeDocumentWritable(self):
         if self._IsReadOnly():
             return self.MakeDocumentWritable()
-        return 1
+        return True
 
     def SaveModified(self):
         # Called as the document is closed.  If we are about

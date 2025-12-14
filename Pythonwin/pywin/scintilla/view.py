@@ -358,7 +358,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
         ## Don't trigger autocomplete if any text is selected
         s, e = self.GetSel()
         if s != e:
-            return 1
+            return True
         self.SCIAddText(".")
         if self.bAutoCompleteAttributes:
             self._AutoComplete()

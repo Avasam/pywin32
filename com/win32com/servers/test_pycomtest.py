@@ -140,7 +140,7 @@ class PyCOMTest:
         raise COMException(hresult=winerror.E_NOTIMPL)
 
     def CheckVariantSafeArray(self, data):
-        return 1
+        return True
 
     def LongProp(self):
         return self.longval

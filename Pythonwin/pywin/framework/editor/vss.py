@@ -63,7 +63,7 @@ def CheckoutFile(fileName):
     global g_sourceSafe
     import pythoncom
 
-    ok = 0
+    ok = False
     # Assumes the fileName has a complete path,
     # and that the INI file can be found in that path
     # (or a parent path if a ni style package)
@@ -93,7 +93,7 @@ def CheckoutFile(fileName):
             g_sourceSafe.Open(database, pythoncom.Missing, pythoncom.Missing)
         item = g_sourceSafe.VSSItem(f"$/{project}/{vssFname}")
         item.Checkout(None, fileName)
-        ok = 1
+        ok = True
     except pythoncom.com_error as exc:
         win32ui.MessageBox(exc.strerror, "Error checking out file")
     except:
