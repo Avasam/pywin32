@@ -17,7 +17,6 @@
 
 
 import os
-import sys
 import traceback
 
 import win32api
