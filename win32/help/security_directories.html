@@ -458,7 +458,7 @@ if len(sys.argv) == 1:
     print(sys.argv[0],"<all options> file or directory<return>")
     print("-r for recursive mode \n-o for output file (default screen) \n-d for directories only")
     print("Example:",sys.argv[0],"-o a.txt -r c:\\junk  \n ----goes down dir tree in c:\\junk and saves in a.txt")
-    sys.exit(0)
+    sys.exit()
 else:
     try:
         optlist, args = getopt.getopt(sys.argv[1:], 'dho:r')
@@ -466,7 +466,7 @@ else:
        print("invalid option.  available options are: -d -h -r -o <file or dir>")
        print("-r for recursive mode \n-o for output file (default screen) \n-d for directories only")
 
-       sys.exit(0)
+    sys.exit()
 
     opts = {'-d':0,'-h':0,'-o':0,'-r':0}
     for key, value in optlist:
@@ -484,13 +484,13 @@ else:
             os.path.walk(args[0],get_perms,opts['-d'])
         else:
             print("Directory",args[0],"does not exist")
-            sys.exit(0)
+            sys.exit()
     else:
         if os.path.exists(args[0]):
             Results=get_perm(args[0])
         else:
             print("Directory or file",args[0],"does not exist")
-            sys.exit(0)
+            sys.exit()
 
     # now print out the results
     if opts['-o']:

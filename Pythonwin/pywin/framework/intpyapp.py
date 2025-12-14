@@ -546,7 +546,7 @@ class InteractivePythonApp(app.CApp):
 
     def OnUpdateViewToolbarDbg(self, cmdui):
         win32ui.GetMainFrame().OnUpdateControlBarMenu(cmdui)
-        cmdui.Enable(1)
+        cmdui.Enable(True)
 
     def OnHelpIndex(self, id, code):
         from . import help

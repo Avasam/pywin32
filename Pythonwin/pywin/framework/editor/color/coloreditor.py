@@ -366,7 +366,7 @@ class SyntEditView(SyntEditViewParent):
 
     def OnUpdateViewFold(self, cmdui):  # Update the tick on the UI.
         if not self.bFolding:
-            cmdui.Enable(0)
+            cmdui.Enable(False)
             return
         id = cmdui.m_nID
         if id in (win32ui.ID_VIEW_FOLD_EXPAND_ALL, win32ui.ID_VIEW_FOLD_COLLAPSE_ALL):

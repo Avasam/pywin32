@@ -453,4 +453,4 @@ if __name__ == "__main__":
     rc = main()
     if rc:
         sys.exit(rc)
-    sys.exit(0)
+    sys.exit()

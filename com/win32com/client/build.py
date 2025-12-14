@@ -516,7 +516,7 @@ class LazyDispatchItem(DispatchItem):
 
     def __init__(self, attr, doc):
         self.clsid = attr[0]
-        DispatchItem.__init__(self, None, attr, doc, 0)
+        DispatchItem.__init__(self, None, attr, doc, False)
 
 
 typeSubstMap = {

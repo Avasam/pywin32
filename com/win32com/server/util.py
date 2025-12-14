@@ -1,4 +1,5 @@
 """General Server side utilities"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -11,6 +12,7 @@ from .exception import COMException
 
 if TYPE_CHECKING:
     from win32com.server.dispatcher import DispatcherBase
+
 
 def wrap(
     ob,

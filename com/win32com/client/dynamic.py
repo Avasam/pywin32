@@ -161,7 +161,7 @@ def MakeOleRepr(IDispatch, typeinfo, typecomp):
                 typeinfo = typeinfo.GetRefTypeInfo(href)
                 attr = typeinfo.GetTypeAttr()
             if typecomp is None:
-                olerepr = build.DispatchItem(typeinfo, attr, None, 0)
+                olerepr = build.DispatchItem(typeinfo, attr, None, False)
             else:
                 olerepr = build.LazyDispatchItem(attr, None)
         except pythoncom.ole_error:

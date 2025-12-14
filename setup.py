@@ -791,6 +791,7 @@ class my_build_ext(build_ext):
         return f"{name}{suffix}.pyd"
 
     def get_export_symbols(self, ext):
+        assert isinstance(ext, WinExt)
         if ext.is_regular_dll:
             return ext.export_symbols
         return build_ext.get_export_symbols(self, ext)
