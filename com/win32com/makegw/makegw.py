@@ -55,16 +55,16 @@ from . import makegwparse
 def make_framework_support(
     header_file_name,
     interface_name,
-    bMakeInterface=1,
-    bMakeGateway=1,
+    bMakeInterface=True,
+    bMakeGateway=True,
     output_directory=None,
 ):
     """Generate C++ code for a Python Interface and Gateway
 
     header_file_name -- The full path to the .h file which defines the interface.
     interface_name -- The name of the interface to search for, and to generate.
-    bMakeInterface = 1 -- Should interface (ie, client) support be generated.
-    bMakeGatewayInterface = 1 -- Should gateway (ie, server) support be generated.
+    bMakeInterface = True -- Should interface (ie, client) support be generated.
+    bMakeGatewayInterface = True -- Should gateway (ie, server) support be generated.
 
     This method will write a .cpp and .h file into the current directory,
     (using the name of the interface to build the file name.

@@ -377,23 +377,23 @@ def get_mask(mask):
 
 
 def is_group(sys_id):
-    #get the server for the domain -- it has to be a primary dc
-    group=0
-    resume=0
-    sys_id=sys_id.strip()
+    # get the server for the domain -- it has to be a primary dc
+    group = False
+    resume = False
+    sys_id = sys_id.strip()
     if D_group.has_key(sys_id):
-        group=1
+        group = True
     elif D_except.has_key(sys_id):
-        group=0
+        group = False
     else:
         try:
             #info returns a dictionary of information
             info = win32net.NetGroupGetInfo(Server, sys_id, 0)
-            group=1
+            group = True
         except:
             try:
-                win32net.NetLocalGroupGetMembers(Server, sys_id, 0,resume,4096)
-                group=1
+                win32net.NetLocalGroupGetMembers(Server, sys_id, 0, resume, 4096)
+                group = True
             except:
                 pass
     return group
@@ -454,11 +454,11 @@ print("************************ Using domain ",domain)
 only_dir=0
 D_group={}
 D_except={}
-if len(sys.argv)==1:
+if len(sys.argv) == 1:
     print(sys.argv[0],"<all options> file or directory<return>")
     print("-r for recursive mode \n-o for output file (default screen) \n-d for directories only")
     print("Example:",sys.argv[0],"-o a.txt -r c:\\junk  \n ----goes down dir tree in c:\\junk and saves in a.txt")
-    sys.exit(0)
+    sys.exit()
 else:
     try:
         optlist, args = getopt.getopt(sys.argv[1:], 'dho:r')
@@ -466,7 +466,7 @@ else:
        print("invalid option.  available options are: -d -h -r -o <file or dir>")
        print("-r for recursive mode \n-o for output file (default screen) \n-d for directories only")
 
-       sys.exit(0)
+    sys.exit()
 
     opts = {'-d':0,'-h':0,'-o':0,'-r':0}
     for key, value in optlist:
@@ -484,13 +484,13 @@ else:
             os.path.walk(args[0],get_perms,opts['-d'])
         else:
             print("Directory",args[0],"does not exist")
-            sys.exit(0)
+            sys.exit()
     else:
         if os.path.exists(args[0]):
             Results=get_perm(args[0])
         else:
             print("Directory or file",args[0],"does not exist")
-            sys.exit(0)
+            sys.exit()
 
     # now print out the results
     if opts['-o']:

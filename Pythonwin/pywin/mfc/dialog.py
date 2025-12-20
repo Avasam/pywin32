@@ -39,7 +39,7 @@ class Dialog(window.Wnd):
             dlg = win32ui.CreateDialog(id, self.dll)
         window.Wnd.__init__(self, dlg)
         self.HookCommands()
-        self.bHaveInit = None
+        self.bHaveInit = False
 
     def HookCommands(self):
         pass
@@ -56,13 +56,13 @@ class Dialog(window.Wnd):
         self._obj_.OnCancel()
 
     def OnInitDialog(self):
-        self.bHaveInit = 1
+        self.bHaveInit = True
         if self._obj_.data:
             self._obj_.UpdateData(0)
-        return 1  # I did NOT set focus to a child window.
+        return True  # I did NOT set focus to a child window.
 
     def OnDestroy(self, msg):
-        self.dll = None  # theoretically not needed if object destructs normally.
+        self.dll = False  # theoretically not needed if object destructs normally.
 
     # DDX support
     def AddDDX(self, *args):
@@ -120,7 +120,7 @@ class PrintDialog(Dialog):
         dlg = win32ui.CreatePrintDialog(dlgID, printSetupOnly, flags, parent, self.dll)
         window.Wnd.__init__(self, dlg)
         self.HookCommands()
-        self.bHaveInit = None
+        self.bHaveInit = False
         self.pInfo = pInfo
         # init values (if PrintSetup is called, values still available)
         flags = pInfo.GetFlags()
@@ -231,9 +231,9 @@ class PropertySheet(window.Wnd):
             oldRes = win32ui.SetResource(self.dll)
         try:  # try list style access
             pages[0]
-            isSeq = 1
+            isSeq = True
         except (TypeError, KeyError):
-            isSeq = 0
+            isSeq = False
         if isSeq:
             for page in pages:
                 self.DoAddSinglePage(page)

@@ -37,7 +37,7 @@ class AppDialog(dialog.Dialog):
     # Only needed to provide a minimized icon
     def OnEraseBkgnd(self, dc):
         if self.IsIconic():
-            return 1
+            return True
         else:
             return self._obj_.OnEraseBkgnd(dc)
 

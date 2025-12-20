@@ -16,8 +16,8 @@ return Validate()
 def Validate():
 	if not TestForm.Name.Value or not TestForm.Address.Value:
 		ax.alert("You must enter a name and address.")
-		return 1
-	return 0
+		return True
+	return False
 
 </SCRIPT>
 

@@ -49,7 +49,7 @@ class EnumDebugStackFrames(gateways.EnumDebugStackFrames):
         gateways.EnumDebugStackFrames.__init__(self, infos, 0)
 
     # def __del__(self):
-    #     print("EnumDebugStackFrames dieing")
+    #     print("EnumDebugStackFrames dying")
 
     def Next(self, count):
         return gateways.EnumDebugStackFrames.Next(self, count)
@@ -57,7 +57,8 @@ class EnumDebugStackFrames(gateways.EnumDebugStackFrames):
     # def _query_interface_(self, iid):
     #     from win32com.util import IIDToInterfaceName
     #     print(f"EnumDebugStackFrames QI with {IIDToInterfaceName(iid)} ({iid})")
-    #     return 0
+    #     return None
+
     def _wrap(self, obj):
         # This enum returns a tuple, with 2 com objects in it.
         obFrame, min, lim, fFinal, obFinal = obj
@@ -75,7 +76,7 @@ class DebugStackFrame(gateways.DebugStackFrame):
         self.expressionContext = None
 
     # def __del__(self):
-    #     print("DSF dieing")
+    #     print("DSF dying")
     def _query_interface_(self, iid):
         if iid == axdebug.IID_IDebugExpressionContext:
             if self.expressionContext is None:
@@ -86,7 +87,7 @@ class DebugStackFrame(gateways.DebugStackFrame):
             return self.expressionContext
         # from win32com.util import IIDToInterfaceName
         # print(f"DebugStackFrame QI with {IIDToInterfaceName(iid)} ({iid})")
-        return 0
+        return None
 
     #
     # The following need implementation
@@ -133,7 +134,7 @@ class DebugStackFrameSniffer:
         trace("DebugStackFrameSniffer instantiated")
 
     # def __del__(self):
-    #     print("DSFS dieing")
+    #     print("DSFS dying")
     def EnumStackFrames(self):
         trace("DebugStackFrameSniffer.EnumStackFrames called")
         return _wrap(

@@ -81,7 +81,7 @@ class OptionsPropPage(dialog.PropertyPage):
                 cf = d.GetCharFormat()
                 editControl.SetDefaultCharFormat(cf)
                 self.SetModified(1)
-            return 0  # We handled this fully!
+            return False  # We handled this fully!
 
     def OnOK(self):
         # Handle the edit controls - get all the fonts, put them back into interact, then
@@ -103,7 +103,7 @@ class OptionsPropPage(dialog.PropertyPage):
         # And the other options.
         win32ui.WriteProfileVal("Settings", "Recent File List Size", self["MRUSize"])
 
-        return 1
+        return True
 
     def ChangeFormat(self, fmtAttribute, fmt):
         dlg = win32ui.CreateFontDialog(fmt)

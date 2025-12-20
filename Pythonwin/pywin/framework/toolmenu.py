@@ -33,7 +33,7 @@ def LoadToolMenuItems():
     # Load from the registry.
     items = []
     lookNo = 1
-    while 1:
+    while True:
         menu = win32ui.GetProfileVal("Tools Menu\\%s" % lookNo, "", "")
         if menu == "":
             break
@@ -55,7 +55,7 @@ def WriteToolMenuItems(items):
     except win32ui.error:
         toolKey = None
     if toolKey is not None:
-        while 1:
+        while True:
             try:
                 subkey = win32api.RegEnumKey(toolKey, 0)
             except win32api.error:
@@ -143,7 +143,7 @@ def HandleToolCommand(cmd, code):
     win32ui.SetStatusText(text, 1)
 
 
-# The property page for maintaing the items on the Tools menu.
+# The property page for maintaining the items on the Tools menu.
 import commctrl
 from pywin.mfc import dialog
 
@@ -152,7 +152,8 @@ LVN_ENDLABELEDIT = commctrl.LVN_ENDLABELEDITW
 
 class ToolMenuPropPage(dialog.PropertyPage):
     def __init__(self):
-        self.bImChangingEditControls = 0  # Am I programatically changing the controls?
+        # Am I programmatically changing the controls?
+        self.bImChangingEditControls = False
         dialog.PropertyPage.__init__(self, win32ui.IDD_PP_TOOLMENU)
 
     def OnInitDialog(self):
@@ -198,7 +199,7 @@ class ToolMenuPropPage(dialog.PropertyPage):
         # Write the menu back to the registry.
         items = []
         itemLook = 0
-        while 1:
+        while True:
             try:
                 text = self.listControl.GetItemText(itemLook, 0)
                 if not text:
@@ -218,7 +219,7 @@ class ToolMenuPropPage(dialog.PropertyPage):
             newText = self.editMenuCommand.GetWindowText()
             self.listControl.SetItemText(itemNo, 1, newText)
 
-        return 0
+        return False
 
     def OnNotifyListControlEndLabelEdit(self, id, cmd):
         newText = self.listControl.GetEditControl().GetWindowText()
@@ -232,14 +233,14 @@ class ToolMenuPropPage(dialog.PropertyPage):
         except win32ui.error:  # No selection!
             return
 
-        self.bImChangingEditControls = 1
+        self.bImChangingEditControls = True
         try:
             item = self.listControl.GetItem(itemNo, 1)
             self.editMenuCommand.SetWindowText(item[4])
         finally:
-            self.bImChangingEditControls = 0
+            self.bImChangingEditControls = False
 
-        return 0  # we have handled this!
+        return False  # we have handled this!
 
     def OnButtonNew(self, id, cmd):
         if cmd == win32con.BN_CLICKED:

@@ -246,19 +246,18 @@ class ConfigManager:
     def report_warning(self, msg):
         print(f"Warning in {self.filename}: {msg}")
 
-    def _readline(self, fp, lineno, bStripComments=1):
+    def _readline(self, fp, lineno, bStripComments=True):
         line = fp.readline()
         lineno += 1
         if line:
-            bBreak = (
-                get_section_header(line)[0] is not None
-            )  # A new section is starting
+            # A new section is starting
+            bBreak = get_section_header(line)[0] is not None
             if bStripComments and not bBreak:
                 pos = line.find("#")
                 if pos >= 0:
                     line = line[:pos] + "\n"
         else:
-            bBreak = 1
+            bBreak = True
         return line, lineno, bBreak
 
     def get_data(self, name, default=None):
@@ -270,7 +269,7 @@ class ConfigManager:
 
     def _load_general(self, sub_section, fp, lineno):
         map = {}
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno)
             if bBreak:
                 break
@@ -290,7 +289,7 @@ class ConfigManager:
         # (scancode, flags) = event_name
         main_map = self.get_data("keys", {})
         map = main_map.get(sub_section, {})
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno)
             if bBreak:
                 break
@@ -310,7 +309,7 @@ class ConfigManager:
     def _load_extensions(self, sub_section, fp, lineno):
         start_lineno = lineno
         lines = []
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno, 0)
             if bBreak:
                 break
@@ -336,7 +335,7 @@ class ConfigManager:
         if extension_map is None:
             extension_map = {}
         extensions = []
-        while 1:
+        while True:
             line, lineno, bBreak = self._readline(fp, lineno)
             if bBreak:
                 break

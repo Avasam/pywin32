@@ -38,5 +38,5 @@ server.AddTopic(MyOtherTopic("RunAnyCommand"))
 server.AddTopic(MyRequestTopic("ComputeStringLength"))
 server.Create("RunAny")
 
-while 1:
+while True:
     win32ui.PumpWaitingMessages(0, -1)

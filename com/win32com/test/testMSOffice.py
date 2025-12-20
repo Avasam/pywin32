@@ -36,7 +36,7 @@ def TestWord():
             dispatch = win32com.client.dynamic._GetGoodDispatch("Word.Application")
             typeinfo = dispatch.GetTypeInfo()
             attr = typeinfo.GetTypeAttr()
-            olerepr = win32com.client.build.DispatchItem(typeinfo, attr, None, 0)
+            olerepr = win32com.client.build.DispatchItem(typeinfo, attr, None, False)
             word = win32com.client.dynamic.CDispatch(dispatch, olerepr)
             dispatch = typeinfo = attr = olerepr = None
             TestWord8(word)

@@ -71,7 +71,7 @@ import sys
 import pythoncom
 from win32com.client import Dispatch, gencache, genpy, selecttlb
 
-bForDemandDefault = 0  # Default value of bForDemand - toggle this to change the world - see also gencache.py
+bForDemandDefault = False  # Default value of bForDemand - toggle this to change the world - see also gencache.py
 
 
 def usage():
@@ -242,7 +242,7 @@ def GenerateFromTypeLibSpec(
     verboseLevel=None,
     progressInstance=None,
     bForDemand=bForDemandDefault,
-    bBuildHidden=1,
+    bBuildHidden=True,
 ):
     if verboseLevel is None:
         verboseLevel = 0  # By default, we use no gui and no verbose level!
@@ -420,7 +420,7 @@ def main():
         usage()
 
     if not doit:
-        return 0
+        return
     if len(args) == 0:
         rc = selecttlb.SelectTlb()
         if rc is None:
@@ -453,4 +453,4 @@ if __name__ == "__main__":
     rc = main()
     if rc:
         sys.exit(rc)
-    sys.exit(0)
+    sys.exit()

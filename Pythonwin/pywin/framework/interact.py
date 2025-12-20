@@ -527,7 +527,7 @@ class InteractiveCore:
         # First, check for an error message
         haveGrabbedOutput = 0
         if self.HandleSpecialLine():
-            return 0
+            return False
 
         lineNo = self.LineFromChar()
         start, end, isCode = self.GetBlockBoundary(lineNo)
@@ -565,7 +565,7 @@ class InteractiveCore:
                 if self.interp.runsource(
                     source, "<interactive input>"
                 ):  # Need more input!
-                    bNeedIndent = 1
+                    bNeedIndent = True
                 else:
                     # If the last line isn't empty, append a newline
                     if self.history is not None:
@@ -592,7 +592,7 @@ class InteractiveCore:
                 indent = indent[:-1]
             # use ReplaceSel to ensure it goes at the cursor rather than end of buffer.
             self.ReplaceSel(sys.ps2 + indent)
-        return 0
+        return False
 
     # ESC key handler
     def ProcessEscEvent(self, event):
@@ -602,7 +602,7 @@ class InteractiveCore:
         else:
             win32ui.SetStatusText("Cancelled.")
             self.AppendToPrompt(("",))
-        return 0
+        return False
 
     def OnSelectBlock(self, command, code):
         lineNo = self.LineFromChar()
@@ -728,7 +728,7 @@ class InteractiveView(InteractiveCore, winout.WindowOutputView):
 
 class CInteractivePython(winout.WindowOutput):
     def __init__(self, makeDoc=None, makeFrame=None):
-        self.IsFinalDestroy = 0
+        self.IsFinalDestroy = False
         winout.WindowOutput.__init__(
             self,
             sectionProfile,
@@ -748,7 +748,7 @@ class CInteractivePython(winout.WindowOutput):
         winout.WindowOutput.OnViewDestroy(self, view)
 
     def Close(self):
-        self.IsFinalDestroy = 1
+        self.IsFinalDestroy = True
         winout.WindowOutput.Close(self)
 
 
@@ -780,7 +780,7 @@ class DockedInteractiveView(DockedInteractiveViewParent):
 
     def OnSetFocus(self, msg):
         self.GetParentFrame().SetActiveView(self)
-        return 1
+        return True
 
     def OnKillFocus(self, msg):
         # If we are losing focus to another in this app, reset the main frame's active view.
@@ -792,7 +792,7 @@ class DockedInteractiveView(DockedInteractiveViewParent):
             reset = 0  # Not my window
         if reset:
             self.GetParentFrame().SetActiveView(None)
-        return 1
+        return True
 
     def OnDestroy(self, msg):
         newSize = self.GetWindowPlacement()[4]
@@ -812,24 +812,24 @@ class DockedInteractiveView(DockedInteractiveViewParent):
 
 class CDockedInteractivePython(CInteractivePython):
     def __init__(self, dockbar):
-        self.bFirstCreated = 0
+        self.bFirstCreated = False
         self.dockbar = dockbar
         CInteractivePython.__init__(self)
 
     def NeedRecreateWindow(self):
         if self.bCreating:
-            return 0
+            return False
         try:
             frame = win32ui.GetMainFrame()
             if frame.closing:
-                return 0  # Dieing!
+                return False  # Dying!
         except (win32ui.error, AttributeError):
-            return 0  # The app is dieing!
+            return False  # The app is dying!
         try:
             cb = frame.GetControlBar(ID_DOCKED_INTERACTIVE_CONTROLBAR)
             return not cb.IsWindowVisible()
         except win32ui.error:
-            return 1  # Control bar does not exist!
+            return True  # Control bar does not exist!
 
     def RecreateWindow(self):
         try:
@@ -841,7 +841,7 @@ class CDockedInteractivePython(CInteractivePython):
             CreateDockedInteractiveWindow()
 
     def Create(self):
-        self.bCreating = 1
+        self.bCreating = True
         doc = InteractiveDocument(None, self.DoCreateDoc())
         view = DockedInteractiveView(doc)
         defRect = pywin.framework.app.LoadWindowSize("Interactive Window", "docked")
@@ -851,10 +851,10 @@ class CDockedInteractivePython(CInteractivePython):
         id = 1050  # win32ui.AFX_IDW_PANE_FIRST
         view.CreateWindow(self.dockbar, id, style, defRect)
         view.OnInitialUpdate()
-        self.bFirstCreated = 1
+        self.bFirstCreated = True
 
         self.currentView = doc.GetFirstView()
-        self.bCreating = 0
+        self.bCreating = False
         if self.title:
             doc.SetTitle(self.title)
 

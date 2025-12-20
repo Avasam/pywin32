@@ -42,7 +42,7 @@ def TestExcel():
                 print("You can not double-click there...")
                 # This function is a void, so the result ends up in
                 # the only ByRef - Cancel.
-                return 1
+                return True
 
     class WorkbookEvents:
         def OnActivate(self):
@@ -93,7 +93,7 @@ def TestWord():
 
 def _WaitForFinish(ob, timeout):
     end = time.time() + timeout
-    while 1:
+    while True:
         if msvcrt.kbhit():
             msvcrt.getch()
             break
@@ -106,13 +106,13 @@ def _WaitForFinish(ob, timeout):
             if not ob.Visible:
                 # Gone invisible - we need to pretend we timed
                 # out, so the app is quit.
-                return 0
+                return False
         except pythoncom.com_error:
             # Excel is busy (eg, editing the cell) - ignore
             pass
         if time.time() > end:
-            return 0
-    return 1
+            return False
+    return True
 
 
 def _CheckSeenEvents(o, events):

@@ -137,7 +137,7 @@ class AXScriptCodeBlock:
         self.sourceContextCookie = sourceContextCookie
         self.startLineNumber = startLineNumber
         self.flags = flags
-        self.beenExecuted = 0
+        self.beenExecuted = False
 
     def GetFileName(self):
         # Gets the "file name" for Python - uses <...> so Python doesn't think
@@ -251,10 +251,10 @@ class EventSink:
             mainTypeInfo = self.coDispatch.QueryInterface(
                 axscript.IID_IProvideMultipleClassInfo
             )
-            isMulti = 1
+            isMulti = True
             numTypeInfos = mainTypeInfo.GetMultiTypeInfoCount()
         except pythoncom.com_error:
-            isMulti = 0
+            isMulti = False
             numTypeInfos = 1
             try:
                 mainTypeInfo = self.coDispatch.QueryInterface(
@@ -310,7 +310,7 @@ class ScriptItem:
         self.eventSink = None
         self.subItems = {}
         self.createdConnections = 0
-        self.isRegistered = 0
+        self.isRegistered = False
 
     # 		trace("Creating ScriptItem", name, "of parent", parentItem,"with dispatch", dispatch)
 
@@ -343,7 +343,7 @@ class ScriptItem:
         self.Disconnect()
         if self.eventSink:
             self.eventSink.Reset()
-        self.isRegistered = 0
+        self.isRegistered = False
         for subItem in self.subItems.values():
             subItem.Reset()
 
@@ -373,7 +373,7 @@ class ScriptItem:
         #         print("*** No dispatch")
         #         return
         #     print("**** Made dispatch")
-        self.isRegistered = 1
+        self.isRegistered = True
         # Register the sub-items.
         for item in self.subItems.values():
             if not item.isRegistered:
@@ -482,7 +482,7 @@ class ScriptItem:
             )
             defaultType = self.GetDefaultSourceTypeInfo(typeinfo)
             index = 0
-            while 1:
+            while True:
                 try:
                     fdesc = defaultType.GetFuncDesc(index)
                 except pythoncom.com_error:
@@ -502,7 +502,7 @@ class ScriptItem:
                         and elemdesc[0][1][0] == pythoncom.VT_USERDEFINED
                     )
                 except:
-                    isSubObject = 0
+                    isSubObject = False
                 if isSubObject:
                     try:
                         # We found a sub-object.
@@ -641,8 +641,8 @@ class COMScript:
     def _query_interface_(self, iid):
         if self.debugManager:
             return self.debugManager._query_interface_for_debugger_(iid)
-        # 		trace("ScriptEngine QI - unknown IID", iid)
-        return 0
+        # trace("ScriptEngine QI - unknown IID", iid)
+        return None
 
     # IActiveScriptParse
     def InitNew(self):
@@ -912,7 +912,7 @@ class COMScript:
         # Get the win32com gencache to register this library.
         from win32com.client import gencache
 
-        gencache.EnsureModule(uuid, self.lcid, major, minor, bForDemand=1)
+        gencache.EnsureModule(uuid, self.lcid, major, minor, bForDemand=True)
 
     # This is never called by the C++ framework - it does magic.
     # See PyGActiveScript.cpp
@@ -1117,7 +1117,7 @@ class COMScript:
         self, codeBlock: AXScriptCodeBlock, type, realCode=None
     ):
         if codeBlock.codeObject is not None:  # already compiled
-            return 1
+            return True
         if realCode is None:
             code = codeBlock.codeText
         else:
@@ -1128,7 +1128,7 @@ class COMScript:
             try:
                 codeObject = self._CompileInScriptedSection(RemoveCR(code), name, type)
                 codeBlock.codeObject = codeObject
-                return 1
+                return True
             finally:
                 if self.debugManager:
                     self.debugManager.OnLeaveScript()
@@ -1153,7 +1153,7 @@ class COMScript:
         assert not codeBlock.beenExecuted, (
             "This code block should not have been executed"
         )
-        codeBlock.beenExecuted = 1
+        codeBlock.beenExecuted = True
         self.BeginScriptedSection()
         try:
             try:
@@ -1181,7 +1181,7 @@ class COMScript:
         assert not codeBlock.beenExecuted, (
             "This code block should not have been executed"
         )
-        codeBlock.beenExecuted = 1
+        codeBlock.beenExecuted = True
         self.BeginScriptedSection()
         try:
             try:

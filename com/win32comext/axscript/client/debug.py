@@ -108,20 +108,21 @@ class DebugManager:
         The result is a boolean which indicates if the error handler should call
         IActiveScriptSite::OnScriptError()
         """
-        # 		if self.IsAnyHost:
-        # 			site = _wrap(self, axdebug.IID_IActiveScriptSite)
-        # 			breakResume, errorResume, fCallOnError = self.debugApplication(activeScriptErrorDebug, site)
-        # Do something with these!
-        # 		else:
-        trace("HandleRuntimeError")
-        fCallOnError = 1
-        return fCallOnError
+        # if self.IsAnyHost:
+        #     site = _wrap(self, axdebug.IID_IActiveScriptSite)
+        #     # Do something with these!
+        #     breakResume, errorResume, fCallOnError = self.debugApplication(activeScriptErrorDebug, site)
+        # else:
+        #     trace("HandleRuntimeError")
+        #     fCallOnError = True
+        # return fCallOnError
+        return True
 
     def _query_interface_for_debugger_(self, iid):
         if iid in self._debugger_interfaces_:
             return self.activeScriptDebug
         trace("DebugManager QI - unknown IID", iid)
-        return 0
+        return None
 
     def OnEnterScript(self):
         trace("OnEnterScript")

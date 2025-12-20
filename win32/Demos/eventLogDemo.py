@@ -1,3 +1,5 @@
+import sys
+
 import win32api  # To translate NT Sids to account names.
 import win32con
 import win32evtlog
@@ -12,7 +14,7 @@ def ReadLog(computer, logType="Application", dumpEachRecord=0):
     # print(f"There are {numRecords} records")
 
     num = 0
-    while 1:
+    while True:
         objects = win32evtlog.ReadEventLog(
             h,
             win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ,
@@ -93,7 +95,7 @@ def test():
             computer = val
         if opt in ["-h", "-?"]:
             usage()
-            return
+            return 0
         if opt == "-r":
             do_read = 0
         if opt == "-w":
@@ -135,4 +137,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    sys.exit(test())

@@ -54,11 +54,11 @@ def _docopy(src, dest):
                 os.path.abspath(orig_src), os.path.abspath(src)
             )
         )
-        return 0
+        return False
     try:
         shutil.copy(src, dest)
         print(f"Copied {src} -> {dest}")
-        return 1
+        return True
     except:
         print(f"Error copying '{src}' -> '{dest}'")
         print(sys.exc_info()[1])

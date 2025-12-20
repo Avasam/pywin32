@@ -35,7 +35,9 @@ def trace(*args):
 
 
 def _wrap(object, iid):
-    useDispatcher = win32com.server.policy.DispatcherWin32trace if debugging else None
+    useDispatcher = (
+        win32com.server.dispatcher.DispatcherWin32trace if debugging else None
+    )
     return win32com.server.util.wrap(object, iid, useDispatcher=useDispatcher)
 
 

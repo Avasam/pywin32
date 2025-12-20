@@ -64,7 +64,7 @@ class DIBDemo:
 
     def OnCreateClient(self, createparams, context):
         self.dibView.view.CreateWindow(self.frame)
-        return 1
+        return True
 
 
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ def SubstituteInFile(inName, outName, evalEnv):
     try:
         outFile = open(outName, "w")
         try:
-            while 1:
+            while True:
                 line = inFile.read()
                 if not line:
                     break
@@ -144,7 +144,7 @@ def GetLastBuildNo(project):
     return None
 
 
-def MakeNewBuildNo(project, buildDesc=None, auto=0, bRebrand=0):
+def MakeNewBuildNo(project, buildDesc=None, auto=0, bRebrand=False):
     if buildDesc is None:
         buildDesc = "Created by Python"
     ss = GetSS()

@@ -50,7 +50,7 @@ def UserEnum():
     "Enumerates all the local users"
     resume = 0
     nuser = 0
-    while 1:
+    while True:
         data, total, resume = win32net.NetUserEnum(
             server, 3, win32netcon.FILTER_NORMAL_ACCOUNT, resume
         )
@@ -70,13 +70,13 @@ def GroupEnum():
     "Enumerates all the domain groups"
     nmembers = 0
     resume = 0
-    while 1:
+    while True:
         data, total, resume = win32net.NetGroupEnum(server, 1, resume)
         # print(f"Call to NetGroupEnum obtained {len(data)} entries of {total} total")
         for group in data:
             verbose("Found group {name}:{comment} ".format(**group))
             memberresume = 0
-            while 1:
+            while True:
                 memberdata, total, memberresume = win32net.NetGroupGetUsers(
                     server, group["name"], 0, resume
                 )
@@ -95,12 +95,12 @@ def LocalGroupEnum():
     "Enumerates all the local groups"
     resume = 0
     nmembers = 0
-    while 1:
+    while True:
         data, total, resume = win32net.NetLocalGroupEnum(server, 1, resume)
         for group in data:
             verbose("Found group {name}:{comment} ".format(**group))
             memberresume = 0
-            while 1:
+            while True:
                 memberdata, total, memberresume = win32net.NetLocalGroupGetMembers(
                     server, group["name"], 2, resume
                 )
@@ -122,7 +122,7 @@ def LocalGroupEnum():
 def ServerEnum():
     "Enumerates all servers on the network"
     resume = 0
-    while 1:
+    while True:
         data, total, resume = win32net.NetServerEnum(
             server, 100, win32netcon.SV_TYPE_ALL, None, resume
         )
@@ -130,7 +130,7 @@ def ServerEnum():
             verbose("Found server %s" % s["name"])
             # Now loop over the shares.
             shareresume = 0
-            while 1:
+            while True:
                 sharedata, total, shareresume = win32net.NetShareEnum(
                     server, 2, shareresume
                 )
@@ -256,7 +256,7 @@ def main():
                     break
             else:
                 print("Test '%s' unknown - skipping" % arg)
-    if not len(dotests):
+    if not dotests:
         print("Nothing to do!")
         usage(tests)
     for test in dotests:

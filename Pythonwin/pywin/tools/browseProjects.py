@@ -44,7 +44,7 @@ class HLICLBRItem(hierlist.HierListItem):
     def TakeDefaultAction(self):
         if self.file:
             pywin.framework.scriptutils.JumpToDocument(
-                self.file, self.lineno, bScrollToTop=1
+                self.file, self.lineno, bScrollToTop=True
             )
         else:
             win32ui.SetStatusText("The source of this object is unknown")
@@ -106,7 +106,7 @@ class HLIModuleItem(hierlist.HierListItem):
         return os.path.split(self.path)[1] + " (module)"
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def TakeDefaultAction(self):
         win32ui.GetApp().OpenDocumentFile(self.path)
@@ -164,7 +164,7 @@ def MakePathSubList(path):
 
 
 class HLIDirectoryItem(hierlist.HierListItem):
-    def __init__(self, path, displayName=None, bSubDirs=0):
+    def __init__(self, path, displayName=None, bSubDirs=False):
         hierlist.HierListItem.__init__(self)
         self.path = path
         self.bSubDirs = bSubDirs
@@ -174,7 +174,7 @@ class HLIDirectoryItem(hierlist.HierListItem):
             self.displayName = path
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetText(self):
         return self.displayName
@@ -204,7 +204,7 @@ class HLIProjectRoot(hierlist.HierListItem):
         return self.displayName
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetSubList(self):
         paths = regutil.GetRegisteredNamedPath(self.projectName)
@@ -221,7 +221,7 @@ class HLIRoot(hierlist.HierListItem):
         hierlist.HierListItem.__init__(self)
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetSubList(self):
         keyStr = regutil.BuildDefaultPythonKey() + "\\PythonPath"
@@ -230,7 +230,7 @@ class HLIRoot(hierlist.HierListItem):
             ret = []
             ret.append(HLIProjectRoot("", "Standard Python Library"))  # The core path.
             index = 0
-            while 1:
+            while True:
                 try:
                     ret.append(HLIProjectRoot(win32api.RegEnumKey(hKey, index)))
                     index += 1

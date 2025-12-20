@@ -18,7 +18,7 @@ class Persists:
 
     def __init__(self):
         self.data = b"abcdefg"
-        self.dirty = 1
+        self.dirty = True
 
     def GetClassID(self):
         return pythoncom.IID_NULL
@@ -32,7 +32,7 @@ class Persists:
     def Save(self, stream, clearDirty):
         stream.Write(self.data)
         if clearDirty:
-            self.dirty = 0
+            self.dirty = False
 
     def GetSizeMax(self):
         return 1024

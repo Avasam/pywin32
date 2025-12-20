@@ -47,7 +47,7 @@ class DebuggerCommandHandler:
 
     def OnUpdateDebuggerToolbar(self, cmdui):
         win32ui.GetMainFrame().OnUpdateControlBarMenu(cmdui)
-        cmdui.Enable(1)
+        cmdui.Enable(True)
 
     def _GetDebugger(self):
         try:
@@ -64,7 +64,7 @@ class DebuggerCommandHandler:
             method()
         else:
             scriptutils.RunScript(
-                defName=None, defArgs=None, bShowDialog=0, debuggingType=startFlag
+                defName=None, defArgs=None, bShowDialog=False, debuggingType=startFlag
             )
 
     def OnStep(self, msg, code):
@@ -92,9 +92,9 @@ class DebuggerCommandHandler:
     def OnUpdateClose(self, cmdui):
         d = self._GetDebugger()
         if d is not None and d.inited:
-            cmdui.Enable(1)
+            cmdui.Enable(True)
         else:
-            cmdui.Enable(0)
+            cmdui.Enable(False)
 
     def OnAdd(self, msg, code):
         doc, view = scriptutils.GetActiveEditorDocument()

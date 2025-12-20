@@ -31,4 +31,4 @@ class DebuggerOptionsPropPage(dialog.PropertyPage):
 
         if pywin.debugger.currentDebugger is not None:
             pywin.debugger.currentDebugger.options = self.options
-        return 1
+        return True

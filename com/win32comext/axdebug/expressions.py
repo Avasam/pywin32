@@ -43,7 +43,7 @@ class Expression(gateways.DebugExpression):
         self.radix = radix
         self.delim = delim
         self.flags = flags
-        self.isComplete = 0
+        self.isComplete = False
         self.result = None
         self.hresult = winerror.E_UNEXPECTED
 
@@ -66,7 +66,7 @@ class Expression(gateways.DebugExpression):
                 self.result = "\n".join(s[:-1] for s in l)
                 self.hresult = winerror.E_FAIL
         finally:
-            self.isComplete = 1
+            self.isComplete = True
             callback.onComplete()
 
     def Abort(self):

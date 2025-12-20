@@ -69,7 +69,7 @@ def recurse_delete_key(path, base=win32con.HKEY_CLASSES_ROOT):
         # to always close the thing (error or no).
         try:
             # remove all of the subkeys
-            while 1:
+            while True:
                 try:
                     subkeyname = win32api.RegEnumKey(h, 0)
                 except win32api.error as xxx_todo_changeme:
@@ -302,7 +302,7 @@ def RegisterServer(
         _remove_key(keyNameRoot + "\\PythonCOMPath")
 
     if addPyComCat is None:
-        addPyComCat = pythoncom.frozen == 0
+        addPyComCat = pythoncom.frozen == False
     if addPyComCat:
         catids = catids + [CATID_PythonCOMServer]
 

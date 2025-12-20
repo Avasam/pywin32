@@ -146,7 +146,7 @@ class AutoIndent:
         assert have > 0
         want = int((have - 1) / self.indentwidth) * self.indentwidth
         ncharsdeleted = 0
-        while 1:
+        while True:
             chars = chars[:-1]
             ncharsdeleted += 1
             have = len(chars.expandtabs(self.tabwidth))

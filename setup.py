@@ -791,6 +791,7 @@ class my_build_ext(build_ext):
         return f"{name}{suffix}.pyd"
 
     def get_export_symbols(self, ext):
+        assert isinstance(ext, WinExt)
         if ext.is_regular_dll:
             return ext.export_symbols
         return build_ext.get_export_symbols(self, ext)
@@ -987,7 +988,7 @@ win32_extensions.append(
         ],
         libraries="advapi32",
         export_symbol_file="win32/src/PerfMon/perfmondata.def",
-        is_regular_dll=1,
+        is_regular_dll=True,
         depends=[
             "win32/src/PerfMon/perfutil.h",
             "win32/src/PerfMon/PyPerfMonControl.h",
@@ -1802,7 +1803,7 @@ other_extensions.append(
                """.split()
         ],
         pch_header="StdAfx.h",
-        is_regular_dll=1,
+        is_regular_dll=True,
         export_symbols="""HttpExtensionProc GetExtensionVersion
                            TerminateExtension GetFilterVersion
                            HttpFilterProc TerminateFilter

@@ -278,7 +278,7 @@ def __get_disp_and_event_classes(dispatch):
             disp_clsid = ti.GetTypeAttr()[0]
             tlb, index = ti.GetContainingTypeLib()
             tla = tlb.GetLibAttr()
-            gencache.EnsureModule(tla[0], tla[1], tla[3], tla[4], bValidateFile=0)
+            gencache.EnsureModule(tla[0], tla[1], tla[3], tla[4], bValidateFile=False)
             # Get the class from the module.
             disp_class = gencache.GetClassForProgID(str(disp_clsid))
         except pythoncom.com_error as error:
@@ -413,18 +413,18 @@ def getevents(clsid):
 
     Example:
 
-    >>>win32com.client.gencache.EnsureModule('{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}',0,1,1)
-    <module 'win32com.gen_py.....
+    >>> win32com.client.gencache.EnsureModule('{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}',0,1,1)
+    <module 'win32com.gen_py....' from '....py'>
     >>>
     >>> class InternetExplorerEvents(win32com.client.getevents("InternetExplorer.Application.1")):
-    ...    def OnVisible(self, Visible):
-    ...        print("Visibility changed: ", Visible)
+    ...     def OnVisible(self, Visible: bool):
+    ...         print("Visibility changed: ", Visible)
     ...
     >>>
     >>> ie=win32com.client.Dispatch("InternetExplorer.Application.1")
     >>> events=InternetExplorerEvents(ie)
-    >>> ie.Visible=1
-    Visibility changed:  1
+    >>> ie.Visible = True
+    Visibility changed:  True
     >>>
     """
 

@@ -78,7 +78,7 @@ MODIFYING_VK_KEYS_ALT = [
 # Due to a limitation in the Windows edit controls, we are limited to one view
 # per document, although nothing in this code assumes this (I hope!)
 
-isRichText = 1  # We are using the Rich Text control.  This has not been tested with value "0" for quite some time!
+isRichText = True  # We are using the Rich Text control.  This has not been tested with value "0" for quite some time!
 
 
 class EditorDocument(ParentEditorDocument):
@@ -104,17 +104,16 @@ class EditorDocument(ParentEditorDocument):
                 + "\nCan not find this file\nPlease verify that the correct path and file name are given"
             )
             self.EndWaitCursor()
-            return 0
+            return False
         raw = f.read()
         f.close()
         contents = self.TranslateLoadedData(raw)
-        rc = 0
         try:
             self.GetFirstView().SetWindowText(contents)
-            rc = 1
+            rc = True
         except TypeError:  # Null byte in file.
             win32ui.MessageBox("This file contains NULL bytes, and can not be edited")
-            rc = 0
+            rc = False
 
         self.EndWaitCursor()
         self.SetModifiedFlag(0)  # No longer dirty
@@ -161,7 +160,7 @@ class EditorDocument(ParentEditorDocument):
 
 # 	def StreamTextOut(self, data): ### This seems unreliable???
 # 		self.saveFileHandle.write(data)
-# 		return 1 # keep em coming!
+# 		return True # keep em coming!
 
 
 class EditorView(ParentEditorView):
@@ -172,7 +171,7 @@ class EditorView(ParentEditorView):
 
         self.addToMRU = 1
         self.HookHandlers()
-        self.bCheckingFile = 0
+        self.bCheckingFile = False
 
         self.defCharFormat = GetEditorFontOption("Default Font", defaultCharacterFormat)
 
@@ -296,7 +295,7 @@ class EditorView(ParentEditorView):
     def BlockDent(self, isIndent, startLine, endLine):
         "Indent/Undent all lines specified"
         if not self.GetDocument().CheckMakeDocumentWritable():
-            return 0
+            return
         tabSize = self.tabSize  # hard-code for now!
         info = self._PrepareUserStateChange()
         try:
@@ -379,16 +378,16 @@ class EditorView(ParentEditorView):
         menu.AppendMenu(flags, win32con.MF_SEPARATOR)
         menu.AppendMenu(flags, ID_GOTO_LINE, "&Goto line...")
         menu.TrackPopupMenu(params[5])
-        return 0
+        return False
 
     def OnCmdGotoLine(self, cmd, code):
         self.GotoLine()
-        return 0
+        return False
 
     def OnCmdLocateFile(self, cmd, code):
         modName = patImport.group("name")
         if not modName:
-            return 0
+            return False
         import pywin.framework.scriptutils
 
         fileName = pywin.framework.scriptutils.LocatePythonFile(modName)
@@ -396,12 +395,12 @@ class EditorView(ParentEditorView):
             win32ui.SetStatusText("Can't locate module %s" % modName)
         else:
             win32ui.GetApp().OpenDocumentFile(fileName)
-        return 0
+        return False
 
     # Key handlers
     def OnKeyEnter(self, key):
         if not self.GetDocument().CheckMakeDocumentWritable():
-            return 0
+            return False
         curLine = self._obj_.GetLine()
         self._obj_.ReplaceSel("\r\n")  # insert the newline
         # If the current line indicates the next should be indented,
@@ -410,25 +409,25 @@ class EditorView(ParentEditorView):
         if res > 0 and curLine.strip():
             curIndent = patIndent.group(1)
             self._obj_.ReplaceSel(curIndent)
-        return 0  # don't pass on
+        return False  # don't pass on
 
     def OnKeyCtrlY(self, key):
         if not self.GetDocument().CheckMakeDocumentWritable():
-            return 0
+            return False
         self.CutCurLine()
-        return 0  # don't let him have it!
+        return False  # don't let him have it!
 
     def OnKeyCtrlG(self, key):
         self.GotoLine()
-        return 0  # don't let him have it!
+        return False  # don't let him have it!
 
     def OnKeyTab(self, key):
         if not self.GetDocument().CheckMakeDocumentWritable():
-            return 0
+            return False
         start, end = self._obj_.GetSel()
         if start == end:  # normal TAB key
             self.Indent()
-            return 0  # we handled this.
+            return False  # we handled this.
 
         # Otherwise it is a block indent/dedent.
         if start > end:
@@ -437,7 +436,7 @@ class EditorView(ParentEditorView):
         endLine = self._obj_.LineFromChar(end)
 
         self.BlockDent(win32api.GetKeyState(win32con.VK_SHIFT) >= 0, startLine, endLine)
-        return 0
+        return False
 
     def OnEditPaste(self, id, code):
         # Return 1 if we can make the file editable.(or it already is!)
@@ -459,7 +458,7 @@ class EditorView(ParentEditorView):
         if key in modList:
             # Return 1 if we can make the file editable.(or it already is!)
             return self.GetDocument().CheckMakeDocumentWritable()
-        return 1  # Pass it on OK
+        return True  # Pass it on OK
 
     # 	def OnKey(self, key):
     # 		return self.GetDocument().CheckMakeDocumentWritable()
@@ -467,9 +466,9 @@ class EditorView(ParentEditorView):
     def OnCheckExternalDocumentUpdated(self, msg):
         if self._obj_ is None or self.bCheckingFile:
             return
-        self.bCheckingFile = 1
+        self.bCheckingFile = True
         self.GetDocument().CheckExternalDocumentUpdated()
-        self.bCheckingFile = 0
+        self.bCheckingFile = False
 
 
 from .template import EditorTemplateBase

@@ -92,7 +92,7 @@ outctxt = 0
 buf = None
 readsize = 100
 
-while 1:
+while True:
     bytes_read, buf, ctxt = win32file.BackupRead(h, readsize, buf, False, True, ctxt)
     if bytes_read == 0:
         break

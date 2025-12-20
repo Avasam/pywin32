@@ -49,7 +49,7 @@ class flags:
 
 class WindowOutputDocument(WindowOutputDocumentParent):
     def SaveModified(self):
-        return 1  # say it is OK to destroy my document
+        return True  # say it is OK to destroy my document
 
     def OnSaveDocument(self, fileName):
         win32ui.SetStatusText("Saving file...", 1)
@@ -57,9 +57,9 @@ class WindowOutputDocument(WindowOutputDocumentParent):
             self.SaveFile(fileName)
         except OSError as details:
             win32ui.MessageBox("Error - could not save file\r\n\r\n%s" % details)
-            return 0
+            return False
         win32ui.SetStatusText("Ready")
-        return 1
+        return True
 
 
 class WindowOutputFrame(window.MDIChildWnd):
@@ -91,7 +91,7 @@ class WindowOutputFrame(window.MDIChildWnd):
 
     def OnDestroy(self, message):
         self.template.OnFrameDestroy(self)
-        return 1
+        return True
 
 
 class WindowOutputViewImpl:
@@ -128,7 +128,7 @@ class WindowOutputViewImpl:
                 appendParams = (appendParams,)
             menu.AppendMenu(*appendParams)
         menu.TrackPopupMenu(params[5])  # track at mouse position.
-        return 0
+        return False
 
     # as this is often used as an output window, exeptions will often
     # be printed.  Therefore, we support this functionality at this level.
@@ -150,12 +150,12 @@ class WindowOutputViewImpl:
                 from . import help
 
                 help.OpenHelpFile(det[2][3], win32con.HELP_CONTEXT, det[2][4])
-                return 1
+                return True
             except win32api.error as details:
                 win32ui.SetStatusText(
                     "The help file could not be opened - %s" % details.strerror
                 )
-                return 1
+                return True
             except:
                 win32ui.SetStatusText(
                     "Line is a COM error, but no WinHelp details can be parsed"
@@ -173,7 +173,7 @@ class WindowOutputViewImpl:
             fileName = matchResult.group(1)
             if fileName[0] == "<":
                 win32ui.SetStatusText("Can not load this file")
-                return 1  # still was an error message.
+                return True  # still was an error message.
             else:
                 lineNoString = matchResult.group(2)
                 # Attempt to locate the file (in case it is a relative spec)
@@ -184,16 +184,16 @@ class WindowOutputViewImpl:
                     win32ui.SetStatusText(
                         "Can't locate the file '%s'" % (fileNameSpec), 0
                     )
-                    return 1
+                    return True
 
                 win32ui.SetStatusText(
                     "Jumping to line " + lineNoString + " of file " + fileName, 1
                 )
                 if not scriptutils.JumpToDocument(fileName, int(lineNoString)):
                     win32ui.SetStatusText("Could not open %s" % fileName)
-                    return 1  # still was an error message.
-                return 1
-        return 0  # not an error line
+                    return True  # still was an error message.
+                return True
+        return False  # not an error line
 
     def write(self, msg):
         return self.template.write(msg)
@@ -224,12 +224,11 @@ class WindowOutputViewRTF(docview.RichEditView, WindowOutputViewImpl):
         # Hook for finding and locating error messages
         self.HookMessage(self.OnLDoubleClick, win32con.WM_LBUTTONDBLCLK)
 
-    # 		docview.RichEditView.HookHandlers(self)
+        # docview.RichEditView.HookHandlers(self)
 
     def OnLDoubleClick(self, params):
-        if self.HandleSpecialLine():
-            return 0  # don't pass on
-        return 1  # pass it on by default.
+        # Don't pass on if HandleSpecialLine
+        return not self.HandleSpecialLine()
 
     def RestoreKillBuffer(self):
         if len(self.template.killBuffer):
@@ -241,7 +240,7 @@ class WindowOutputViewRTF(docview.RichEditView, WindowOutputViewImpl):
 
     def _StreamRTFOut(self, data):
         self.template.killBuffer.append(data)
-        return 1  # keep em coming!
+        return True  # keep em coming!
 
     def _StreamRTFIn(self, bytes):
         try:
@@ -284,13 +283,13 @@ class WindowOutputViewScintilla(
             self.OnScintillaDoubleClick, scintillacon.SCN_DOUBLECLICK
         )
 
-    ##		self.HookMessage(self.OnLDoubleClick,win32con.WM_LBUTTONDBLCLK)
+        # self.HookMessage(self.OnLDoubleClick,win32con.WM_LBUTTONDBLCLK)
 
     def OnScintillaDoubleClick(self, std, extra):
         self.HandleSpecialLine()
 
-    ##	def OnLDoubleClick(self,params):
-    ##			return 0	# never don't pass on
+    # def OnLDoubleClick(self, params):
+    #     return False  # never don't pass on
 
     def RestoreKillBuffer(self):
         assert len(self.template.killBuffer) in (0, 1), "Unexpected killbuffer contents"
@@ -308,7 +307,7 @@ class WindowOutputViewScintilla(
         if atEnd:
             self.SetSel(self.GetTextLength())
 
-    def SetWordWrap(self, bWrapOn=1):
+    def SetWordWrap(self, bWrapOn=True):
         if bWrapOn:
             wrap_mode = scintillacon.SC_WRAP_WORD
         else:
@@ -337,7 +336,7 @@ class WindowOutput(docview.DocTemplate):
         title=None,
         defSize=None,
         queueing=flags.WQ_LINE,
-        bAutoRestore=1,
+        bAutoRestore=True,
         style=None,
         makeDoc=None,
         makeFrame=None,
@@ -349,7 +348,7 @@ class WindowOutput(docview.DocTemplate):
         defSize=None -- What is the default size for the window - if this
                         is a string, the size will be loaded from the ini file.
         queueing = flags.WQ_LINE -- When should output be written
-        bAutoRestore=1 -- Should a minimized window be restored.
+        bAutoRestore = True -- Should a minimized window be restored.
         style -- Style for Window, or None for default.
         makeDoc, makeFrame, makeView -- Classes for frame, view and window respectively.
         """
@@ -370,7 +369,7 @@ class WindowOutput(docview.DocTemplate):
         self.style = style
         self.bAutoRestore = bAutoRestore
         self.title = title
-        self.bCreating = 0
+        self.bCreating = False
         self.interruptCount = 0
         if isinstance(defSize, str):  # maintain size pos from ini file.
             self.iniSizeSection = defSize
@@ -389,7 +388,7 @@ class WindowOutput(docview.DocTemplate):
         self.Close()
 
     def Create(self, title=None, style=None):
-        self.bCreating = 1
+        self.bCreating = True
         if title:
             self.title = title
         if style:
@@ -398,7 +397,7 @@ class WindowOutput(docview.DocTemplate):
         if doc is None:
             return
         self.currentView = doc.GetFirstView()
-        self.bCreating = 0
+        self.bCreating = False
         if self.title:
             doc.SetTitle(self.title)
 
@@ -442,16 +441,16 @@ class WindowOutput(docview.DocTemplate):
     def RecreateWindow(self):
         if self.errorCantRecreate:
             debug("Error = not trying again")
-            return 0
+            return False
         try:
             # This will fail if app shutting down
             win32ui.GetMainFrame().GetSafeHwnd()
             self.Create()
-            return 1
+            return True
         except (win32ui.error, AttributeError):
             self.errorCantRecreate = 1
             debug("Winout can not recreate the Window!\n")
-            return 0
+            return False
 
     # this handles the idle message, and does the printing.
     def QueueIdleHandler(self, handler, count):
@@ -468,7 +467,7 @@ class WindowOutput(docview.DocTemplate):
                 # Drop the queue quickly as the user is already annoyed :-)
                 self.outputQueue = queue.Queue(-1)
                 print("Interrupted.")
-                bEmpty = 1
+                bEmpty = True
             else:
                 raise  # re-raise the error so the users exception filters up.
         return not bEmpty  # More to do if not empty.
@@ -477,45 +476,40 @@ class WindowOutput(docview.DocTemplate):
     def NeedRecreateWindow(self):
         try:
             if self.currentView is not None and self.currentView.IsWindow():
-                return 0
-        except (
-            win32ui.error,
-            AttributeError,
-        ):  # Attribute error if the win32ui object has died.
+                return False
+        except (win32ui.error, AttributeError):
+            # Attribute error if the win32ui object has died.
             pass
-        return 1
+        return True
 
     # Returns true if the Window is OK (either cos it was, or because it was recreated
     def CheckRecreateWindow(self):
-        if self.bCreating:
-            return 1
-        if not self.NeedRecreateWindow():
-            return 1
-        if self.bAutoRestore:
-            if self.RecreateWindow():
-                return 1
-        return 0
+        return (
+            self.bCreating
+            or not self.NeedRecreateWindow()
+            or (self.bAutoRestore and self.RecreateWindow())
+        )
 
     def QueueFlush(self, max=None):
         # Returns true if the queue is empty after the flush
         # 		debug("Queueflush - %d, %d\n" % (max, self.outputQueue.qsize()))
         if self.bCreating:
-            return 1
+            return True
         items = []
-        rc = 0
+        rc = False
         while max is None or max > 0:
             try:
                 item = self.outputQueue.get_nowait()
                 items.append(item)
             except queue.Empty:
-                rc = 1
+                rc = True
                 break
             if max is not None:
                 max -= 1
         if len(items) != 0:
             if not self.CheckRecreateWindow():
                 debug(":Recreate failed!\n")
-                return 1  # In trouble - so say we have nothing to do.
+                return True  # In trouble - so say we have nothing to do.
             win32ui.PumpWaitingMessages()  # Pump paint messages
             self.currentView.dowrite("".join(items))
         return rc

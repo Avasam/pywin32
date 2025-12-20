@@ -1,9 +1,12 @@
 # intpyapp.py  - Interactive Python application class
 #
+from __future__ import annotations
+
 import os
 import sys
 import traceback
 from collections.abc import Sequence
+from typing import Literal
 
 import __main__
 import commctrl
@@ -32,7 +35,7 @@ docview.DocTemplate._SetupSharedMenu_ = _SetupSharedMenu_  # type: ignore[method
 
 
 class MainFrame(app.MainFrame):
-    def OnCreate(self, createStruct):
+    def OnCreate(self, createStruct) -> Literal[-1, 0, 1] | None:
         self.closing = 0
         if app.MainFrame.OnCreate(self, createStruct) == -1:
             return -1
@@ -67,6 +70,7 @@ class MainFrame(app.MainFrame):
         from pywin.framework import help
 
         help.SetHelpMenuOtherHelp(menu)
+        return None
 
     def OnClose(self):
         try:
@@ -115,7 +119,7 @@ class MainFrame(app.MainFrame):
             )  # Raise an exception if none - good - then we want default handling
             # Main frame _does_ have a current view (ie, a docking view) - see if it wants it.
             if v.OnCommand(wparam, lparam):
-                return 1
+                return True
         except (win32ui.error, AttributeError):
             pass
         return self._obj_.OnCommand(wparam, lparam)
@@ -181,14 +185,14 @@ class InteractivePythonApp(app.CApp):
                 if connection is not None:
                     connection.Exec("self.Activate()")
                     if self.ProcessArgs(sys.argv, connection) is None:
-                        return 1
+                        return True
             except:
                 # It is too early to 'print' an exception - we
                 # don't have stdout setup yet!
                 win32ui.DisplayTraceback(
                     sys.exc_info(), " - error in DDE conversation with Pythonwin"
                 )
-                return 1
+                return True
 
     def InitInstance(self):
         # Allow "/nodde" and "/new" to optimize this!
@@ -199,7 +203,7 @@ class InteractivePythonApp(app.CApp):
             and "-new" not in sys.argv
         ):
             if self.InitDDE():
-                return 1  # A remote DDE client is doing it for us!
+                return True  # A remote DDE client is doing it for us!
         else:
             self.ddeServer = None
 
@@ -542,7 +546,7 @@ class InteractivePythonApp(app.CApp):
 
     def OnUpdateViewToolbarDbg(self, cmdui):
         win32ui.GetMainFrame().OnUpdateControlBarMenu(cmdui)
-        cmdui.Enable(1)
+        cmdui.Enable(True)
 
     def OnHelpIndex(self, id, code):
         from . import help

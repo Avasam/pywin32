@@ -99,25 +99,25 @@ class HLIPythonObject(hierlist.HierListItem):
 
     def CalculateIsExpandable(self):
         if hasattr(self.myobject, "__doc__"):
-            return 1
+            return True
         try:
             for key in self.myobject.__dict__:
                 if key not in special_names:
-                    return 1
+                    return True
         except (AttributeError, TypeError):
             pass
         try:
             self.myobject.__methods__
-            return 1
+            return True
         except (AttributeError, TypeError):
             pass
         try:
             for item in self.myobject.__members__:
                 if item not in special_names:
-                    return 1
+                    return True
         except (AttributeError, TypeError):
             pass
-        return 0
+        return False
 
     def GetBitmapColumn(self):
         if self.IsExpandable():
@@ -137,7 +137,7 @@ class HLIDocString(HLIPythonObject):
         return self.myobject.strip()
 
     def IsExpandable(self):
-        return 0
+        return False
 
     def GetBitmapColumn(self):
         return 6
@@ -210,7 +210,7 @@ class HLIInstance(HLIPythonObject):
         )
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetSubList(self):
         ret = []
@@ -229,7 +229,7 @@ class HLIFunction(HLIPythonObject):
         return "Function"
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def GetSubList(self):
         ret = [
@@ -274,7 +274,7 @@ class HLIDict(HLIPythonObject):
     def IsExpandable(self):
         try:
             self.myobject.__doc__
-            return 1
+            return True
         except (AttributeError, TypeError):
             return len(self.myobject) > 0
 
@@ -287,7 +287,7 @@ class HLIDict(HLIPythonObject):
 # strings and Unicode have builtin methods, but we don't really want to see these
 class HLIString(HLIPythonObject):
     def IsExpandable(self):
-        return 0
+        return False
 
 
 TypeMap = {
@@ -448,7 +448,6 @@ class BrowserDocument(docview.Document):
 
     def OnOpenDocument(self, name):
         raise TypeError("This template can not open files")
-        return 0
 
 
 class BrowserView(docview.TreeView):

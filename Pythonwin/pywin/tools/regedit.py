@@ -13,11 +13,11 @@ from . import hierlist
 def SafeApply(fn, args, err_desc=""):
     try:
         fn(*args)
-        return 1
+        return True
     except win32api.error as exc:
         msg = "Error " + err_desc + "\r\n\r\n" + exc.strerror
         win32ui.MessageBox(msg)
-        return 0
+        return False
 
 
 class SplitterFrame(window.MDIChildWnd):
@@ -43,7 +43,7 @@ class SplitterFrame(window.MDIChildWnd):
         splitter.SetRowInfo(0, size[1], 0)
         # Setup items in the imagelist
 
-        return 1
+        return True
 
     def OnItemDoubleClick(self, info, extra):
         (hwndFrom, idFrom, code) = info
@@ -53,7 +53,7 @@ class SplitterFrame(window.MDIChildWnd):
         elif idFrom == win32ui.AFX_IDW_PANE_FIRST + 1:
             item = self.keysview.SelectedItem()
             self.valuesview.EditValue(item)
-            return 0
+            return False
             # List control
         else:
             return None  # Pass it on
@@ -158,7 +158,7 @@ class RegistryTreeView(docview.TreeView):
 
     def SearchSelectedItem(self):
         handle = self.hierList.GetChildItem(0)
-        while 1:
+        while True:
             # print("State is", self.hierList.GetItemState(handle, -1))
             if self.hierList.GetItemState(handle, commctrl.TVIS_SELECTED):
                 # print("Item is ", self.hierList.ItemFromHandle(handle))
@@ -187,7 +187,7 @@ class RegistryValueView(docview.ListView):
         try:
             valNum = 0
             ret = []
-            while 1:
+            while True:
                 try:
                     res = win32api.RegEnumValue(hkey, valNum)
                 except win32api.error:
@@ -311,7 +311,6 @@ class RegDocument(docview.Document):
 
     def OnOpenDocument(self, name):
         raise TypeError("This template can not open files")
-        return 0
 
 
 class HLIRegistryKey(hierlist.HierListItem):
@@ -343,14 +342,13 @@ class HLIRegistryKey(hierlist.HierListItem):
 
     def IsExpandable(self):
         # All keys are expandable, even if they currently have zero children.
-        return 1
-
-    ##		hkey = win32api.RegOpenKey(self.keyRoot, self.keyName)
-    ##		try:
-    ##			keys, vals, dt = win32api.RegQueryInfoKey(hkey)
-    ##			return (keys>0)
-    ##		finally:
-    ##			win32api.RegCloseKey(hkey)
+        return True
+        # hkey = win32api.RegOpenKey(self.keyRoot, self.keyName)
+        # try:
+        #     keys, vals, dt = win32api.RegQueryInfoKey(hkey)
+        #     return keys > 0
+        # finally:
+        #     win32api.RegCloseKey(hkey)
 
     def GetSubList(self):
         hkey = win32api.RegOpenKey(self.keyRoot, self.keyName)
@@ -358,7 +356,7 @@ class HLIRegistryKey(hierlist.HierListItem):
         try:
             keyNum = 0
             ret = []
-            while 1:
+            while True:
                 try:
                     key = win32api.RegEnumKey(hkey, keyNum)
                 except win32api.error:

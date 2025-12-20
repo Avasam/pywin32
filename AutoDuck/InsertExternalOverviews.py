@@ -12,7 +12,7 @@ Usage:
 
 
 def processFile(input, out, extLinksHTML, extTopicHTML, importantHTML):
-    while 1:
+    while True:
         line = input.readline()
         if not line:
             break

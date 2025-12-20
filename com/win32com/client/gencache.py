@@ -39,7 +39,7 @@ import win32event
 
 from . import CLSIDToClass
 
-bForDemandDefault = 0  # Default value of bForDemand - toggle this to change the world - see also makepy.py
+bForDemandDefault = False  # Default value of bForDemand - toggle this to change the world - see also makepy.py
 
 # The global dictionary
 clsidToTypelib: dict[str, tuple[str, int, int, int]] = {}
@@ -322,7 +322,7 @@ def MakeModuleForTypelib(
     minor,
     progressInstance=None,
     bForDemand=bForDemandDefault,
-    bBuildHidden=1,
+    bBuildHidden=True,
 ):
     """Generate support for a type library.
 
@@ -351,7 +351,7 @@ def MakeModuleForTypelib(
 
 
 def MakeModuleForTypelibInterface(
-    typelib_ob, progressInstance=None, bForDemand=bForDemandDefault, bBuildHidden=1
+    typelib_ob, progressInstance=None, bForDemand=bForDemandDefault, bBuildHidden=True
 ):
     """Generate support for a type library.
 
@@ -386,7 +386,7 @@ def MakeModuleForTypelibInterface(
 
 
 def EnsureModuleForTypelibInterface(
-    typelib_ob, progressInstance=None, bForDemand=bForDemandDefault, bBuildHidden=1
+    typelib_ob, progressInstance=None, bForDemand=bForDemandDefault, bBuildHidden=True
 ):
     """Check we have support for a type library, generating if not.
 
@@ -453,7 +453,7 @@ def EnsureModule(
     progressInstance=None,
     bValidateFile=not is_readonly,
     bForDemand=bForDemandDefault,
-    bBuildHidden=1,
+    bBuildHidden=True,
 ):
     """Ensure Python support is loaded for a type library, generating if necessary.
 
@@ -476,7 +476,7 @@ def EnsureModule(
     bForDemand -- Should a complete generation happen now, or on demand?
     bBuildHidden -- Should hidden members/attributes etc be generated?
     """
-    bReloadNeeded = 0
+    bReloadNeeded = False
     try:
         try:
             module = GetModuleForTypelib(typelibCLSID, lcid, major, minor)
@@ -530,7 +530,7 @@ def EnsureModule(
                 # We have a module, but no type lib - we should still
                 # run with what we have though - the typelib may not be
                 # deployed here.
-                bValidateFile = 0
+                bValidateFile = False
         if module is not None and bValidateFile:
             assert not is_readonly, "Can't validate in a read-only gencache"
             filePathPrefix = "{}\\{}".format(
@@ -567,7 +567,7 @@ def EnsureModule(
                     shutil.rmtree(filePathPrefix)
                 minor = tlbAttributes[4]
                 module = None
-                bReloadNeeded = 1
+                bReloadNeeded = True
             else:
                 minor = module.MinorVersion
                 filePathPrefix = "{}\\{}".format(
@@ -593,7 +593,7 @@ def EnsureModule(
                 # print(typLibPath)
                 typLibModTime = os.stat(typLibPath)[8]
                 if fModTimeSet and (typLibModTime > pyModTime):
-                    bReloadNeeded = 1
+                    bReloadNeeded = True
                     module = None
     except (ImportError, OSError):
         module = None
@@ -642,7 +642,7 @@ def EnsureModule(
 
 
 def EnsureDispatch(
-    prog_id, bForDemand=1
+    prog_id, bForDemand=True
 ):  # New fn, so we default the new demand feature to on!
     """Given a COM prog_id, return an object that is using makepy support, building if necessary"""
     disp = win32com.client.Dispatch(prog_id)

@@ -37,7 +37,7 @@ def RunAsCollector():
     win32trace.InitRead()
     print("Collecting Python Trace Output...")
     try:
-        while 1:
+        while True:
             # a short timeout means ctrl+c works next time we wake...
             sys.stdout.write(win32trace.blockingread(500))
     except KeyboardInterrupt:

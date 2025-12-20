@@ -57,17 +57,17 @@ class DlgRunScript(dialog.Dialog):
 
     def OnBrowse(self, id, code):
         if code != 0:  # BN_CLICKED
-            return 1
+            return True
         openFlags = win32con.OFN_OVERWRITEPROMPT | win32con.OFN_FILEMUSTEXIST
         dlg = win32ui.CreateFileDialog(
             1, None, None, openFlags, "Python Scripts (*.py)|*.py||", self
         )
         dlg.SetOFNTitle("Run Script")
         if dlg.DoModal() != win32con.IDOK:
-            return 0
+            return False
         self["script"] = dlg.GetPathName()
         self.UpdateData(0)
-        return 0
+        return False
 
 
 def GetDebugger():
@@ -92,10 +92,10 @@ def IsOnPythonPath(path):
         try:
             # sys.path can have an empty entry.
             if syspath and win32ui.FullPath(syspath) == path:
-                return 1
+                return True
         except win32ui.error as details:
             print(f"Warning: The sys.path entry '{syspath}' is invalid\n{details}")
-    return 0
+    return False
 
 
 def GetPackageModuleName(fileName):
@@ -170,7 +170,7 @@ def GetActiveEditorDocument():
     return (None, None)
 
 
-def GetActiveFileName(bAutoSave=1):
+def GetActiveFileName(bAutoSave=True):
     """Gets the file name for the active frame, saving it if necessary.
 
     Returns None if it can't be found, or raises KeyboardInterrupt.
@@ -211,7 +211,7 @@ lastArgs = ""
 lastDebuggingType = RS_DEBUGGER_NONE
 
 
-def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
+def RunScript(defName=None, defArgs=None, bShowDialog=True, debuggingType=None):
     global lastScript, lastArgs, lastDebuggingType
     _debugger_stop_frame_ = 1  # Magic variable so the debugger will hide me!
 
@@ -329,7 +329,7 @@ def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
     else:
         sys.path.insert(0, newPath0)
         insertedPath0 = 1
-    bWorked = 0
+    bWorked = False
     win32ui.DoWaitCursor(1)
     base = os.path.split(script)[1]
     # Allow windows to repaint before starting.
@@ -363,15 +363,15 @@ def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
         else:
             # Post mortem or no debugging
             exec(codeObject, __main__.__dict__)
-        bWorked = 1
+        bWorked = True
     except bdb.BdbQuit:
         # Don't print tracebacks when the debugger quit, but do print a message.
         print("Debugging session cancelled.")
         exitCode = 1
-        bWorked = 1
+        bWorked = True
     except SystemExit as code:
         exitCode = code
-        bWorked = 1
+        bWorked = True
     except KeyboardInterrupt:
         # Consider this successful, as we don't want the debugger.
         # (but we do want a traceback!)
@@ -380,7 +380,7 @@ def RunScript(defName=None, defArgs=None, bShowDialog=1, debuggingType=None):
         traceback.print_exc()
         if interact.edit and interact.edit.currentView:
             interact.edit.currentView.AppendToPrompt([])
-        bWorked = 1
+        bWorked = True
     except:
         if interact.edit and interact.edit.currentView:
             interact.edit.currentView.EnsureNoPrompt()
@@ -454,11 +454,11 @@ def ImportFile():
             sys.path.append(newPath)
 
     if modName in sys.modules:
-        bNeedReload = 1
+        bNeedReload = True
         what = "reload"
     else:
         what = "import"
-        bNeedReload = 0
+        bNeedReload = False
 
     win32ui.SetStatusText(what.capitalize() + "ing module...", 1)
     win32ui.DoWaitCursor(1)
@@ -533,7 +533,7 @@ def RunTabNanny(filename):
     tabnanny = FindTabNanny()
     if tabnanny is None:
         win32ui.MessageBox("The TabNanny is not around, so the children can run amok!")
-        return
+        return False
 
     # Capture the tab-nanny output
     newout = io.StringIO()
@@ -558,15 +558,15 @@ def RunTabNanny(filename):
         except (IndexError, TypeError, ValueError):
             print("The tab nanny complained, but I can't see where!")
             print(data)
-        return 0
-    return 1
+        return False
+    return True
 
 
 def _JumpToPosition(fileName, lineno, col=1):
     JumpToDocument(fileName, lineno, col)
 
 
-def JumpToDocument(fileName, lineno=0, col=1, nChars=0, bScrollToTop=0):
+def JumpToDocument(fileName, lineno=0, col=1, nChars=0, bScrollToTop=False):
     # Jump to the position in a file.
     # If lineno is <= 0, don't move the position - just open/restore.
     # if nChars > 0, select that many characters.
@@ -654,7 +654,7 @@ def FindTabNanny():
         del sys.path[0]
 
 
-def LocatePythonFile(fileName, bBrowseIfDir=1):
+def LocatePythonFile(fileName, bBrowseIfDir=True):
     "Given a file name, return a fully qualified file name, or None"
     # first look for the exact file as specified
     if not os.path.isfile(fileName):

@@ -118,7 +118,7 @@ class Arg:
 
 
 class Method:
-    def __init__(self, method_info, isEventSink=0):
+    def __init__(self, method_info, isEventSink=False):
         all_names, dispid, desc = method_info
         name = all_names[0]
         names = all_names[1:]

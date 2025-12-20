@@ -64,7 +64,7 @@ class EditorFrame(pywin.framework.window.MDIChildWnd):
         if not doc.SaveModified():
             # Cancel button selected from Save dialog, do not actually close
             # print("close cancelled")
-            return 0
+            return True
         ## So the 'Save' dialog doesn't come up twice
         doc._obj_.SetModifiedFlag(False)
 

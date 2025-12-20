@@ -26,9 +26,9 @@ ParentEditorDocument = pywin.scintilla.document.CScintillaDocument
 class EditorDocumentBase(ParentEditorDocument):
     def __init__(self, template):
         self.bAutoReload = GetEditorOption("Auto Reload", 1)
-        self.bDeclinedReload = 0  # Has the user declined to reload.
+        self.bDeclinedReload = False  # Has the user declined to reload.
         self.fileStat = None
-        self.bReportedFileNotFound = 0
+        self.bReportedFileNotFound = False
 
         # what sort of bak file should I create.
         # default to write to %temp%/bak/filename.ext
@@ -83,7 +83,7 @@ class EditorDocumentBase(ParentEditorDocument):
             self.SaveFile(fileName)
         except OSError as details:
             win32ui.MessageBox("Error - could not save file\r\n\r\n%s" % details)
-            return 0
+            return False
         except (UnicodeEncodeError, LookupError) as details:
             rc = win32ui.MessageBox(
                 "Encoding failed: \r\n%s" % details
@@ -102,16 +102,16 @@ class EditorDocumentBase(ParentEditorDocument):
                     win32ui.MessageBox(
                         "Error - could not save file\r\n\r\n%s" % details
                     )
-                    return 0
+                    return False
             else:
-                return 0
+                return False
         self.SetModifiedFlag(0)  # No longer dirty
-        self.bDeclinedReload = 0  # They probably want to know if it changes again!
+        self.bDeclinedReload = False  # They probably want to know if it changes again!
         win32ui.AddToRecentFileList(fileName)
         self.SetPathName(fileName)
         win32ui.SetStatusText("Ready")
         self._DocumentStateChanged()
-        return 1
+        return True
 
     def FinalizeViewCreation(self, view):
         ParentEditorDocument.FinalizeViewCreation(self, view)
@@ -161,7 +161,7 @@ class EditorDocumentBase(ParentEditorDocument):
                         self.GetPathName(), exc.strerror
                     )
                 )
-                self.bReportedFileNotFound = 1
+                self.bReportedFileNotFound = True
             return
         if self.bReportedFileNotFound:
             print(
@@ -169,9 +169,8 @@ class EditorDocumentBase(ParentEditorDocument):
                     self.GetPathName()
                 )
             )
-            self.bReportedFileNotFound = (
-                0  # Once found again we want to start complaining.
-            )
+            # Once found again we want to start complaining.
+            self.bReportedFileNotFound = False
         changed = (
             (self.fileStat is None)
             or self.fileStat[0] != newstat[0]
@@ -197,7 +196,7 @@ class EditorDocumentBase(ParentEditorDocument):
             if question:
                 rc = win32ui.MessageBox(question, None, mbStyle)
                 if rc != win32con.IDYES:
-                    self.bDeclinedReload = 1
+                    self.bDeclinedReload = True
                     return
             self.ReloadDocument()
 
@@ -254,7 +253,7 @@ class EditorDocumentBase(ParentEditorDocument):
                 "Document is read-only, and no source-control system is configured"
             )
             win32api.MessageBeep()
-            return 0
+            return False
 
         # We have source control support - check if the user wants to use it.
         msg = "Would you like to check this file out?"
@@ -263,7 +262,7 @@ class EditorDocumentBase(ParentEditorDocument):
             msg += "\r\n\r\nALL CHANGES IN THE EDITOR WILL BE LOST"
             defButton = win32con.MB_YESNO
         if win32ui.MessageBox(msg, None, defButton) != win32con.IDYES:
-            return 0
+            return False
 
         if pretend_ss:
             print("We are only pretending to check it out!")
@@ -271,7 +270,7 @@ class EditorDocumentBase(ParentEditorDocument):
                 self.GetPathName(), win32con.FILE_ATTRIBUTE_NORMAL
             )
             self.ReloadDocument()
-            return 1
+            return True
 
         # Now call on the module to do it.
         if self.scModule is None:
@@ -282,17 +281,17 @@ class EditorDocumentBase(ParentEditorDocument):
             except:
                 traceback.print_exc()
                 print("Error loading source control module.")
-                return 0
+                return False
 
         if self.scModule.CheckoutFile(self.GetPathName()):
             self.ReloadDocument()
-            return 1
-        return 0
+            return True
+        return False
 
     def CheckMakeDocumentWritable(self):
         if self._IsReadOnly():
             return self.MakeDocumentWritable()
-        return 1
+        return True
 
     def SaveModified(self):
         # Called as the document is closed.  If we are about
@@ -350,7 +349,7 @@ class FileWatchingThread(pywin.mfc.thread.WinThread):
         win32event.SetEvent(self.stopEvent)
 
     def Run(self):
-        while 1:
+        while True:
             handles = [self.stopEvent, self.adminEvent]
             if self.watchEvent is not None:
                 handles.append(self.watchEvent)

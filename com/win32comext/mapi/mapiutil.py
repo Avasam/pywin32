@@ -100,9 +100,9 @@ def GetProperties(obj, propList):
 
     If the property fetch fails, the result is None.
     """
-    bRetList = 1
+    bRetList = True
     if not isinstance(propList, (tuple, list)):
-        bRetList = 0
+        bRetList = False
         propList = (propList,)
     realPropList = []
     rc = []

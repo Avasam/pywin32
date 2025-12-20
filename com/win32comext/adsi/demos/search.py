@@ -84,7 +84,7 @@ def search():
         print("-- new row --")
         if attributes is None:
             # Loop over all columns returned
-            while 1:
+            while True:
                 col_name = gc.GetNextColumnName(h)
                 if col_name is None:
                     break

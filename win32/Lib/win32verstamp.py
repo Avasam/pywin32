@@ -34,7 +34,7 @@ def file_type(is_dll):
     return 1  # VFT_APP
 
 
-def VS_FIXEDFILEINFO(maj, min, sub, build, debug=0, is_dll=1):
+def VS_FIXEDFILEINFO(maj, min, sub, build, debug=0, is_dll=True):
     return struct.pack(
         "lllllllllllll",
         VS_FFI_SIGNATURE,  # dwSignature
@@ -113,7 +113,7 @@ def VarFileInfo(data):
     return addlen(result)
 
 
-def VS_VERSION_INFO(maj, min, sub, build, sdata, vdata, debug=0, is_dll=1):
+def VS_VERSION_INFO(maj, min, sub, build, sdata, vdata, debug=0, is_dll=True):
     ffi = VS_FIXEDFILEINFO(maj, min, sub, build, debug, is_dll)
     result = struct.pack("hh", len(ffi), 0)  # wValueLength, wType
     result += nullterm("VS_VERSION_INFO")

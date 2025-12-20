@@ -36,7 +36,6 @@ class object_document(docview.Document):
 
     def OnOpenDocument(self, name):
         raise RuntimeError("Should not be called if template strings set up correctly")
-        return 0
 
 
 class object_view(docview.EditView):

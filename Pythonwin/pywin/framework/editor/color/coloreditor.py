@@ -44,7 +44,7 @@ class SyntEditView(SyntEditViewParent):
 
     def __init__(self, doc):
         SyntEditViewParent.__init__(self, doc)
-        self.bCheckingFile = 0
+        self.bCheckingFile = False
 
     def OnInitialUpdate(self):
         SyntEditViewParent.OnInitialUpdate(self)
@@ -303,19 +303,19 @@ class SyntEditView(SyntEditViewParent):
             if self.SCIGetFoldLevel(line_click) & scintillacon.SC_FOLDLEVELHEADERFLAG:
                 # If a fold point.
                 self.SCIToggleFold(line_click)
-        return 1
+        return True
 
     def OnSetFocus(self, msg):
         # Even though we use file change notifications, we should be very sure about it here.
         self.OnCheckExternalDocumentUpdated(msg)
-        return 1
+        return True
 
     def OnCheckExternalDocumentUpdated(self, msg):
         if self.bCheckingFile:
             return
-        self.bCheckingFile = 1
+        self.bCheckingFile = True
         self.GetDocument().CheckExternalDocumentUpdated()
-        self.bCheckingFile = 0
+        self.bCheckingFile = False
 
     def OnRClick(self, params):
         menu = win32ui.CreatePopupMenu()
@@ -350,7 +350,7 @@ class SyntEditView(SyntEditViewParent):
             win32con.TPM_LEFTALIGN | win32con.TPM_LEFTBUTTON | win32con.TPM_RIGHTBUTTON
         )
         menu.TrackPopupMenu(params[5], flags, self)
-        return 0
+        return False
 
     def OnCmdViewFold(self, cid, code):  # Handle the menu command
         if cid == win32ui.ID_VIEW_FOLD_EXPAND_ALL:
@@ -366,7 +366,7 @@ class SyntEditView(SyntEditViewParent):
 
     def OnUpdateViewFold(self, cmdui):  # Update the tick on the UI.
         if not self.bFolding:
-            cmdui.Enable(0)
+            cmdui.Enable(False)
             return
         id = cmdui.m_nID
         if id in (win32ui.ID_VIEW_FOLD_EXPAND_ALL, win32ui.ID_VIEW_FOLD_COLLAPSE_ALL):
@@ -398,7 +398,7 @@ class SyntEditView(SyntEditViewParent):
             pos, end = self.GetSel()
         startLine = self.LineFromChar(pos)
         self.GetDocument().MarkerToggle(startLine + 1, MARKER_BOOKMARK)
-        return 0
+        return False
 
     def GotoNextBookmarkEvent(self, event, fromPos=-1):
         """Move to the next bookmark"""
@@ -413,14 +413,14 @@ class SyntEditView(SyntEditViewParent):
         else:
             self.SCIEnsureVisible(nextLine)
             self.SCIGotoLine(nextLine)
-        return 0
+        return False
 
     def TabKeyEvent(self, event):
         """Insert an indent.  If no selection, a single indent, otherwise a block indent"""
         # Handle auto-complete first.
         if self.SCIAutoCActive():
             self.SCIAutoCComplete()
-            return 0
+            return False
         # Call the IDLE event.
         return self.bindings.fire("<<smart-indent>>", event)
 
@@ -440,7 +440,7 @@ class SyntEditView(SyntEditViewParent):
 
     def FoldTopLevelEvent(self, event=None):
         if not self.bFolding:
-            return 1
+            return True
 
         win32ui.DoWaitCursor(1)
         try:
@@ -473,7 +473,7 @@ class SyntEditView(SyntEditViewParent):
 
     def FoldExpandSecondLevelEvent(self, event):
         if not self.bFolding:
-            return 1
+            return True
         win32ui.DoWaitCursor(1)
         ## I think this is needed since Scintilla may not have
         ## already formatted parts of file outside visible window.
@@ -499,7 +499,7 @@ class SyntEditView(SyntEditViewParent):
 
     def FoldCollapseSecondLevelEvent(self, event):
         if not self.bFolding:
-            return 1
+            return True
         win32ui.DoWaitCursor(1)
         ## I think this is needed since Scintilla may not have
         ## already formatted parts of file outside visible window.
@@ -525,7 +525,7 @@ class SyntEditView(SyntEditViewParent):
 
     def FoldExpandEvent(self, event):
         if not self.bFolding:
-            return 1
+            return True
         win32ui.DoWaitCursor(1)
         lineno = self.LineFromChar(self.GetSel()[0])
         if self.SCIGetFoldLevel(
@@ -536,7 +536,7 @@ class SyntEditView(SyntEditViewParent):
 
     def FoldExpandAllEvent(self, event):
         if not self.bFolding:
-            return 1
+            return True
         win32ui.DoWaitCursor(1)
         for lineno in range(0, self.GetLineCount()):
             if self.SCIGetFoldLevel(
@@ -549,7 +549,7 @@ class SyntEditView(SyntEditViewParent):
 
     def FoldCollapseEvent(self, event):
         if not self.bFolding:
-            return 1
+            return True
         win32ui.DoWaitCursor(1)
         lineno = self.LineFromChar(self.GetSel()[0])
         if self.SCIGetFoldLevel(
@@ -560,7 +560,7 @@ class SyntEditView(SyntEditViewParent):
 
     def FoldCollapseAllEvent(self, event):
         if not self.bFolding:
-            return 1
+            return True
         win32ui.DoWaitCursor(1)
         self.Colorize()
         for lineno in range(0, self.GetLineCount()):
@@ -574,11 +574,11 @@ class SyntEditView(SyntEditViewParent):
 class SplitterFrame(EditorFrame):
     def OnCreate(self, cs):
         self.HookCommand(self.OnWindowSplit, win32ui.ID_WINDOW_SPLIT)
-        return 1
+        return True
 
     def OnWindowSplit(self, id, code):
         self.GetDlgItem(win32ui.AFX_IDW_PANE_FIRST).DoKeyboardSplit()
-        return 1
+        return True
 
 
 class SyntEditTemplate(EditorTemplateBase):
@@ -591,13 +591,13 @@ class SyntEditTemplate(EditorTemplateBase):
             makeView = SyntEditView
         if makeFrame is None:
             makeFrame = SplitterFrame
-        self.bSetMenus = 0
+        self.bSetMenus = False
         EditorTemplateBase.__init__(self, res, makeDoc, makeFrame, makeView)
 
     def CheckIDLEMenus(self, idle):
         if self.bSetMenus:
             return
-        self.bSetMenus = 1
+        self.bSetMenus = True
 
         submenu = win32ui.CreatePopupMenu()
         newitems = idle.GetMenuItems("edit")

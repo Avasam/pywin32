@@ -202,7 +202,7 @@ class TestMultipleThreadsWriting(unittest.TestCase):
         return bucketsAreFull
 
     def read(self):
-        while 1:
+        while True:
             readString = win32trace.blockingread()
             for ch in readString:
                 integer = int(ch)
@@ -314,7 +314,7 @@ class TestOutofProcess(unittest.TestCase):
         return bucketsAreFull
 
     def read(self):
-        while 1:
+        while True:
             readString = win32trace.blockingread()
             for ch in readString:
                 integer = int(ch)
@@ -354,7 +354,7 @@ def _RunAsTestProcess():
 if __name__ == "__main__":
     if sys.argv[1:2] == ["/run_test_process"]:
         _RunAsTestProcess()
-        sys.exit(0)
+        sys.exit()
     # If some other win32traceutil reader is running, these tests fail
     # badly (as the other reader sometimes sees the output!)
     win32trace.InitRead()

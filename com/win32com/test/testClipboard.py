@@ -17,7 +17,7 @@ num_do_objects = 0
 
 
 def WrapCOMObject(ob, iid=None):
-    return wrap(ob, iid=iid, useDispatcher=0)
+    return wrap(ob, iid=iid, useDispatcher=None)
 
 
 class TestDataObject:

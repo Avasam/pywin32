@@ -347,11 +347,11 @@ class DemoWindowBase:
         x = win32api.LOWORD(lparam)
         y = win32api.HIWORD(lparam)
         self._DoSize(x, y)
-        return 1
+        return True
 
     def OnSearchResult(self, hwnd, msg, wparam, lparam):
         try:
-            while 1:
+            while True:
                 params = self.result_queue.get(0)
                 self.AddListItem(*params)
         except queue.Empty:
@@ -364,7 +364,7 @@ class DemoWindowBase:
         info = win32gui_struct.UnpackNMITEMACTIVATE(lparam)
         if info.code == commctrl.NM_DBLCLK:
             print("Double click on item", info.iItem + 1)
-        return 1
+        return True
 
     def OnCommand(self, hwnd, msg, wparam, lparam):
         id = win32api.LOWORD(wparam)

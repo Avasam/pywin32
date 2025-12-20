@@ -7,7 +7,6 @@
 # usage:
 # >>> import pywin.debugger
 # >>> pywin.debugger.GetDebugger().run("command")
-
 import bdb
 import os
 import pdb
@@ -81,12 +80,12 @@ class HierFrameItem(HierListItem):
         return ret
 
     def IsExpandable(self):
-        return 1
+        return True
 
     def TakeDefaultAction(self):
         # Set the default frame to be this frame.
         self.debugger.set_cur_frame(self.myobject)
-        return 1
+        return True
 
 
 class HierFrameDict(browser.HLIDict):
@@ -103,7 +102,7 @@ class NoStackAvailableItem(HierListItem):
         HierListItem.__init__(self, None, why)
 
     def IsExpandable(self):
-        return 0
+        return False
 
     def GetText(self):
         return self.name
@@ -118,7 +117,7 @@ class HierStackRoot(HierListItem):
         self.last_stack = []
 
     # def __del__(self):
-    #     print("HierStackRoot dieing")
+    #     print("HierStackRoot dying")
     def GetSubList(self):
         debugger = self.myobject
         # print(self.debugger.stack, self.debugger.curframe)
@@ -145,7 +144,7 @@ class HierStackRoot(HierListItem):
         return "root item"
 
     def IsExpandable(self):
-        return 1
+        return True
 
 
 class HierListDebugger(hierlist.HierListWithItems):
@@ -187,10 +186,10 @@ class DebuggerWindow(window.Wnd):
     def OnKeyDown(self, msg):
         key = msg[2]
         if key in (13, 27, 32):
-            return 1
+            return True
         if key in (46, 8):  # delete/BS key
             self.DeleteSelected()
-            return 0
+            return False
         view = scriptutils.GetActiveView()
         try:
             firer = view.bindings.fire_key_event
@@ -199,7 +198,7 @@ class DebuggerWindow(window.Wnd):
         if firer is not None:
             return firer(msg)
         else:
-            return 1
+            return True
 
     def DeleteSelected(self):
         win32api.MessageBeep()
@@ -252,7 +251,7 @@ class DebuggerStackWindow(DebuggerWindow):
             handle = self.GetChildItem(0)
         except win32ui.error:
             return  # No items
-        while 1:
+        while True:
             item = self.list.ItemFromHandle(handle)
             col = self.list.GetBitmapColumn(item)
             selCol = self.list.GetSelectedBitmapColumn(item)
@@ -313,7 +312,7 @@ class DebuggerListViewWindow(DebuggerWindow):
         # If someone starts typing, they probably are trying to edit the text!
         if chr(key) in string.ascii_uppercase:
             self.EditSelected()
-            return 0
+            return False
         return DebuggerWindow.OnKeyDown(self, msg)
 
     def OnItemDoubleClick(self, notify_data, extra):
@@ -362,7 +361,7 @@ class DebuggerBreakpointsWindow(DebuggerListViewWindow):
         win32ui.WriteProfileVal(
             "Debugger Windows\\" + self.title, "Visible", self.IsWindowVisible()
         )
-        return 1
+        return True
 
     def OnListEndLabelEdit(self, std, extra):
         item = extra[0]
@@ -438,7 +437,7 @@ class DebuggerWatchWindow(DebuggerListViewWindow):
         win32ui.WriteProfileVal(
             "Debugger Windows\\" + self.title, "Visible", self.IsWindowVisible()
         )
-        return 1
+        return True
 
     def OnListEndLabelEdit(self, std, extra):
         item = extra[0]
@@ -569,13 +568,13 @@ class Debugger(debugger_parent):
         self.shownLineCallstack = None  # The last filename I highlighted.
         self.last_cmd_debugged = ""
         self.abortClosed = 0
-        self.isInitialBreakpoint = 0
+        self.isInitialBreakpoint = False
         debugger_parent.__init__(self)
 
         # See if any break-points have been set in the editor
         for doc in editor.editorTemplate.GetDocumentList():
             lineNo = -1
-            while 1:
+            while True:
                 lineNo = doc.MarkerGetNext(lineNo + 1, MARKER_BREAKPOINT)
                 if lineNo <= 0:
                     break
@@ -584,30 +583,30 @@ class Debugger(debugger_parent):
         self.reset()
         self.inForcedGUI = win32ui.GetApp().IsInproc()
         self.options = LoadDebuggerOptions()
-        self.bAtException = self.bAtPostMortem = 0
+        self.bAtException = self.bAtPostMortem = False
 
     def __del__(self):
         self.close()
 
     def close(self, frameShutdown=0):
         # abortClose indicates if we have total shutdown
-        # (ie, main window is dieing)
+        # (ie, main window is dying)
         if self.pumping:
             # Can stop pump here, as it only posts a message, and
             # returns immediately.
             if not self.StopDebuggerPump():  # User cancelled close.
-                return 0
+                return False
             # NOTE - from this point on the close can not be
             # stopped - the WM_QUIT message is already in the queue.
         self.frameShutdown = frameShutdown
         if not self.inited:
-            return 1
+            return True
         self.inited = 0
 
         SetInteractiveContext(None, None)
 
         frame = win32ui.GetMainFrame()
-        # Hide the debuger toolbars (as they won't normally form part of the main toolbar state.
+        # Hide the debugger toolbars (as they won't normally form part of the main toolbar state.
         for id, klass, float in DebuggerDialogInfos:
             try:
                 tb = frame.GetControlBar(id)
@@ -619,7 +618,7 @@ class Debugger(debugger_parent):
 
         self._UnshowCurrentLine()
         self.set_quit()
-        return 1
+        return True
 
     def StopDebuggerPump(self):
         assert self.pumping, "Can't stop the debugger pump if I'm not pumping!"
@@ -627,8 +626,8 @@ class Debugger(debugger_parent):
         if self.GUIAboutToFinishInteract():
             self.pumping = 0
             win32ui.StopDebuggerPump()  # Posts a message, so we do return.
-            return 1
-        return 0
+            return True
+        return False
 
     def get_option(self, option):
         """Public interface into debugger options"""
@@ -715,15 +714,15 @@ class Debugger(debugger_parent):
 
     def stop_here(self, frame):
         if self.isInitialBreakpoint:
-            self.isInitialBreakpoint = 0
+            self.isInitialBreakpoint = False
             self.set_continue()
-            return 0
+            return False
         if frame is self.botframe and self.skipBotFrame == SKIP_RUN:
             self.set_continue()
-            return 0
+            return False
         if frame is self.botframe and self.skipBotFrame == SKIP_STEP:
             self.set_step()
-            return 0
+            return False
         return debugger_parent.stop_here(self, frame)
 
     def run(self, cmd, globals=None, locals=None, start_stepping=1):
@@ -731,9 +730,9 @@ class Debugger(debugger_parent):
             raise TypeError("Only strings can be run")
         self.last_cmd_debugged = cmd
         if start_stepping:
-            self.isInitialBreakpoint = 0
+            self.isInitialBreakpoint = False
         else:
-            self.isInitialBreakpoint = 1
+            self.isInitialBreakpoint = True
         try:
             if globals is None:
                 import __main__
@@ -941,11 +940,11 @@ class Debugger(debugger_parent):
 
     def GUIAboutToRun(self):
         if not self.StopDebuggerPump():
-            return 0
+            return False
         self._UnshowCurrentLine()
         self.RespondDebuggerState(DBGSTATE_RUNNING)
         SetInteractiveContext(None, None)
-        return 1
+        return True
 
     def GUIAboutToBreak(self):
         "Called as the GUI debugger is about to get context, and take control of the running program."
@@ -994,21 +993,21 @@ class Debugger(debugger_parent):
             except win32ui.error:
                 # old window may be dead.
                 pass
-        # 			self.oldForeground.SetForegroundWindow() - fails??
+        # self.oldForeground.SetForegroundWindow() - fails??
         if not self.inForcedGUI:
-            return 1  # Never a problem, and nothing else to do.
+            return True  # Never a problem, and nothing else to do.
         # If we are running a forced GUI, we may never get an opportunity
-        # to interact again.  Therefore we perform a "SaveAll", to makesure that
+        # to interact again.  Therefore we perform a "SaveAll", to make sure that
         # any documents are saved before leaving.
         for template in win32ui.GetApp().GetDocTemplateList():
             for doc in template.GetDocumentList():
                 if not doc.SaveModified():
-                    return 0
+                    return False
         # All documents saved - now hide the app and debugger.
         if self.get_option(OPT_HIDE):
             frame = win32ui.GetMainFrame()
             frame.ShowWindow(win32con.SW_HIDE)
-        return 1
+        return True
 
     #
     # Pythonwin interface - all stuff to do with showing source files,
@@ -1082,9 +1081,9 @@ class Debugger(debugger_parent):
                 doc = editor.editorTemplate.FindOpenDocument(filename)
                 if doc is not None:
                     self.UpdateDocumentLineStates(doc)
-                    return 1
-                return 0
-            return 1
+                    return True
+                return False
+            return True
         else:
             # Can't find the source file - linecache may have it?
             import linecache
@@ -1094,4 +1093,4 @@ class Debugger(debugger_parent):
                 "%s(%d): %s"
                 % (os.path.basename(filename), lineno, line[:-1].expandtabs(4))
             )
-            return 0
+            return False

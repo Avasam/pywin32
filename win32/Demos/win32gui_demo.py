@@ -59,7 +59,7 @@ def OnPaint_1(hwnd, msg, wp, lp):
     win32gui.EndPath(dc)
     win32gui.StrokeAndFillPath(dc)
     win32gui.EndPaint(hwnd, ps)
-    return 0
+    return False
 
 
 wndproc_1 = {win32con.WM_PAINT: OnPaint_1}
@@ -100,7 +100,7 @@ def OnPaint_2(hwnd, msg, wp, lp):
         mesh = ((0, 1, 2),)
         win32gui.GradientFill(dc, vertices, mesh, win32con.GRADIENT_FILL_TRIANGLE)
     win32gui.EndPaint(hwnd, ps)
-    return 0
+    return False
 
 
 wndproc_2 = {win32con.WM_PAINT: OnPaint_2}

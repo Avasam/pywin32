@@ -64,7 +64,7 @@ class TestNetwork(unittest.TestCase):
             self.hi, "https://www.python.org", None, INTERNET_FLAG_EXISTING_CONNECT
         )
         chunks = []
-        while 1:
+        while True:
             chunk = InternetReadFile(hdl, 1024)
             if not chunk:
                 break

@@ -45,7 +45,7 @@ class TestDialog(dialog.Dialog):
     def OnNotify(self, controlid, code):
         if code == win32con.EN_CHANGE:
             print("Edit text changed!")
-        return 1  # I handled this, so no need to call defaults!
+        return True  # I handled this, so no need to call defaults!
 
     # kill focus for the edit box.
     # Simply increment the value in the text box.

@@ -55,7 +55,7 @@ class CScintillaDocument(ParentScintillaDocument):
                 win32con.MB_YESNO | win32con.MB_ICONWARNING,
             )
             if rc == win32con.IDNO:
-                return 0
+                return False
             assert rc == win32con.IDYES, rc
             try:
                 f = open(filename, "wb+")
@@ -65,7 +65,7 @@ class CScintillaDocument(ParentScintillaDocument):
                     f.close()
             except OSError as e:
                 rc = win32ui.MessageBox("Cannot create the file %s" % filename)
-        return 1
+        return True
 
     def SaveFile(self, fileName, encoding=None):
         view = self.GetFirstView()

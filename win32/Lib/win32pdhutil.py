@@ -84,7 +84,7 @@ def FindPerformanceAttributesByName(
     counter=None,
     format=win32pdh.PDH_FMT_LONG,
     machine=None,
-    bRefresh=0,
+    bRefresh=False,
 ):
     """Find performance attributes by (case insensitive) instance name.
 
@@ -182,7 +182,7 @@ def BrowseCallBackDemo(counters):
             "Added '%s' on object '%s' (machine %s), instance %s(%d)-parent of %s"
             % (counterName, object, machine, instance, index, parentInstance)
         )
-    return 0
+    return False
 
 
 def browse(

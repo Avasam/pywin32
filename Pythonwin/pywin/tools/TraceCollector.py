@@ -21,7 +21,7 @@ def CollectorThread(stopEvent, file):
     )
 
     try:
-        while 1:
+        while True:
             rc = win32event.WaitForMultipleObjects(
                 (handle, stopEvent), 0, win32event.INFINITE
             )
@@ -33,7 +33,7 @@ def CollectorThread(stopEvent, file):
                 break
     finally:
         win32trace.TermRead()
-        print("Thread dieing")
+        print("Thread dying")
 
 
 class WindowOutput(winout.WindowOutput):
@@ -58,7 +58,7 @@ class WindowOutput(winout.WindowOutput):
 
 def MakeOutputWindow():
     # Note that it will not show until the first string written or
-    # you pass bShow = 1
+    # you pass bShow = True
     global outputWindow
     if outputWindow is None:
         title = "Python Trace Collector"

@@ -41,7 +41,7 @@ class ListDialog(dialog.Dialog):
     def OnListClick(self, id, code):
         if code == commctrl.NM_DBLCLK:
             self.EndDialog(win32con.IDOK)
-        return 1
+        return True
 
     def OnListItemChange(self, std, extra):
         (
