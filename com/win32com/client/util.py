@@ -76,7 +76,7 @@ class Enumerator:
         return self._oleobj_.Reset()
 
     def Clone(self):
-        return self.__class__(self._oleobj_.Clone(), self.resultCLSID)
+        return self.__class__(self._oleobj_.Clone())
 
     def _make_retval_(self, result):
         return result
@@ -86,6 +86,9 @@ class EnumVARIANT(Enumerator):
     def __init__(self, enum, resultCLSID=None):
         self.resultCLSID = resultCLSID
         Enumerator.__init__(self, enum)
+
+    def Clone(self):
+        return self.__class__(self._oleobj_.Clone(), self.resultCLSID)
 
     def _make_retval_(self, result):
         return _get_good_object_(result, resultCLSID=self.resultCLSID)
