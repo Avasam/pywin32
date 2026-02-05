@@ -310,12 +310,11 @@ class Connection:
         rolling it back first if it supports transactions."""
         if self.connector is None:
             return
-        if not self._autocommit:
-            if self.transaction_level:
-                try:
-                    self.connector.RollbackTrans()
-                except:
-                    pass
+        if not self._autocommit and self.transaction_level:
+            try:
+                self.connector.RollbackTrans()
+            except:
+                pass
         self.connector.Close()
         if verbose:
             print("adodbapi Closed connection at %X" % id(self))
@@ -383,21 +382,21 @@ class Connection:
         non-ability to perform the roll back when the method is invoked.
         """
         self.messages = []
-        if (
-            self.transaction_level
-        ):  # trying to roll back with no open transaction causes an error
+        # trying to roll back with no open transaction causes an error
+        if self.transaction_level:
             try:
                 self.transaction_level = self.connector.RollbackTrans()
                 if verbose > 1:
                     print("rollback done on connection at %X" % id(self))
-                if not self._autocommit and not (
-                    self.connector.Attributes & adc.adXactAbortRetaining
-                ):
+                if (
+                    not self._autocommit
+                    and not (self.connector.Attributes & adc.adXactAbortRetaining)
                     # If attributes has adXactAbortRetaining it performs retaining aborts that is,
                     # calling RollbackTrans automatically starts a new transaction. Not all providers support this.
                     # If not, we will have to start a new transaction by this command:
-                    if not self.transaction_level:
-                        self.transaction_level = self.connector.BeginTrans()
+                    and not self.transaction_level
+                ):
+                    self.transaction_level = self.connector.BeginTrans()
             except Exception as e:
                 self._raiseConnectionError(api.ProgrammingError, e)
 

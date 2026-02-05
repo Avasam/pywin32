@@ -21,20 +21,44 @@ debugging = False
 # which is the "Microsoft Internet Controls" typelib defining interfaces
 # such as IWebBrowser2 and the associated events.
 
-IOleClientSite_methods = """SaveObject GetMoniker GetContainer ShowObject
-                            OnShowWindow RequestNewObjectLayout""".split()
+IOleClientSite_methods = [
+    "SaveObject",
+    "GetMoniker",
+    "GetContainer",
+    "ShowObject",
+    "OnShowWindow",
+    "RequestNewObjectLayout",
+]
 
-IOleInPlaceSite_methods = """GetWindow ContextSensitiveHelp CanInPlaceActivate
-                             OnInPlaceActivate OnUIActivate GetWindowContext
-                             Scroll OnUIDeactivate OnInPlaceDeactivate
-                             DiscardUndoState DeactivateAndUndo
-                             OnPosRectChange""".split()
+IOleInPlaceSite_methods = [
+    "GetWindow",
+    "ContextSensitiveHelp",
+    "CanInPlaceActivate",
+    "OnInPlaceActivate",
+    "OnUIActivate",
+    "GetWindowContext",
+    "Scroll",
+    "OnUIDeactivate",
+    "OnInPlaceDeactivate",
+    "DiscardUndoState",
+    "DeactivateAndUndo",
+    "OnPosRectChange",
+]
 
-IOleInPlaceFrame_methods = """GetWindow ContextSensitiveHelp GetBorder
-                              RequestBorderSpace SetBorderSpace
-                              SetActiveObject InsertMenus SetMenu
-                              RemoveMenus SetStatusText EnableModeless
-                              TranslateAccelerator""".split()
+IOleInPlaceFrame_methods = [
+    "GetWindow",
+    "ContextSensitiveHelp",
+    "GetBorder",
+    "RequestBorderSpace",
+    "SetBorderSpace",
+    "SetActiveObject",
+    "InsertMenus",
+    "SetMenu",
+    "RemoveMenus",
+    "SetStatusText",
+    "EnableModeless",
+    "TranslateAccelerator",
+]
 
 
 class SimpleSite:

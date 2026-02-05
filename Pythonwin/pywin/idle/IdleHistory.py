@@ -30,12 +30,15 @@ class History:
         nhist = len(self.history)
         pointer = self.history_pointer
         prefix = self.history_prefix
-        if pointer is not None and prefix is not None:
-            if (
+        if (
+            pointer is not None
+            and prefix is not None
+            and (
                 self.text.compare("insert", "!=", "end-1c")
                 or self._get_source("iomark", "end-1c") != self.history[pointer]
-            ):
-                pointer = prefix = None
+            )
+        ):
+            pointer = prefix = None
         if pointer is None or prefix is None:
             prefix = self._get_source("iomark", "end-1c")
             if reverse:

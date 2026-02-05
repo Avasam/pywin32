@@ -14,6 +14,7 @@ select = [
   "PLC", # Pylint Convention
   "PLE", # Pylint Error
   "RSE", # flake8-raise
+  "SIM", # flake8-simplify
   "W", # pycodestyle Warning
   "YTT", # flake8-2020
 
@@ -34,15 +35,21 @@ select = [
   "TC", # flake8-type-checking
 ]
 extend-ignore = [
-  # We prefer explicit open mode parameter
-  "UP015", # redundant-open-modes
+  # contextlib.suppress is roughly 3x slower than try/except
+  "SIM105", # flake8-simplify: use-contextlib-suppress
+  "SIM108", # Don't force ternaries
   # No such concerns for stdlib
   "TC003", # typing-only-standard-library-import
+  # We prefer explicit open mode parameter
+  "UP015", # redundant-open-modes
   # TODO: Consider passing exception around to ensure methods are only ever used within exception handlers
   "PLE0704", # misplaced-bare-raise
+  # TODO: Is probably revealing actual bugs on Windows, but will cause change of runtime behaviour
+  "SIM112", # Use capitalized environment variable {expected} instead of {actual}
   # TODO: Still lots of manual fixes needed
   "UP031", # Use format specifiers instead of percent format
   "UP032", # Use f-string instead of format call
+  "SIM115", # Use a context manager for opening files
 ]
 
 [lint.per-file-ignores]
@@ -60,6 +67,10 @@ extend-ignore = [
   "UP035",
   "UP036",
   "YTT301",
+]
+"*/test/*" = [
+  "SIM202", # Testing equality semantics (__neq__)
+  "SIM300", # Testing equality semantics (__req__)
 ]
 
 [lint.isort]

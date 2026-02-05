@@ -225,19 +225,19 @@ class TestResult(unittest.TextTestResult):
         # translate ERROR_ACCESS_DENIED for non-admin users to be skipped.
         # (access denied errors for an admin user aren't expected.)
         if (
-            isinstance(exc_val, pywintypes.error)
-            and exc_val.winerror in non_admin_error_codes
-            and not check_is_admin()
+            (
+                isinstance(exc_val, pywintypes.error)
+                and exc_val.winerror in non_admin_error_codes
+                and not check_is_admin()
+            )
+            or isinstance(exc_val, pywintypes.com_error)
+            and exc_val.hresult
+            in [
+                winerror.CO_E_CLASSSTRING,
+                winerror.REGDB_E_CLASSNOTREG,
+                winerror.TYPE_E_LIBNOTREGISTERED,
+            ]
         ):
-            exc_val = TestSkipped(exc_val)
-        # and COM errors due to objects not being registered (the com test
-        # suite will attempt to catch this and handle it itself if the user
-        # is admin)
-        elif isinstance(exc_val, pywintypes.com_error) and exc_val.hresult in [
-            winerror.CO_E_CLASSSTRING,
-            winerror.REGDB_E_CLASSNOTREG,
-            winerror.TYPE_E_LIBNOTREGISTERED,
-        ]:
             exc_val = TestSkipped(exc_val)
         # NotImplemented generally means the platform doesn't support the
         # functionality.

@@ -58,10 +58,14 @@ class COMException(pythoncom.com_error):
 
         # convert a WIN32 error into an HRESULT
         scode = scode or hresult
-        if scode and scode != 1:  # We don't want S_FALSE mapped!
-            if scode >= -32768 and scode < 32768:
-                # this is HRESULT_FROM_WIN32()
-                scode = -2147024896 | (scode & 0x0000FFFF)
+        if (
+            scode
+            and scode != 1  # We don't want S_FALSE mapped!
+            and scode >= -32768
+            and scode < 32768
+        ):
+            # this is HRESULT_FROM_WIN32()
+            scode = -2147024896 | (scode & 0x0000FFFF)
         self.scode = scode
 
         self.description = description or desc

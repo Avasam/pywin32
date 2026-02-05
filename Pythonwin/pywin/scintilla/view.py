@@ -114,9 +114,8 @@ def DoBraceMatch(control):
     braceAtPos = braceOpposite = -1
     if charBefore in "[](){}":
         braceAtPos = curPos - 1
-    if braceAtPos == -1:
-        if charAt in "[](){}":
-            braceAtPos = curPos
+    if braceAtPos == -1 and charAt in "[](){}":
+        braceAtPos = curPos
     if braceAtPos != -1:
         braceOpposite = control.SCIBraceMatch(braceAtPos, 0)
     if braceAtPos != -1 and braceOpposite == -1:

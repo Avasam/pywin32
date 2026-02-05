@@ -61,14 +61,14 @@ class CallTips:
         return ""  # so the event is handled normally.
 
     def check_calltip_cancel_event(self, event):
-        if self.calltip:
+        if self.calltip and (
             # If we have moved before the start of the calltip,
             # or off the calltip line, then cancel the tip.
             # (Later need to be smarter about multi-line, etc)
-            if self.text.compare(
-                "insert", "<=", self.calltip_start
-            ) or self.text.compare("insert", ">", self.calltip_start + " lineend"):
-                self._remove_calltip_window()
+            self.text.compare("insert", "<=", self.calltip_start)
+            or self.text.compare("insert", ">", self.calltip_start + " lineend")
+        ):
+            self._remove_calltip_window()
         return ""  # so the event is handled normally.
 
     def calltip_cancel_event(self, event):

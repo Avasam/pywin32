@@ -255,9 +255,8 @@ class FindReplaceDialog(dialog.Dialog):
         if not self.editFindText.GetWindowText():
             win32api.MessageBeep()
             return 1
-        if self.DoFindNext() != FOUND_NOTHING:
-            if not self.butKeepDialogOpen.GetCheck():
-                self.DestroyWindow()
+        if self.DoFindNext() != FOUND_NOTHING and not self.butKeepDialogOpen.GetCheck():
+            self.DestroyWindow()
 
 
 class FindDialog(FindReplaceDialog):

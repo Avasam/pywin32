@@ -12,9 +12,8 @@ if "help" in sys.argv:
 kw_args = {}  # pick up filename and proxy address from command line (optionally)
 for arg in sys.argv:
     s = arg.split("=")
-    if len(s) > 1:
-        if s[0] in cmd_args:
-            kw_args[s[0]] = s[1]
+    if len(s) > 1 and s[0] in cmd_args:
+        kw_args[s[0]] = s[1]
 
 kw_args.setdefault(
     "filename", "test.mdb"

@@ -146,7 +146,7 @@ class ControlDef:
 
     def createDialogTemplate(self):
         ct = self.controlType
-        if "CONTROL" == ct:
+        if ct == "CONTROL":
             ct = self.subType
         if ct in _controlMap:
             ct = _controlMap[ct]
@@ -310,16 +310,16 @@ class RCParser:
             if self.token is None:
                 return
 
-            if "BEGIN" == self.token:
+            if self.token == "BEGIN":
                 # A 'BEGIN' for a structure we don't understand - skip to the
                 # matching 'END'
                 deep = 1
                 while deep != 0 and self.token is not None:
                     self.getToken()
                     self.debug("Zooming over", self.token)
-                    if "BEGIN" == self.token:
+                    if self.token == "BEGIN":
                         deep += 1
-                    elif "END" == self.token:
+                    elif self.token == "END":
                         deep -= 1
             else:
                 rp = id_parsers.get(self.token)
@@ -438,15 +438,15 @@ class RCParser:
         list = defaults
         style = defaultStyle
 
-        if "STYLE" == self.token:
+        if self.token == "STYLE":
             self.getToken()
         i = 0
         Not = False
         while (
-            (i % 2 == 1 and ("|" == self.token or "NOT" == self.token)) or (i % 2 == 0)
+            (i % 2 == 1 and (self.token == "|" or self.token == "NOT")) or (i % 2 == 0)
         ) and not self.token is None:
             Not = False
-            if "NOT" == self.token:
+            if self.token == "NOT":
                 Not = True
                 self.getToken()
             i += 1
@@ -472,7 +472,7 @@ class RCParser:
         return style, list
 
     def dialogCaption(self, dlg):
-        if "CAPTION" == self.token:
+        if self.token == "CAPTION":
             self.getToken()
         self.token = self.token[1:-1]
         self.debug("Caption is:", self.token)
@@ -480,14 +480,14 @@ class RCParser:
         self.getToken()
 
     def dialogFont(self, dlg):
-        if "FONT" == self.token:
+        if self.token == "FONT":
             self.getToken()
         dlg.fontSize = int(self.token)
         self.getCommaToken()
         self.getToken()  # Font name
         dlg.font = self.token[1:-1]  # it's quoted
         self.getToken()
-        while "BEGIN" != self.token:
+        while self.token != "BEGIN":
             self.getToken()
 
     def controls(self, dlg):

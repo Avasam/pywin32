@@ -96,17 +96,15 @@ class ListsDialog(ListDialog):
         self.colHeadings = colHeadings
 
     def FillList(self):
-        index = 0
         size = self.GetWindowRect()
         width = (
             size[2] - size[0] - (10) - win32api.GetSystemMetrics(win32con.SM_CXVSCROLL)
         )
         numCols = len(self.colHeadings)
 
-        for col in self.colHeadings:
+        for index, col in enumerate(self.colHeadings):
             itemDetails = (commctrl.LVCFMT_LEFT, int(width / numCols), col, 0)
             self.itemsControl.InsertColumn(index, itemDetails)
-            index += 1
         index = 0
         for items in self.items:
             index = self.itemsControl.InsertItem(index + 1, str(items[0]), 0)

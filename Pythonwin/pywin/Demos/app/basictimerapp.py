@@ -18,10 +18,9 @@ class TimerAppDialog(dlgappcore.AppDialog):
         dlgappcore.AppDialog.__init__(self, win32ui.IDD_GENERAL_STATUS)
         self.timerAppName = appName
         self.argOff = 0
-        if len(self.timerAppName) == 0:
-            if len(sys.argv) > 1 and sys.argv[1][0] != "/":
-                self.timerAppName = sys.argv[1]
-                self.argOff = 1
+        if len(self.timerAppName) == 0 and len(sys.argv) > 1 and sys.argv[1][0] != "/":
+            self.timerAppName = sys.argv[1]
+            self.argOff = 1
 
     def PreDoModal(self):
         # 		sys.stderr = sys.stdout

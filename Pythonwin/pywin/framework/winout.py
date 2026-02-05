@@ -491,9 +491,8 @@ class WindowOutput(docview.DocTemplate):
             return 1
         if not self.NeedRecreateWindow():
             return 1
-        if self.bAutoRestore:
-            if self.RecreateWindow():
-                return 1
+        if self.bAutoRestore and self.RecreateWindow():
+            return 1
         return 0
 
     def QueueFlush(self, max=None):

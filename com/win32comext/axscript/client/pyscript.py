@@ -261,9 +261,10 @@ class PyScript(framework.COMScript):
         try:
             globs = self.globalNameSpaceModule.__dict__
             for codeBlock in self.codeBlocks:
-                if not codeBlock.beenExecuted:
-                    if self.CompileInScriptedSection(codeBlock, "exec"):
-                        self.ExecInScriptedSection(codeBlock, globs)
+                if not codeBlock.beenExecuted and self.CompileInScriptedSection(
+                    codeBlock, "exec"
+                ):
+                    self.ExecInScriptedSection(codeBlock, globs)
         finally:
             pass
 

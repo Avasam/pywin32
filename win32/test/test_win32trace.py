@@ -209,9 +209,8 @@ class TestMultipleThreadsWriting(unittest.TestCase):
                 count = self.buckets[integer]
                 self.assertNotEqual(count, -1)
                 self.buckets[integer] = count + 1
-                if self.buckets[integer] == self.FullBucket:
-                    if self.areBucketsFull():
-                        return
+                if self.buckets[integer] == self.FullBucket and self.areBucketsFull():
+                    return
 
     def testThreads(self):
         for each in self.threads:
@@ -321,9 +320,8 @@ class TestOutofProcess(unittest.TestCase):
                 count = self.buckets[integer]
                 self.assertNotEqual(count, -1)
                 self.buckets[integer] = count + 1
-                if self.buckets[integer] == self.FullBucket:
-                    if self.areBucketsFull():
-                        return
+                if self.buckets[integer] == self.FullBucket and self.areBucketsFull():
+                    return
 
     def testProcesses(self):
         for each in self.processes:

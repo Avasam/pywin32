@@ -24,10 +24,12 @@ RS_DEBUGGER_PM = (
     3  # Don't run under debugger, but do post-mortem analysis on exception.
 )
 
-debugging_options = """No debugging
-Step-through in the debugger
-Run in the debugger
-Post-Mortem of unhandled exceptions""".split("\n")
+debugging_options = [
+    "No debugging",
+    "Step-through in the debugger",
+    "Run in the debugger",
+    "Post-Mortem of unhandled exceptions",
+]
 
 byte_cr = b"\r"
 byte_lf = b"\n"
@@ -183,21 +185,25 @@ def GetActiveFileName(bAutoSave=1):
         doc = active.GetDocument()
         pathName = doc.GetPathName()
 
-        if bAutoSave and (
-            len(pathName) > 0
-            or doc.GetTitle()[:8] == "Untitled"
-            or doc.GetTitle()[:6] == "Script"
-        ):  # if not a special purpose window
-            if doc.IsModified():
-                try:
-                    doc.OnSaveDocument(pathName)
-                    pathName = doc.GetPathName()
+        if (
+            bAutoSave
+            and (
+                len(pathName) > 0
+                or doc.GetTitle()[:8] == "Untitled"
+                or doc.GetTitle()[:6] == "Script"
+            )
+            # if not a special purpose window
+            and doc.IsModified()
+        ):
+            try:
+                doc.OnSaveDocument(pathName)
+                pathName = doc.GetPathName()
 
-                    # clear the linecache buffer
-                    linecache.clearcache()
+                # clear the linecache buffer
+                linecache.clearcache()
 
-                except win32ui.error:
-                    raise KeyboardInterrupt
+            except win32ui.error:
+                raise KeyboardInterrupt
 
     except (win32ui.error, AttributeError):
         pass
@@ -416,9 +422,12 @@ def ImportFile():
     except KeyboardInterrupt:
         pathName = None
 
-    if pathName is not None:
-        if os.path.splitext(pathName)[1].lower() not in (".py", ".pyw", ".pyx"):
-            pathName = None
+    if pathName is not None and os.path.splitext(pathName)[1].lower() not in (
+        ".py",
+        ".pyw",
+        ".pyx",
+    ):
+        pathName = None
 
     if pathName is None:
         openFlags = win32con.OFN_OVERWRITEPROMPT | win32con.OFN_FILEMUSTEXIST

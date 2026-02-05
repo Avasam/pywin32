@@ -112,8 +112,8 @@ while True:
         (StopEvent,), 0, TIMEOUT, win32event.QS_ALLEVENTS
     )
 
-    if rc == win32event.WAIT_OBJECT_0:
+    if rc == win32event.WAIT_OBJECT_0 or (
+        # wm_quit
+        rc == win32event.WAIT_OBJECT_0 + 1 and pythoncom.PumpWaitingMessages()
+    ):
         break
-    elif rc == win32event.WAIT_OBJECT_0 + 1:
-        if pythoncom.PumpWaitingMessages():
-            break  # wm_quit

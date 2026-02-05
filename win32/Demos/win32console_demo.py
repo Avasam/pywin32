@@ -88,40 +88,40 @@ while not breakout:
                     breakout = True
                     break
         elif input_record.EventType == win32console.MOUSE_EVENT:
-            if input_record.EventFlags == 0:  ## 0 indicates a button event
-                if input_record.ButtonState != 0:  ## exclude button releases
-                    pos = input_record.MousePosition
-                    # switch the foreground and background colors of the character that was clicked
-                    attr = newbuffer.ReadConsoleOutputAttribute(
-                        Length=1, ReadCoord=pos
-                    )[0]
-                    new_attr = attr
-                    if attr & win32console.FOREGROUND_BLUE:
-                        new_attr = (
-                            new_attr & ~win32console.FOREGROUND_BLUE
-                        ) | win32console.BACKGROUND_BLUE
-                    if attr & win32console.FOREGROUND_RED:
-                        new_attr = (
-                            new_attr & ~win32console.FOREGROUND_RED
-                        ) | win32console.BACKGROUND_RED
-                    if attr & win32console.FOREGROUND_GREEN:
-                        new_attr = (
-                            new_attr & ~win32console.FOREGROUND_GREEN
-                        ) | win32console.BACKGROUND_GREEN
+            if (
+                input_record.EventFlags == 0  # 0 indicates a button event
+                and input_record.ButtonState != 0  # exclude button releases
+            ):
+                pos = input_record.MousePosition
+                # switch the foreground and background colors of the character that was clicked
+                attr = newbuffer.ReadConsoleOutputAttribute(Length=1, ReadCoord=pos)[0]
+                new_attr = attr
+                if attr & win32console.FOREGROUND_BLUE:
+                    new_attr = (
+                        new_attr & ~win32console.FOREGROUND_BLUE
+                    ) | win32console.BACKGROUND_BLUE
+                if attr & win32console.FOREGROUND_RED:
+                    new_attr = (
+                        new_attr & ~win32console.FOREGROUND_RED
+                    ) | win32console.BACKGROUND_RED
+                if attr & win32console.FOREGROUND_GREEN:
+                    new_attr = (
+                        new_attr & ~win32console.FOREGROUND_GREEN
+                    ) | win32console.BACKGROUND_GREEN
 
-                    if attr & win32console.BACKGROUND_BLUE:
-                        new_attr = (
-                            new_attr & ~win32console.BACKGROUND_BLUE
-                        ) | win32console.FOREGROUND_BLUE
-                    if attr & win32console.BACKGROUND_RED:
-                        new_attr = (
-                            new_attr & ~win32console.BACKGROUND_RED
-                        ) | win32console.FOREGROUND_RED
-                    if attr & win32console.BACKGROUND_GREEN:
-                        new_attr = (
-                            new_attr & ~win32console.BACKGROUND_GREEN
-                        ) | win32console.FOREGROUND_GREEN
-                    newbuffer.WriteConsoleOutputAttribute((new_attr,), pos)
+                if attr & win32console.BACKGROUND_BLUE:
+                    new_attr = (
+                        new_attr & ~win32console.BACKGROUND_BLUE
+                    ) | win32console.FOREGROUND_BLUE
+                if attr & win32console.BACKGROUND_RED:
+                    new_attr = (
+                        new_attr & ~win32console.BACKGROUND_RED
+                    ) | win32console.FOREGROUND_RED
+                if attr & win32console.BACKGROUND_GREEN:
+                    new_attr = (
+                        new_attr & ~win32console.BACKGROUND_GREEN
+                    ) | win32console.FOREGROUND_GREEN
+                newbuffer.WriteConsoleOutputAttribute((new_attr,), pos)
         else:
             newbuffer.WriteConsole(str(input_record))
     time.sleep(0.1)

@@ -501,7 +501,7 @@ def main():
             options.service_class = "PythonScpTest"
             log(2, "--test: --service-class=%s", options.service_class)
         if not options.keywords:
-            options.keywords = "Python Powered".split()
+            options.keywords = ["Python", "Powered"]
             log(2, "--test: --keyword=%s", options.keywords)
         if not options.binding_string:
             options.binding_string = "test binding string"
