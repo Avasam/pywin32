@@ -1,4 +1,4 @@
-"""
+r"""
 Performance Data Helper (PDH) Query Classes
 
 Wrapper classes for end-users and high-level access to the PDH query
@@ -239,7 +239,6 @@ class BaseQuery:
                         self.counters.append(win32pdh.AddCounter(base, path))
                     except win32api.error:  # we passed a bad path
                         self.counters.append(0)
-                        pass
                 self._base = base
                 self.active = 1
                 return 0  # open succeeded

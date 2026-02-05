@@ -12,7 +12,7 @@ from . import app
 
 
 class AppDialog(dialog.Dialog):
-    "The dialog box for the application"
+    """The dialog box for the application"""
 
     def __init__(self, id, dll=None):
         self.iconId = win32ui.IDR_MAINFRAME
@@ -49,7 +49,7 @@ class AppDialog(dialog.Dialog):
 
 
 class DialogApp(app.CApp):
-    "An application class, for an app with main dialog box"
+    """An application class, for an app with main dialog box"""
 
     def InitInstance(self):
         # 		win32ui.SetProfileFileName('dlgapp.ini')

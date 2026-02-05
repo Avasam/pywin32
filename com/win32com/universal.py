@@ -191,7 +191,7 @@ class Definition:
         ReadFromInTuple=pythoncom._univgw.ReadFromInTuple,
         WriteFromOutTuple=pythoncom._univgw.WriteFromOutTuple,
     ):
-        "Dispatch a call to an interface method."
+        """Dispatch a call to an interface method."""
         meth = self._methods[index]
         # Infer S_OK if they don't return anything bizarre.
         hr = 0

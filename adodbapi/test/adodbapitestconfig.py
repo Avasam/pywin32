@@ -1,5 +1,5 @@
 # Configure this to _YOUR_ environment in order to run the testcases.
-"testADOdbapiConfig.py v 2.6.2.B00"
+"""testADOdbapiConfig.py v 2.6.2.B00"""
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # #

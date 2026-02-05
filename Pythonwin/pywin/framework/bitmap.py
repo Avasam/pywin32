@@ -10,7 +10,7 @@ bStretch = 1
 
 
 class BitmapDocument(docview.Document):
-    "A bitmap document.  Holds the bitmap data itself."
+    """A bitmap document.  Holds the bitmap data itself."""
 
     def __init__(self, template):
         docview.Document.__init__(self, template)
@@ -40,7 +40,7 @@ class BitmapDocument(docview.Document):
 
 
 class BitmapView(docview.ScrollView):
-    "A view of a bitmap.  Obtains data from document."
+    """A view of a bitmap.  Obtains data from document."""
 
     def __init__(self, doc):
         docview.ScrollView.__init__(self, doc)

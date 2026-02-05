@@ -24,7 +24,7 @@ MARKER_CURRENT = 2
 
 
 class SyntEditDocument(EditorDocumentBase):
-    "A SyntEdit document."
+    """A SyntEdit document."""
 
     def OnDebuggerStateChange(self, state):
         self._ApplyOptionalToViews("OnDebuggerStateChange", state)
@@ -40,7 +40,7 @@ class SyntEditDocument(EditorDocumentBase):
 
 
 class SyntEditView(SyntEditViewParent):
-    "A view of a SyntEdit.  Obtains data from document."
+    """A view of a SyntEdit.  Obtains data from document."""
 
     def __init__(self, doc):
         SyntEditViewParent.__init__(self, doc)
@@ -538,7 +538,7 @@ class SyntEditView(SyntEditViewParent):
         if not self.bFolding:
             return 1
         win32ui.DoWaitCursor(1)
-        for lineno in range(0, self.GetLineCount()):
+        for lineno in range(self.GetLineCount()):
             if self.SCIGetFoldLevel(
                 lineno
             ) & scintillacon.SC_FOLDLEVELHEADERFLAG and not self.SCIGetFoldExpanded(
@@ -563,7 +563,7 @@ class SyntEditView(SyntEditViewParent):
             return 1
         win32ui.DoWaitCursor(1)
         self.Colorize()
-        for lineno in range(0, self.GetLineCount()):
+        for lineno in range(self.GetLineCount()):
             if self.SCIGetFoldLevel(
                 lineno
             ) & scintillacon.SC_FOLDLEVELHEADERFLAG and self.SCIGetFoldExpanded(lineno):

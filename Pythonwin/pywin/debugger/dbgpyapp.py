@@ -11,7 +11,7 @@ version = "0.3.0"
 
 class DebuggerPythonApp(intpyapp.InteractivePythonApp):
     def LoadMainFrame(self):
-        "Create the main applications frame"
+        """Create the main applications frame"""
         self.frame = self.CreateMainFrame()
         self.SetMainFrame(self.frame)
         self.frame.LoadFrame(win32ui.IDR_DEBUGGER, win32con.WS_OVERLAPPEDWINDOW)

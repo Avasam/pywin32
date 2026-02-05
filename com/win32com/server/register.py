@@ -28,13 +28,13 @@ def _set_subkeys(keyName, valueDict, base=win32con.HKEY_CLASSES_ROOT):
 
 
 def _set_string(path, value, base=win32con.HKEY_CLASSES_ROOT):
-    "Set a string value in the registry."
+    """Set a string value in the registry."""
 
     win32api.RegSetValue(base, path, win32con.REG_SZ, value)
 
 
 def _get_string(path, base=win32con.HKEY_CLASSES_ROOT):
-    "Get a string value from the registry."
+    """Get a string value from the registry."""
 
     try:
         return win32api.RegQueryValue(base, path)
@@ -43,7 +43,7 @@ def _get_string(path, base=win32con.HKEY_CLASSES_ROOT):
 
 
 def _remove_key(path, base=win32con.HKEY_CLASSES_ROOT):
-    "Remove a string from the registry."
+    """Remove a string from the registry."""
 
     try:
         win32api.RegDeleteKey(base, path)

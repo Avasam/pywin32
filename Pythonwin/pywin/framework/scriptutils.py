@@ -36,7 +36,7 @@ byte_crlf = b"\r\n"
 
 # A dialog box for the "Run Script" command.
 class DlgRunScript(dialog.Dialog):
-    "A class for the 'run script' dialog"
+    """A class for the 'run script' dialog"""
 
     def __init__(self, bHaveDebugger):
         dialog.Dialog.__init__(self, win32ui.IDD_RUN_SCRIPT)
@@ -86,7 +86,7 @@ def GetDebugger():
 
 
 def IsOnPythonPath(path):
-    "Given a path only, see if it is on the Pythonpath.  Assumes path is a full path spec."
+    """Given a path only, see if it is on the Pythonpath.  Assumes path is a full path spec."""
     # must check that the command line arg's path is in sys.path
     for syspath in sys.path:
         try:
@@ -655,7 +655,7 @@ def FindTabNanny():
 
 
 def LocatePythonFile(fileName, bBrowseIfDir=1):
-    "Given a file name, return a fully qualified file name, or None"
+    """Given a file name, return a fully qualified file name, or None"""
     # first look for the exact file as specified
     if not os.path.isfile(fileName):
         # Go looking!

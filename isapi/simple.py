@@ -12,7 +12,7 @@ from __future__ import annotations
 
 
 class SimpleExtension:
-    "Base class for a simple ISAPI extension"
+    """Base class for a simple ISAPI extension"""
 
     def __init__(self):
         pass
@@ -35,11 +35,10 @@ class SimpleExtension:
 
     def TerminateExtension(self, status):
         """Called by the ISAPI framework as the extension terminates."""
-        pass
 
 
 class SimpleFilter:
-    "Base class for a a simple ISAPI filter"
+    """Base class for a a simple ISAPI filter"""
 
     filter_flags: int | None = None
 
@@ -70,4 +69,3 @@ class SimpleFilter:
 
     def TerminateFilter(self, status):
         """Called by the ISAPI framework as the filter terminates."""
-        pass

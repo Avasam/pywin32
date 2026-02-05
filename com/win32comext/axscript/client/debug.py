@@ -95,7 +95,7 @@ class DebugManager:
     # print("Close complete")
 
     def IsAnyHost(self):
-        "Do we have _any_ debugging interfaces installed?"
+        """Do we have _any_ debugging interfaces installed?"""
         return self.debugApplication is not None
 
     def IsSimpleHost(self):

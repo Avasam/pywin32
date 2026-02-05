@@ -114,7 +114,7 @@ class HLI_IMoniker(HLI_Interface):
 
 
 class HLIHeadingCategory(HLICOM):
-    "A tree heading for registered categories"
+    """A tree heading for registered categories"""
 
     def GetText(self):
         return "Registered Categories"
@@ -138,7 +138,7 @@ class HLIHeadingCategory(HLICOM):
 
 
 class HLICategory(HLICOM):
-    "An actual Registered Category"
+    """An actual Registered Category"""
 
     def GetText(self):
         desc = self.myobject[2]
@@ -533,7 +533,7 @@ class HLITypeLib(HLICOM):
 
 
 class HLIHeadingRegisterdTypeLibs(HLICOM):
-    "A tree heading for registered type libraries"
+    """A tree heading for registered type libraries"""
 
     def GetText(self):
         return "Registered Type Libraries"
