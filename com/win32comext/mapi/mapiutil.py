@@ -62,28 +62,33 @@ def GetPropTagName(pt):
 mapiErrorTable: dict[int, str] = {}
 
 
-def GetScodeString(hr):
+def GetScodeString(hr: int) -> str | None:
+    global mapiErrorTable
     if not mapiErrorTable:
-        for name, value in mapi.__dict__.items():
-            if name[:7] in ["MAPI_E_", "MAPI_W_"]:
-                mapiErrorTable[value] = name
+        mapiErrorTable = {
+            value: name
+            for name, value in mapi.__dict__.items()
+            if name[:7] in {"MAPI_E_", "MAPI_W_"}
+        }
     return mapiErrorTable.get(hr, pythoncom.GetScodeString(hr))
 
 
 ptTable: dict[int, str] = {}
 
 
-def GetMapiTypeName(propType, rawType=True):
+def GetMapiTypeName(propType: int, rawType: bool = True) -> str:
     """Given a mapi type flag, return a string description of the type"""
+    global ptTable
     if not ptTable:
-        for name, value in mapitags.__dict__.items():
-            if name[:3] == "PT_":
-                # PT_TSTRING is a conditional assignment
-                # for either PT_UNICODE or PT_STRING8 and
-                # should not be returned during a lookup.
-                if name in ["PT_TSTRING", "PT_MV_TSTRING"]:
-                    continue
-                ptTable[value] = name
+        ptTable = {
+            value: name
+            for name, value in mapitags.__dict__.items()
+            if name[:3] == "PT_"
+            # PT_TSTRING is a conditional assignment
+            # for either PT_UNICODE or PT_STRING8 and
+            # should not be returned during a lookup.
+            and name not in {"PT_TSTRING", "PT_MV_TSTRING"}
+        }
 
     if rawType:
         propType &= ~mapitags.MV_FLAG

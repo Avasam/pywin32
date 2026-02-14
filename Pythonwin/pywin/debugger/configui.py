@@ -18,17 +18,17 @@ class DebuggerOptionsPropPage(dialog.PropertyPage):
 
     def OnOK(self):
         self.UpdateData()
-        dirty = 0
-        for key, val in self.items():
-            if key in self.options:
-                if self.options[key] != val:
-                    self.options[key] = val
-                    dirty = 1
-        if dirty:
+        new_options = {
+            key: val
+            for key, val in self.items()
+            if key in self.options and self.options[key] != val
+        }
+        if new_options:
+            self.options.update(new_options)
             dbgcon.SaveDebuggerOptions(self.options)
         # If there is a debugger open, then set its options.
         import pywin.debugger
 
         if pywin.debugger.currentDebugger is not None:
             pywin.debugger.currentDebugger.options = self.options
-        return 1
+        return True

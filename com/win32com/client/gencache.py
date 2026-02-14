@@ -678,12 +678,12 @@ def AddModuleToCache(
     info = str(typelibclsid), lcid, major, minor
     dict_modified = False
 
-    def SetTypelibForAllClsids(dict):
+    def SetTypelibForAllClsids(dict) -> None:
         nonlocal dict_modified
-        for clsid in dict:
-            if clsidToTypelib.get(clsid) != info:
-                clsidToTypelib[clsid] = info
-                dict_modified = True
+        new_ids = {clsid: info for clsid in dict if clsidToTypelib.get(clsid) != info}
+        if new_ids:
+            clsidToTypelib.update(new_ids)
+            dict_modified = True
 
     SetTypelibForAllClsids(mod.CLSIDToClassMap)
     SetTypelibForAllClsids(mod.CLSIDToPackageMap)

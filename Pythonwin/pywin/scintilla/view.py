@@ -575,8 +575,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
                 for iFun in range(0, typeAttr.cFuncs):
                     funDesc = typeInfo.GetFuncDesc(iFun)
                     funName = typeInfo.GetNames(funDesc.memid)[0]
-                    if funName not in items_dict:
-                        items_dict[funName] = None
+                    items_dict.setdefault(funName, None)
 
                 # Inspect the type info of all implemented types
                 # E.g. IShellDispatch5 implements IShellDispatch4 which implements IShellDispatch3 ...

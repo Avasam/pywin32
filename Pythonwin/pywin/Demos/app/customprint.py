@@ -31,9 +31,10 @@ class PrintDemoView(docview.ScrollView):
             "Magenta": (0xFF << 0) + (0x00 << 8) + (0xFF << 16),
             "Yellow": (0xFF << 0) + (0xFF << 8) + (0x00 << 16),
         }
-        self.pens = {}
-        for name, color in self.colors.items():
-            self.pens[name] = win32ui.CreatePen(win32con.PS_SOLID, 5, color)
+        self.pens = {
+            name: win32ui.CreatePen(win32con.PS_SOLID, 5, color)
+            for name, color in self.colors.items()
+        }
         self.pen = None
         self.size = (128, 128)
         self.SetScaleToFitSize(self.size)

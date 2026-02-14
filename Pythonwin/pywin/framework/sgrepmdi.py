@@ -52,9 +52,7 @@ class dirpath:
                     if recurse:
                         subdirs = getsubdirs(d)
                         for sd in subdirs:
-                            sd = sd.lower()
-                            if sd not in dirs:
-                                dirs[sd] = None
+                            dirs.setdefault(sd.lower(), None)
             elif os.path.isfile(d):
                 pass
             else:
@@ -92,8 +90,7 @@ class dirpath:
                                 subdirs = getsubdirs(xd)
                                 for sd in subdirs:
                                     sd = sd.lower()
-                                    if sd not in dirs:
-                                        dirs[sd] = None
+                                    dirs.setdefault(sd, None)
         self.dirs = list(dirs)
 
     def __getitem__(self, key):

@@ -8,12 +8,13 @@ options = None  # set to optparse options object
 ADsTypeNameMap = {}
 
 
-def getADsTypeName(type_val):
-    # convert integer type to the 'typename' as known in the headerfiles.
+def getADsTypeName(type_val: int) -> str:
+    """Convert integer type to the 'typename' as known in the headerfiles."""
+    global ADsTypeNameMap
     if not ADsTypeNameMap:
-        for n, v in adsicon.__dict__.items():
-            if n.startswith("ADSTYPE_"):
-                ADsTypeNameMap[v] = n
+        ADsTypeNameMap = {
+            v: n for n, v in adsicon.__dict__.items() if n.startswith("ADSTYPE_")
+        }
     return ADsTypeNameMap.get(type_val, hex(type_val))
 
 
