@@ -1,8 +1,5 @@
-from __future__ import annotations
-
-build_id = "311.1"  # may optionally include a ".{patchno}" suffix.
-
-__doc__ = """This is a distutils setup-script for the pywin32 extensions.
+# Originally by Thomas Heller, started in 2000 or so.
+"""This is a distutils setup-script for the pywin32 extensions.
 
 The canonical source of truth for supported versions and build environments
 is [the GitHub CI](https://github.com/mhammond/pywin32/tree/main/.github/workflows).
@@ -24,7 +21,9 @@ instead of a failing, it will report what was skipped, and why. See also
 build_env.md, which is getting out of date but might help getting everything
 required for an official build - see README.md for that process.
 """
-# Originally by Thomas Heller, started in 2000 or so.
+
+from __future__ import annotations
+
 import glob
 import logging
 import os
@@ -38,6 +37,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build import build
+from setuptools.command.build_ext import build_ext
 from setuptools.modified import newer_group
 from tempfile import gettempdir
 from typing import TYPE_CHECKING
@@ -45,37 +45,14 @@ from typing import TYPE_CHECKING
 # We must import from distutils directly at runtime
 # But this prevents typing issues across Python 3.11-3.12
 if TYPE_CHECKING:
-    from setuptools._distutils import ccompiler
-    from setuptools._distutils._msvccompiler import MSVCCompiler
+    from setuptools._distutils.ccompiler import CCompiler
     from setuptools._distutils.command.install_data import install_data
 else:
-    from distutils import ccompiler
-    from distutils._msvccompiler import MSVCCompiler
     from distutils.command.install_data import install_data
 
-
-def my_new_compiler(**kw):
-    if "compiler" in kw and kw["compiler"] in (None, "msvc"):
-        return my_compiler()
-    return orig_new_compiler(**kw)
-
-
-# No way to cleanly wedge our compiler sub-class in.
-orig_new_compiler = ccompiler.new_compiler
-ccompiler.new_compiler = my_new_compiler  # type: ignore[assignment] # Assuming the caller will always use only kwargs
-
-
-# This import has to be delayed to AFTER the compiler hack
-from setuptools.command.build_ext import build_ext  # noqa: E402
-
-build_id_patch = build_id
-if not "." in build_id_patch:
-    build_id_patch += ".0"
-pywin32_version = "%d.%d.%s" % (
-    sys.version_info.major,
-    sys.version_info.minor,
-    build_id_patch,
-)
+build_id = "311.1"  # may optionally include a ".{patchno}" suffix.
+build_id_patch = build_id if "." in build_id else build_id + ".0"
+pywin32_version = f"{sys.version_info.major}.{sys.version_info.minor}.{build_id_patch}"
 print("Building pywin32", pywin32_version)
 
 this_file = os.path.abspath(__file__)
@@ -359,7 +336,7 @@ class my_build(build):
 
 
 class my_build_ext(build_ext):
-    compiler: ccompiler.CCompiler
+    compiler: CCompiler
     extensions: list[WinExt]
 
     def finalize_options(self) -> None:
@@ -884,24 +861,6 @@ class my_build_ext(build_ext):
                 logging.info("skipping swig of %s", source)
 
         return new_sources
-
-
-class my_compiler(MSVCCompiler):
-    # Work around python/cpython#80483 / python/cpython#86175
-    # it sorts sources but this breaks support for building .mc files etc :(
-    # See pypa/setuptools#4986 / pypa/distutils#370 for potential upstream fix.
-    def compile(self, sources, **kwargs):
-        # re-sort the list of source files but ensure all .mc files come first.
-        def key_reverse_mc(a):
-            b, e = os.path.splitext(a)
-            e = "" if e == ".mc" else e
-            return (e, b)
-
-        sources = sorted(sources, key=key_reverse_mc)
-        return super().compile(sources, **kwargs)
-
-
-################################################################
 
 
 class my_install_data(install_data):
@@ -1863,8 +1822,8 @@ def convert_data_files(files: Iterable[str]):
     return ret
 
 
-def convert_optional_data_files(files):
-    ret = []
+def convert_optional_data_files(files: Iterable[str]):
+    ret: list[tuple[str, tuple[str]]] = []
     for file in files:
         try:
             temp = convert_data_files([file])
@@ -1878,12 +1837,8 @@ def convert_optional_data_files(files):
 
 
 ################################################################
-if len(sys.argv) == 1:
-    # distutils will print usage - print our docstring first.
-    print(__doc__)
-    print("Standard usage information follows:")
 
-packages = [
+packages = (
     "win32com",
     "win32com.client",
     "win32com.demos",
@@ -1920,83 +1875,12 @@ packages = [
     "pythonwin.pywin.tools",
     "isapi",
     "adodbapi",
-]
-
-py_modules = [*expand_modules("win32\\lib"), "win32\\winxpgui"]
-ext_modules = (
-    win32_extensions + com_extensions + pythonwin_extensions + other_extensions
 )
 
-cmdclass = {
-    "build": my_build,
-    "build_ext": my_build_ext,
-    "install_data": my_install_data,
-}
-
-classifiers = [
-    "Environment :: Win32 (MS Windows)",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: Python Software Foundation License",
-    "Development Status :: 5 - Production/Stable",
-    "Operating System :: Microsoft :: Windows",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: Implementation :: CPython",
-]
-
-dist = setup(
-    name="pywin32",
-    version=build_id,
-    description="Python for Window Extensions",
-    long_description=(Path(__file__).parent / "README.md").read_text(),
-    long_description_content_type="text/markdown",
-    author="Mark Hammond (et al)",
-    author_email="mhammond@skippinet.com.au",
-    project_urls={
-        # https://docs.pypi.org/project_metadata/#general-url
-        "Homepage": "https://github.com/mhammond/pywin32",
-        "Changes": "https://github.com/mhammond/pywin32/blob/main/CHANGES.md",
-        "Docs": "https://mhammond.github.io/pywin32/",
-        "Bugs": "https://github.com/mhammond/pywin32/issues",
-        # Arbitrary URLs (icons still recognized)
-        "Support Requests": "https://github.com/mhammond/pywin32/discussions",
-        "Mailing List": "https://mail.python.org/mailman/listinfo/python-win32",
-    },
-    license="PSF",
-    license_files=(
-        "**/[Ll]icense.txt",
-        "**/LICENSE*",
-        "isapi/README.txt",
-    ),
-    classifiers=classifiers,
-    cmdclass=cmdclass,
-    # This adds the scripts under Python3XX/Scripts, but doesn't actually do much
-    scripts=[
-        "win32/scripts/pywin32_postinstall.py",
-        "win32/scripts/pywin32_testall.py",
-    ],
-    # This shortcuts `python -m win32.scripts.some_script` to just `some_script`
-    entry_points={
-        "console_scripts": [
-            "pywin32_postinstall = win32.scripts.pywin32_postinstall:main",
-            "pywin32_testall = win32.scripts.pywin32_testall:main",
-        ]
-    },
-    ext_modules=ext_modules,
-    package_dir={
-        "win32com": "com/win32com",
-        "win32comext": "com/win32comext",
-        "pythonwin": "pythonwin",
-    },
-    packages=packages,
-    py_modules=py_modules,
-    data_files=convert_optional_data_files(["PyWin32.chm"])
-    + convert_data_files(
-        [
+data_files = (
+    *convert_optional_data_files(["PyWin32.chm"]),
+    *convert_data_files(
+        (
             "Pythonwin/start_pythonwin.pyw",
             "pythonwin/pywin/*.cfg",
             "pythonwin/pywin/Demos/*.py",
@@ -2055,45 +1939,110 @@ dist = setup(
             "adodbapi/*.txt",
             "adodbapi/test/*.py",
             "adodbapi/examples/*.py",
-        ]
-    )
+        )
+    ),
     # The headers and .lib files
-    + [
-        ("win32/include", ("win32/src/PyWinTypes.h",)),
+    ("win32/include", ("win32/src/PyWinTypes.h",)),
+    (
+        "win32com/include",
         (
-            "win32com/include",
-            (
-                "com/win32com/src/include/PythonCOM.h",
-                "com/win32com/src/include/PythonCOMRegister.h",
-                "com/win32com/src/include/PythonCOMServer.h",
-            ),
+            "com/win32com/src/include/PythonCOM.h",
+            "com/win32com/src/include/PythonCOMRegister.h",
+            "com/win32com/src/include/PythonCOMServer.h",
         ),
-    ]
+    ),
     # And data files convert_data_files can't handle.
-    + [
-        ("", (str(version_file_path),)),
-        ("pythonwin", (str(scintilla_licence_path),)),
-        ("win32comext/mapi", (str(mapi_stubs_licence_path),)),
-        ("win32com", ("com/License.txt",)),
-        ("win32comext", ("com/License.txt",)),
-        # pythoncom.py doesn't quite fit anywhere else.
-        # Note we don't get an auto .pyc - but who cares?
-        ("", ("com/pythoncom.py",)),
-        ("", ("pywin32.pth",)),
-    ],
+    ("", (str(version_file_path),)),
+    ("pythonwin", (str(scintilla_licence_path),)),
+    ("win32comext/mapi", (str(mapi_stubs_licence_path),)),
+    ("win32com", ("com/License.txt",)),
+    ("win32comext", ("com/License.txt",)),
+    # pythoncom.py doesn't quite fit anywhere else.
+    # Note we don't get an auto .pyc - but who cares?
+    ("", ("com/pythoncom.py",)),
+    ("", ("pywin32.pth",)),
+)
+
+
+dist = setup(
+    name="pywin32",
+    version=build_id,
+    description="Python for Window Extensions",
+    long_description=(Path(__file__).parent / "README.md").read_text(),
+    long_description_content_type="text/markdown",
+    author="Mark Hammond (et al)",
+    author_email="mhammond@skippinet.com.au",
+    project_urls={
+        # https://docs.pypi.org/project_metadata/#general-url
+        "Homepage": "https://github.com/mhammond/pywin32",
+        "Changes": "https://github.com/mhammond/pywin32/blob/main/CHANGES.md",
+        "Docs": "https://mhammond.github.io/pywin32/",
+        "Bugs": "https://github.com/mhammond/pywin32/issues",
+        # Arbitrary URLs (icons still recognized)
+        "Support Requests": "https://github.com/mhammond/pywin32/discussions",
+        "Mailing List": "https://mail.python.org/mailman/listinfo/python-win32",
+    },
+    license="PSF",
+    license_files=(
+        "**/[Ll]icense.txt",
+        "**/LICENSE*",
+        "isapi/README.txt",
+    ),
+    classifiers=(
+        "Environment :: Win32 (MS Windows)",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Python Software Foundation License",
+        "Development Status :: 5 - Production/Stable",
+        "Operating System :: Microsoft :: Windows",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
+        "Programming Language :: Python :: Implementation :: CPython",
+    ),
+    cmdclass={
+        "build": my_build,
+        "build_ext": my_build_ext,
+        "install_data": my_install_data,
+    },
+    # This adds the scripts under Python3XX/Scripts, but doesn't actually do much
+    scripts=(
+        "win32/scripts/pywin32_postinstall.py",
+        "win32/scripts/pywin32_testall.py",
+    ),
+    # This shortcuts `python -m win32.scripts.some_script` to just `some_script`
+    entry_points={
+        "console_scripts": (
+            "pywin32_postinstall = win32.scripts.pywin32_postinstall:main",
+            "pywin32_testall = win32.scripts.pywin32_testall:main",
+        )
+    },
+    ext_modules=(
+        *win32_extensions,
+        *com_extensions,
+        *pythonwin_extensions,
+        *other_extensions,
+    ),
+    package_dir={
+        "win32com": "com/win32com",
+        "win32comext": "com/win32comext",
+        "pythonwin": "pythonwin",
+    },
+    packages=packages,
+    py_modules=(*expand_modules("win32\\lib"), "win32\\winxpgui"),
+    data_files=data_files,
 )
 
 # If we did any extension building, and report if we skipped any.
 if "build_ext" in dist.command_obj:
-    what_string = "built"
-    if "install" in dist.command_obj:  # just to be purdy
-        what_string += "/installed"
     # Print the list of extension modules we skipped building.
     excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
     if excluded_extensions:
         skip_whitelist = {"exchange", "axdebug"}
         skipped_ex = []
-        print("*** NOTE: The following extensions were NOT %s:" % what_string)
+        print("*** NOTE: The following extensions were NOT built")
         for ext, why in excluded_extensions:
             print(f" {ext.name}: {why}")
             if ext.name not in skip_whitelist:
@@ -2102,9 +2051,9 @@ if "build_ext" in dist.command_obj:
         print("please execute this script with no arguments (or see the docstring)")
         if skipped_ex:
             print(
-                "*** Non-zero exit status. Missing for complete release build: %s"
-                % skipped_ex
+                f"*** Non-zero exit status. Missing for complete release build:",
+                skipped_ex,
             )
             sys.exit(1000 + len(skipped_ex))
     else:
-        print(f"All extension modules {what_string} OK")
+        print(f"All extension modules built OK")
