@@ -842,10 +842,6 @@ class my_build_ext(build_ext):
                 ext and newer_group(ext.swig_deps + [fqsource], fqtarget)
             )
 
-            # can remove once edklib is no longer used for 32-bit builds
-            if source == "com/win32comext/mapi/src/exchange.i":
-                rebuild = True
-
             logging.debug("should swig %s->%s=%s", source, target, rebuild)
             if rebuild:
                 swig_cmd.extend(["-o", fqtarget, fqsource])
