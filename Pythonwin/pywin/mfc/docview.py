@@ -62,7 +62,7 @@ class RichEditDoc(object.CmdTarget):
 
 
 class CreateContext:
-    "A transient base class used as a CreateContext"
+    """A transient base class used as a CreateContext"""
 
     def __init__(self, template, doc=None):
         self.template = template

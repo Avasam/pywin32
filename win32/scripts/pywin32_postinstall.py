@@ -541,7 +541,7 @@ def install(lib_dir):
     # importing win32com.client ensures the gen_py dir created - not strictly
     # necessary to do now, but this makes the installation "complete"
     try:
-        import win32com.client  # noqa
+        import win32com.client  # noqa: I001, PLC0415
     except ImportError:
         # Don't let this error sound fatal
         pass

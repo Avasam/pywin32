@@ -90,7 +90,7 @@ def _GetServiceShortName(longName):
     num = win32api.RegQueryInfoKey(hkey)[0]
     longName = longName.lower()
     # loop through number of subkeys
-    for x in range(0, num):
+    for x in range(num):
         # find service name, open subkey
         svc = win32api.RegEnumKey(hkey, x)
         skey = win32api.RegOpenKey(hkey, svc, 0, access)
@@ -551,7 +551,7 @@ def StartService(serviceName, args=None, machine=None):
 
 
 def RestartService(serviceName, args=None, waitSeconds=30, machine=None):
-    "Stop the service, and then start it again (with some tolerance for allowing it to stop.)"
+    """Stop the service, and then start it again (with some tolerance for allowing it to stop.)"""
     try:
         StopService(serviceName, machine)
     except pywintypes.error as exc:

@@ -9,26 +9,43 @@ line-ending = "cr-lf"
 select = [
   "B028", # no-explicit-stacklevel
   "C4", # flake8-comprehensions
+  "D3", # pydocstyle docstring quotes
+  # "DTZ",
+  # "E",
+  # "F",
   "F811", # redefined-while-unused
   "I", # isort
+  # "LOG",
+  # "PERF",
+  "PIE", # flake8-pie
   "PLC", # Pylint Convention
   "PLE", # Pylint Error
-  "RSE", # flake8-raise
+  # PL
+  # "RET",
+  # "RUF",
+  "SIM", # flake8-simplify
+  "SLOT",
+  "T10", # flake8-debugger
+  # "TRY",
   "W", # pycodestyle Warning
-  "YTT", # flake8-2020
 
   # String formatting, concatenating, interpolation, ...
   "FLY", # static-join-to-f-string
   "G", # flake8-logging-format
+  "ISC001", # single-line-implicit-string-concatenation
 
   # Ensure modern type annotation syntax and best practices
   # Not including those covered by type-checkers or exclusive to Python 3.11+
   "FA", # flake8-future-annotations
   "F404", # late-future-import
   "PYI", # flake8-pyi
+  "PGH", # pygrep-hooks blanket-*
 
   # Code modernization (strings, annotations, conditions, ...)
   "UP", # pyupgrade
+  "FURB", # refurb
+  "RSE", # flake8-raise
+  "YTT", # flake8-2020
 
   # Helps prevent circular imports and other unneeded imports
   "TC", # flake8-type-checking
@@ -38,6 +55,7 @@ extend-ignore = [
   "UP015", # redundant-open-modes
   # No such concerns for stdlib
   "TC003", # typing-only-standard-library-import
+  # "PERF203",
   # TODO: Consider passing exception around to ensure methods are only ever used within exception handlers
   "PLE0704", # misplaced-bare-raise
   # TODO: Still lots of manual fixes needed
@@ -61,6 +79,11 @@ extend-ignore = [
   "UP036",
   "YTT301",
 ]
+"*/test/*" = [
+  "SIM202", # Testing equality semantics (__neq__)
+  "SIM300", # Testing equality semantics (__req__)
+]
+"Pythonwin/pywin/debugger/*" = ["T10"]
 
 [lint.isort]
 combine-as-imports = true
@@ -75,3 +98,6 @@ known-third-party = [
   "distutils",
 ]
 extra-standard-library = ["setuptools"]
+
+[lint.flake8-implicit-str-concat]
+allow-multiline = false

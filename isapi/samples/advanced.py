@@ -111,7 +111,7 @@ class ReloadWatcherThread(threading.Thread):
 # The ISAPI extension - handles requests in our virtual dir, and sends the
 # response to the client.
 class Extension(SimpleExtension):
-    "Python advanced sample Extension"
+    """Python advanced sample Extension"""
 
     def __init__(self):
         self.reload_watcher = ReloadWatcherThread()
@@ -177,7 +177,7 @@ def PostInstall(params, options):
 
 # Handler for our custom 'status' argument.
 def status_handler(options, log, arg):
-    "Query the status of something"
+    """Query the status of something"""
     print("Everything seems to be fine!")
 
 

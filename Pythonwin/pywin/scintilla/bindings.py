@@ -81,7 +81,7 @@ class BindingsManager:
         self.bind_command(event, cid)
 
     def bind_command(self, event, id=0):
-        "Binds an event to a Windows control/command ID"
+        """Binds an event to a Windows control/command ID"""
         id = assign_command_id(event, id)
         return id
 

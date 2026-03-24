@@ -2,7 +2,7 @@
 # The application is responsible for managing the main frame window.
 #
 # We also grab the FileOpen command, to invoke our Python editor
-"The PythonWin application code. Manages most aspects of MDI, etc"
+"""The PythonWin application code. Manages most aspects of MDI, etc"""
 
 from __future__ import annotations
 
@@ -113,7 +113,7 @@ class MainFrame(window.MDIFrameWnd):
 
 
 class CApp(WinApp):
-    "A class for the application"
+    """A class for the application"""
 
     def __init__(self):
         self.oldCallbackCaller = None
@@ -121,7 +121,7 @@ class CApp(WinApp):
         self.idleHandlers = []
 
     def InitInstance(self):
-        "Called to crank up the app"
+        """Called to crank up the app"""
         HookInput()
         numMRU = win32ui.GetProfileVal("Settings", "Recent File List Size", 10)
         win32ui.LoadStdProfileSettings(numMRU)
@@ -133,7 +133,7 @@ class CApp(WinApp):
         self.SetApplicationPaths()
 
     def ExitInstance(self):
-        "Called as the app dies - too late to prevent it here!"
+        """Called as the app dies - too late to prevent it here!"""
         win32ui.OutputDebug("Application shutdown\n")
         # Restore the callback manager, if any.
         try:
@@ -184,7 +184,7 @@ class CApp(WinApp):
         return MainFrame()
 
     def LoadMainFrame(self):
-        "Create the main applications frame"
+        """Create the main applications frame"""
         self.frame = self.CreateMainFrame()
         self.SetMainFrame(self.frame)
         self.frame.LoadFrame(win32ui.IDR_MAINFRAME, win32con.WS_OVERLAPPEDWINDOW)
@@ -250,19 +250,19 @@ class CApp(WinApp):
         sys.path = new_path + sys.path
 
     def OnRClick(self, params):
-        "Handle right click message"
+        """Handle right click message"""
         # put up the entire FILE menu!
         menu = win32ui.LoadMenu(win32ui.IDR_TEXTTYPE).GetSubMenu(0)
         menu.TrackPopupMenu(params[5])  # track at mouse position.
         return 0
 
     def OnDropFiles(self, msg):
-        "Handle a file being dropped from file manager"
+        """Handle a file being dropped from file manager"""
         hDropInfo = msg[2]
         self.frame.SetActiveWindow()  # active us
         nFiles = win32api.DragQueryFile(hDropInfo)
         try:
-            for iFile in range(0, nFiles):
+            for iFile in range(nFiles):
                 fileName = win32api.DragQueryFile(hDropInfo, iFile)
                 win32ui.GetApp().OpenDocumentFile(fileName)
         finally:
@@ -294,20 +294,20 @@ class CApp(WinApp):
 
     # Command handlers.
     def OnFileMRU(self, id, code):
-        "Called when a File 1-n message is received"
+        """Called when a File 1-n message is received"""
         fileName = win32ui.GetRecentFileList()[id - win32ui.ID_FILE_MRU_FILE1]
         win32ui.GetApp().OpenDocumentFile(fileName)
 
     def HandleOnFileOpen(self, id, code):
-        "Called when FileOpen message is received"
+        """Called when FileOpen message is received"""
         win32ui.GetApp().OnFileOpen()
 
     def HandleOnFileNew(self, id, code):
-        "Called when FileNew message is received"
+        """Called when FileNew message is received"""
         win32ui.GetApp().OnFileNew()
 
     def OnHelpAbout(self, id, code):
-        "Called when HelpAbout message is received.  Displays the About dialog."
+        """Called when HelpAbout message is received.  Displays the About dialog."""
         win32ui.InitRichEdit()
         dlg = AboutBox()
         dlg.DoModal()
@@ -365,7 +365,7 @@ class AboutBox(dialog.Dialog):
 
 
 def Win32Input(prompt=None):
-    "Provide input() for gui apps"
+    """Provide input() for gui apps"""
     # flush stderr/out first.
     try:
         sys.stdout.flush()

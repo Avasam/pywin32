@@ -158,46 +158,46 @@ def get_arg_text(ob):
 if __name__ == "__main__":
 
     def t1():
-        "()"
+        """()"""
 
     def t2(a, b=None):
-        "(a, b=None)"
+        """(a, b=None)"""
 
     def t3(a, *args):
-        "(a, *args)"
+        """(a, *args)"""
 
     def t4(*args):
-        "(*args)"
+        """(*args)"""
 
     def t5(a, *args):
-        "(a, *args)"
+        """(a, *args)"""
 
     def t6(a, b=None, *args, **kw):
-        "(a, b=None, *args, **kw)"
+        """(a, b=None, *args, **kw)"""
 
     class TC:
-        "(self, a=None, *b)"
+        """(self, a=None, *b)"""
 
         def __init__(self, a=None, *b):
-            "(self, a=None, *b)"
+            """(self, a=None, *b)"""
 
         def t1(self):
-            "(self)"
+            """(self)"""
 
         def t2(self, a, b=None):
-            "(self, a, b=None)"
+            """(self, a, b=None)"""
 
         def t3(self, a, *args):
-            "(self, a, *args)"
+            """(self, a, *args)"""
 
         def t4(self, *args):
-            "(self, *args)"
+            """(self, *args)"""
 
         def t5(self, a, *args):
-            "(self, a, *args)"
+            """(self, a, *args)"""
 
         def t6(self, a, b=None, *args, **kw):
-            "(self, a, b=None, *args, **kw)"
+            """(self, a, b=None, *args, **kw)"""
 
     def test(tests):
         failed = []

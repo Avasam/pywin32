@@ -1,6 +1,6 @@
 # startup.py
 #
-"The main application startup code for PythonWin."
+"""The main application startup code for PythonWin."""
 
 #
 # This does the basic command line handling.

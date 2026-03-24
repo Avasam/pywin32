@@ -1,4 +1,4 @@
-"""A sample socket server and client using SSPI authentication and encryption.
+r"""A sample socket server and client using SSPI authentication and encryption.
 
 You must run with either 'client' or 'server' as arguments.  A server must be
 running before a client can connect.

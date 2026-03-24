@@ -23,7 +23,7 @@ except win32api.error:
 # The ISAPI extension - handles requests in our virtual dir, and sends the
 # response to the client.
 class Extension(threaded_extension.ThreadPoolExtension):
-    "Python ISAPI Tester"
+    """Python ISAPI Tester"""
 
     def Dispatch(self, ecb):
         print('Tester dispatching "{}"'.format(ecb.GetServerVariable("URL")))
