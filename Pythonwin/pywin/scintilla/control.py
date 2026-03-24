@@ -179,7 +179,7 @@ class ScintillaControlInterface:
         return self.SendScintilla(scintillacon.SCI_GETVIEWWS)
 
     def SCISetViewWS(self, val):
-        self.SendScintilla(scintillacon.SCI_SETVIEWWS, not (val == 0))
+        self.SendScintilla(scintillacon.SCI_SETVIEWWS, bool(val))
         self.InvalidateRect()
 
     def SCISetIndentationGuides(self, val):
@@ -198,7 +198,7 @@ class ScintillaControlInterface:
         return self.SendScintilla(scintillacon.SCI_GETVIEWEOL)
 
     def SCISetViewEOL(self, val):
-        self.SendScintilla(scintillacon.SCI_SETVIEWEOL, not (val == 0))
+        self.SendScintilla(scintillacon.SCI_SETVIEWEOL, bool(val))
         self.InvalidateRect()
 
     def SCISetTabWidth(self, width):

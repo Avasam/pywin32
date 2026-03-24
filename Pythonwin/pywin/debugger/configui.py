@@ -20,10 +20,9 @@ class DebuggerOptionsPropPage(dialog.PropertyPage):
         self.UpdateData()
         dirty = 0
         for key, val in self.items():
-            if key in self.options:
-                if self.options[key] != val:
-                    self.options[key] = val
-                    dirty = 1
+            if key in self.options and self.options[key] != val:
+                self.options[key] = val
+                dirty = 1
         if dirty:
             dbgcon.SaveDebuggerOptions(self.options)
         # If there is a debugger open, then set its options.

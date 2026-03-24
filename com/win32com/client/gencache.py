@@ -729,7 +729,7 @@ def GetGeneratedInfos():
         files = glob.glob(win32com.__gen_path__ + "\\*")
         ret = []
         for file in files:
-            if not os.path.isdir(file) and not os.path.splitext(file)[1] == ".py":
+            if not os.path.isdir(file) and os.path.splitext(file)[1] != ".py":
                 continue
             name = os.path.splitext(os.path.split(file)[1])[0]
             try:

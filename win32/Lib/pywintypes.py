@@ -65,7 +65,7 @@ def __import_pywin32_system_module__(modname, globs):
             # That shouldn't really matter though, so long as we only ever
             # get one loaded.
             found = _win32sysloader.LoadModule(filename)
-        if found is None:
+        if found is None:  # noqa: SIM102
             # Windows can't find it - which although isn't relevent here,
             # means that we *must* be the first win32 import, as an attempt
             # to import win32api etc would fail when Windows attempts to
@@ -74,9 +74,9 @@ def __import_pywin32_system_module__(modname, globs):
             # we can't put the files anywhere else on the global path.
 
             # If there is a version in our Python directory, use that
-            if os.path.isfile(os.path.join(sys.prefix, filename)):
+            if found is None and os.path.isfile(os.path.join(sys.prefix, filename)):
                 found = os.path.join(sys.prefix, filename)
-        if found is None:
+        if found is None:  # noqa: SIM102
             # Not in the Python directory?  Maybe we were installed via
             # easy_install...
             if os.path.isfile(os.path.join(os.path.dirname(__file__), filename)):

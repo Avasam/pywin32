@@ -37,10 +37,9 @@ class Object:
         self._obj_ = None
 
     def close(self):
-        if "_obj_" in self.__dict__:
-            if self._obj_ is not None:
-                self._obj_.AttachObject(None)
-                self._obj_ = None
+        if "_obj_" in self.__dict__ and self._obj_ is not None:
+            self._obj_.AttachObject(None)
+            self._obj_ = None
 
 
 class CmdTarget(Object):

@@ -252,17 +252,19 @@ class InteractiveFormatter(FormatterParent):
                         quote_char = "'"
                     elif strstyle.name == pywin.scintilla.formatter.STYLE_TQDSTRING:
                         quote_char = '"'
-                    if quote_char is not None:
-                        # It is a TQS.  If the TQS is not terminated, we
-                        # carry the style through.
-                        if look > 2:
-                            look_str = (
-                                self.scintilla.SCIGetCharAt(look - 2)
-                                + self.scintilla.SCIGetCharAt(look - 1)
-                                + self.scintilla.SCIGetCharAt(look)
-                            )
-                            if look_str != quote_char * 3:
-                                stylePyStart = strstyle.name
+                    if (
+                        quote_char is not None
+                        # It is a TQS.
+                        # If the TQS is not terminated, we carry the style through.
+                        and look > 2
+                    ):
+                        look_str = (
+                            self.scintilla.SCIGetCharAt(look - 2)
+                            + self.scintilla.SCIGetCharAt(look - 1)
+                            + self.scintilla.SCIGetCharAt(look)
+                        )
+                        if look_str != quote_char * 3:
+                            stylePyStart = strstyle.name
         if stylePyStart is None:
             stylePyStart = pywin.scintilla.formatter.STYLE_DEFAULT
 
@@ -500,12 +502,10 @@ class InteractiveCore:
 
     def OutputRelease(self):
         # a command may have overwritten these - only restore if not.
-        if self.oldStdOut is not None:
-            if sys.stdout == self:
-                sys.stdout = self.oldStdOut
-        if self.oldStdErr is not None:
-            if sys.stderr == self:
-                sys.stderr = self.oldStdErr
+        if self.oldStdOut is not None and sys.stdout == self:
+            sys.stdout = self.oldStdOut
+        if self.oldStdErr is not None and sys.stderr == self:
+            sys.stderr = self.oldStdErr
         self.oldStdOut = None
         self.oldStdErr = None
         self.flush()

@@ -212,9 +212,8 @@ class SyntEditView(SyntEditViewParent):
         self.SendScintilla(
             scintillacon.SCI_SETMODEVENTMASK, scintillacon.SC_MOD_CHANGEFOLD
         )
-        if self.bFolding:
-            if GetEditorOption("Fold Lines", 1):
-                fold_flags = 16
+        if self.bFolding and GetEditorOption("Fold Lines", 1):
+            fold_flags = 16
 
         self.SCISetProperty("fold", self.bFolding)
         self.SCISetFoldFlags(fold_flags)
@@ -378,12 +377,12 @@ class SyntEditView(SyntEditViewParent):
                 self.SCIGetFoldLevel(lineno) & scintillacon.SC_FOLDLEVELHEADERFLAG
             )
             is_expanded = self.SCIGetFoldExpanded(lineno)
-            if id == win32ui.ID_VIEW_FOLD_EXPAND:
-                if foldable and not is_expanded:
-                    enable = 1
-            elif id == win32ui.ID_VIEW_FOLD_COLLAPSE:
-                if foldable and is_expanded:
-                    enable = 1
+            id_view_fold = (
+                win32ui.ID_VIEW_FOLD_COLLAPSE
+                if is_expanded
+                else win32ui.ID_VIEW_FOLD_EXPAND
+            )
+            enable = foldable and id == id_view_fold
             cmdui.Enable(enable)
 
     def OnCmdViewFoldTopLevel(self, cid, code):  # Handle the menu command
@@ -463,11 +462,12 @@ class SyntEditView(SyntEditViewParent):
                 )
                 is_header = level & scintillacon.SC_FOLDLEVELHEADERFLAG
                 # print(lineSeek, level_no, is_header)
-                if level_no == 0 and is_header:
-                    if (expanding and not self.SCIGetFoldExpanded(lineSeek)) or (
-                        not expanding and self.SCIGetFoldExpanded(lineSeek)
-                    ):
-                        self.SCIToggleFold(lineSeek)
+                if (
+                    level_no == 0
+                    and is_header
+                    and (expanding != self.SCIGetFoldExpanded(lineSeek))
+                ):
+                    self.SCIToggleFold(lineSeek)
         finally:
             win32ui.DoWaitCursor(-1)
 

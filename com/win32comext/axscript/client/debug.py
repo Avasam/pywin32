@@ -162,9 +162,10 @@ class DebugCodeBlockContainer(SourceCodeContainer):
         )
 
     def GetName(self, dnt):
-        if dnt == axdebug.DOCUMENTNAMETYPE_APPNODE:
-            return self.codeBlock.GetDisplayName()
-        elif dnt == axdebug.DOCUMENTNAMETYPE_TITLE:
+        if (
+            dnt == axdebug.DOCUMENTNAMETYPE_APPNODE
+            or dnt == axdebug.DOCUMENTNAMETYPE_TITLE
+        ):
             return self.codeBlock.GetDisplayName()
         # 		elif dnt==axdebug.DOCUMENTNAMETYPE_FILE_TAIL:
         # 		elif dnt==axdebug.DOCUMENTNAMETYPE_URL:

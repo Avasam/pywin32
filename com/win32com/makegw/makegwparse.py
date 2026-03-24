@@ -189,7 +189,7 @@ class ArgFormatter:
     def GetBuildForGatewayPreCode(self):
         "Get a string of C++ code to be executed before (ie, to initialise) the Py_BuildValue conversion for Gateways"
         s = self.GetBuildForInterfacePreCode()  # Usually the same
-        if DEBUG:
+        if DEBUG:  # noqa: SIM102
             if s[:4] == "/* G":
                 s = "/* GetBuildForGatewayPreCode goes here: %s */\n" % self.arg.name
         return s
@@ -203,7 +203,7 @@ class ArgFormatter:
     def GetBuildForGatewayPostCode(self):
         "Get a string of C++ code to be executed after (ie, to finalise) the Py_BuildValue conversion for Gateways"
         s = self.GetBuildForInterfacePostCode()  # Usually the same
-        if DEBUG:
+        if DEBUG:  # noqa: SIM102
             if s[:4] == "/* G":
                 s = "/* GetBuildForGatewayPostCode goes here: %s */\n" % self.arg.name
         return s

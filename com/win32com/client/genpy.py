@@ -308,10 +308,7 @@ class DispatchItem(build.DispatchItem, WritableItem):
         self.coclass_clsid = None
 
     def WriteClass(self, generator):
-        if (
-            not self.bIsDispatch
-            and not self.type_attr.typekind == pythoncom.TKIND_DISPATCH
-        ):
+        if not self.bIsDispatch and self.type_attr.typekind != pythoncom.TKIND_DISPATCH:
             return
         # This is pretty screwey - now we have vtable support we
         # should probably rethink this (ie, maybe write both sides for sinks, etc)
@@ -1267,16 +1264,19 @@ class Generator:
                 # Doesn't appear in a class defn - look in the interface objects for it
                 for type_info_tuple in infos:
                     info, infotype, doc, attr = type_info_tuple
-                    if infotype in [
-                        pythoncom.TKIND_INTERFACE,
-                        pythoncom.TKIND_DISPATCH,
-                    ]:
-                        if build.MakePublicAttributeName(doc[0]) == child:
-                            found = 1
-                            oleItem, vtableItem = self._Build_Interface(type_info_tuple)
-                            oleItems[clsid] = oleItem  # Even "None" goes in here.
-                            if vtableItem is not None:
-                                vtableItems[clsid] = vtableItem
+                    if (
+                        infotype
+                        in [
+                            pythoncom.TKIND_INTERFACE,
+                            pythoncom.TKIND_DISPATCH,
+                        ]
+                        and build.MakePublicAttributeName(doc[0]) == child
+                    ):
+                        found = 1
+                        oleItem, vtableItem = self._Build_Interface(type_info_tuple)
+                        oleItems[clsid] = oleItem  # Even "None" goes in here.
+                        if vtableItem is not None:
+                            vtableItems[clsid] = vtableItem
 
             assert found, (
                 f"Can't find the '{child}' interface in the CoClasses, or the interfaces"
@@ -1286,7 +1286,7 @@ class Generator:
             for key, value in oleItems.items():
                 items[key] = (value, None)
             for key, value in vtableItems.items():
-                existing = items.get(key, None)
+                existing = items.get(key)
                 if existing is not None:
                     new_val = existing[0], value
                 else:

@@ -120,7 +120,7 @@ class _BaseAuth:
         pfQOP = self.ctxt.DecryptMessage(buffer, self._get_next_seq_num())
 
         r = buffer[1].Buffer
-        return r, not (pfQOP == sspicon.SECQOP_WRAP_NO_ENCRYPT)
+        return r, pfQOP != sspicon.SECQOP_WRAP_NO_ENCRYPT
 
     def wrap(self, msg, encrypt=False):
         """

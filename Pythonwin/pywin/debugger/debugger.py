@@ -591,14 +591,15 @@ class Debugger(debugger_parent):
 
     def close(self, frameShutdown=0):
         # abortClose indicates if we have total shutdown
-        # (ie, main window is dieing)
-        if self.pumping:
-            # Can stop pump here, as it only posts a message, and
-            # returns immediately.
-            if not self.StopDebuggerPump():  # User cancelled close.
-                return 0
-            # NOTE - from this point on the close can not be
-            # stopped - the WM_QUIT message is already in the queue.
+        # (ie, main window is dying)
+        if (
+            self.pumping
+            # Can stop pump here, as it only posts a message, and returns immediately.
+            and not self.StopDebuggerPump()
+        ):  # User cancelled close.
+            return 0
+        # NOTE - from this point on the close can not be
+        # stopped - the WM_QUIT message is already in the queue.
         self.frameShutdown = frameShutdown
         if not self.inited:
             return 1

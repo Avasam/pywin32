@@ -47,7 +47,7 @@ def OpenHelpFile(fileName, helpCmd=None, helpArg=None):
         # Tom Heller also points out
         # https://web.archive.org/web/20070519165457/http://www.microsoft.com:80/mind/0499/faq/faq0499.asp ,
         # which may or may not be related.
-        elif 0 and ext == ".chm":
+        elif False and ext == ".chm":  # noqa: SIM223
             import win32help
 
             global htmlhelp_handle

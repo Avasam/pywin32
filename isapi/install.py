@@ -612,9 +612,8 @@ def Uninstall(params, options):
 # Patch up any missing module names in the params, replacing them with
 # the DLL name that hosts this extension/filter.
 def _PatchParamsModule(params, dll_name, file_must_exist=True):
-    if file_must_exist:
-        if not os.path.isfile(dll_name):
-            raise ConfigurationError(f"{dll_name} does not exist")
+    if file_must_exist and not os.path.isfile(dll_name):
+        raise ConfigurationError(f"{dll_name} does not exist")
 
     # Patch up all references to the DLL.
     for f in params.Filters:

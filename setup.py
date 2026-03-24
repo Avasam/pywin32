@@ -1093,26 +1093,23 @@ for name, libraries, sources in (
 win32_extensions += [
     WinExt_win32(
         "win32evtlog",
-        sources="""
-                win32\\src\\win32evtlog_messages.mc win32\\src\\win32evtlog.i
-                """.split(),
+        sources=["win32\\src\\win32evtlog_messages.mc", "win32\\src\\win32evtlog.i"],
         libraries="advapi32 oleaut32",
         delay_load_libraries="wevtapi",
     ),
     WinExt_win32(
         "win32api",
-        sources="""
-                win32/src/win32apimodule.cpp win32/src/win32api_display.cpp win32/src/win32api_cputopo.cpp
-                """.split(),
+        sources=[
+            "win32/src/win32apimodule.cpp",
+            "win32/src/win32api_display.cpp",
+            "win32/src/win32api_cputopo.cpp",
+        ],
         libraries="user32 advapi32 shell32 version",
         delay_load_libraries="powrprof",
     ),
     WinExt_win32(
         "win32gui",
-        sources="""
-                win32/src/win32dynamicdialog.cpp
-                win32/src/win32gui.i
-               """.split(),
+        sources=["win32/src/win32dynamicdialog.cpp", "win32/src/win32gui.i"],
         libraries="gdi32 user32 comdlg32 comctl32 shell32",
         define_macros=[("WIN32GUI", None)],
     ),
@@ -1743,10 +1740,15 @@ other_extensions = [
         "PyISAPI_loader",
         sources=[
             os.path.join("isapi", "src", s)
-            for s in """PyExtensionObjects.cpp PyFilterObjects.cpp
-                  pyISAPI.cpp pyISAPI_messages.mc
-                  PythonEng.cpp StdAfx.cpp Utils.cpp
-               """.split()
+            for s in [
+                "PyExtensionObjects.cpp",
+                "PyFilterObjects.cpp",
+                "pyISAPI.cpp",
+                "pyISAPI_messages.mc",
+                "PythonEng.cpp",
+                "StdAfx.cpp",
+                "Utils.cpp",
+            ]
         ],
         # We keep pyISAPI_messages.h out of the depends list, as it is
         # generated and we aren't smart enough to say *only* the .cpp etc
@@ -1754,17 +1756,28 @@ other_extensions = [
         # rebuilt, which re-creates the .h...
         depends=[
             os.path.join("isapi", "src", s)
-            for s in """ControlBlock.h FilterContext.h PyExtensionObjects.h
-                  PyFilterObjects.h pyISAPI.h
-                  PythonEng.h StdAfx.h Utils.h
-               """.split()
+            for s in [
+                "ControlBlock.h",
+                "FilterContext.h",
+                "PyExtensionObjects.h",
+                "PyFilterObjects.h",
+                "pyISAPI.h",
+                "PythonEng.h",
+                "StdAfx.h",
+                "Utils.h",
+            ]
         ],
         is_regular_dll=1,
-        export_symbols="""HttpExtensionProc GetExtensionVersion
-                           TerminateExtension GetFilterVersion
-                           HttpFilterProc TerminateFilter
-                           PyISAPISetOptions WriteEventLogMessage
-                           """.split(),
+        export_symbols=[
+            "HttpExtensionProc",
+            "GetExtensionVersion",
+            "TerminateExtension",
+            "GetFilterVersion",
+            "HttpFilterProc",
+            "TerminateFilter",
+            "PyISAPISetOptions",
+            "WriteEventLogMessage",
+        ],
         libraries="advapi32",
     )
 ]
@@ -1774,7 +1787,7 @@ W32_exe_files: list[WinExt] = [
         "pythonservice",
         sources=[
             os.path.join("win32", "src", s)
-            for s in "PythonService.cpp PythonService.rc".split()
+            for s in ["PythonService.cpp", "PythonService.rc"]
         ],
         libraries="user32 advapi32 ole32 shell32",
     ),
@@ -1833,7 +1846,7 @@ swig_interface_parents = {
 
 # .i files that are #included, and hence are not part of the build.  Our .dsp
 # parser isn't smart enough to differentiate these.
-swig_include_files = "mapilib adsilib".split()
+swig_include_files = ["mapilib", "adsilib"]
 
 
 def expand_modules(module_dir: str | os.PathLike[str]):

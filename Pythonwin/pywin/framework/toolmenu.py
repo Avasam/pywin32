@@ -185,11 +185,9 @@ class ToolMenuPropPage(dialog.PropertyPage):
         lc.InsertColumn(1, item)
 
         # Insert the existing tools menu
-        itemNo = 0
-        for desc, cmd in LoadToolMenuItems():
+        for itemNo, (desc, cmd) in enumerate(LoadToolMenuItems()):
             lc.InsertItem(itemNo, desc)
             lc.SetItemText(itemNo, 1, cmd)
-            itemNo += 1
 
         self.listControl = lc
         return dialog.PropertyPage.OnInitDialog(self)

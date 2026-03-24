@@ -279,9 +279,8 @@ class ServiceDlg(dialog.Dialog):
         self.listCtrl.SetRedraw(0)
         self.listCtrl.ResetContent()
         svcs = win32service.EnumServicesStatus(self.scm)
-        i = 0
         self.data = []
-        for svc in svcs:
+        for i, svc in enumerate(svcs):
             try:
                 status = (
                     "Unknown",
@@ -315,10 +314,10 @@ class ServiceDlg(dialog.Dialog):
                     svc[0],
                 )
             )
-            i += 1
 
             if service and service[1] == svc[0]:
                 self.listCtrl.SetCurSel(pos)
+
         self.OnListEvent(self.IDC_LIST, win32con.LBN_SELCHANGE)
         self.listCtrl.SetRedraw(1)
 
