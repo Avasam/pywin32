@@ -6,16 +6,25 @@ extend-exclude = ["Pythonwin/pywin/test/_dbgscript.py"]
 line-ending = "cr-lf"
 
 [lint]
+preview = true
+explicit-preview-rules = true
 select = [
   "B028", # no-explicit-stacklevel
   "C4", # flake8-comprehensions
   "F811", # redefined-while-unused
+  "FURB", # refurb
   "I", # isort
   "PLC", # Pylint Convention
   "PLE", # Pylint Error
   "RSE", # flake8-raise
   "W", # pycodestyle Warning
   "YTT", # flake8-2020
+
+  # Rules in preview that need explicit selection
+  "FURB113", # repeated-append
+  "FURB118", # reimplemented-operator
+  "FURB142", # for-loop-set-mutations
+  "FURB148", # unnecessary-enumerate
 
   # String formatting, concatenating, interpolation, ...
   "FLY", # static-join-to-f-string
@@ -34,6 +43,12 @@ select = [
   "TC", # flake8-type-checking
 ]
 extend-ignore = [
+  # Actually makes list comprehensions slower in tuples # astral-sh/ruff#12912
+  "C409", # unnecessary-literal-within-tuple-call
+  # Not that much more idiomatic astral-sh/ruff#24259
+  "FURB122", # for-loop-writes
+  # Often used as lazy import, not configurable
+  "PLC0415", # import-outside-top-level
   # We prefer explicit open mode parameter
   "UP015", # redundant-open-modes
   # No such concerns for stdlib
