@@ -496,9 +496,7 @@ class DispatchItem(OleItem):
         s = linePrefix + "\treturn self._get_good_object_(self._oleobj_.Invoke(*(("
         ret.extend(
             (
-                s
-                + str(entry.dispid)
-                + ",0,%d,1)+args)),'%s')" % (invoketype, names[0]),
+                f"{s}{entry.dispid},0,{invoketype},1)+args)),'{names[0]}')",
                 "",
             )
         )
