@@ -146,7 +146,6 @@ def process(fp, outfp, env={}):
             name = match.group(1)
             body = line[match.end() :]
             body = pytify(body)
-            ok = 0
             stmt = "%s = %s\n" % (name, body.strip())
             try:
                 exec(stmt, env)

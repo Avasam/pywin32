@@ -47,13 +47,14 @@ class DlgRunScript(dialog.Dialog):
         self.bHaveDebugger = bHaveDebugger
 
     def OnInitDialog(self):
-        rc = dialog.Dialog.OnInitDialog(self)
+        rc = super().OnInitDialog()
         cbo = self.GetDlgItem(win32ui.IDC_COMBO1)
         for o in debugging_options:
             cbo.AddString(o)
         cbo.SetCurSel(self["debuggingType"])
         if not self.bHaveDebugger:
             cbo.EnableWindow(0)
+        return rc
 
     def OnBrowse(self, id, code):
         if code != 0:  # BN_CLICKED
@@ -434,7 +435,6 @@ def ImportFile():
     # If already imported, don't look for package
     path, modName = os.path.split(pathName)
     modName, modExt = os.path.splitext(modName)
-    newPath = None
     # note that some packages (*cough* email *cough*) use "lazy importers"
     # meaning sys.modules can change as a side-effect of looking at
     # module.__file__ - so we must take a copy (ie, list(items()))
@@ -512,7 +512,7 @@ def CheckFile():
     finally:
         f.close()
     try:
-        codeObj = compile(code, pathName, "exec")
+        compile(code, pathName, "exec")
         if RunTabNanny(pathName):
             win32ui.SetStatusText(
                 "Python and the TabNanny successfully checked the file '"

@@ -142,8 +142,7 @@ class RichEditDocTemplate(DocTemplate):
 def t():
     class FormTemplate(DocTemplate):
         def CreateView(self, frame, context):
-            makeView = self.MakeView
-            # 			view = FormView(context.doc, win32ui.IDD_PROPDEMO1)
+            # view = FormView(context.doc, win32ui.IDD_PROPDEMO1)
             view = ListView(context.doc)
             view.CreateWindow(frame)
 
