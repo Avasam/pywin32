@@ -15,6 +15,7 @@ Example
  >>> xl.Visible = 1 # The Excel window becomes visible.
 
 """
+from __future__ import annotations
 
 import traceback
 from itertools import chain
@@ -120,7 +121,7 @@ def _GetDescInvokeType(entry, invoke_type):
 def Dispatch(
     IDispatch,
     userName=None,
-    createClass=None,
+    createClass: type[CDispatch] | None = None,
     typeinfo=None,
     clsctx=pythoncom.CLSCTX_SERVER,
 ):
