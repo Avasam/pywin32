@@ -4,6 +4,8 @@ if (-not $IsLinux) {
     exit 1
 }
 
+uv pip install build setuptools
+
 # Find the correct Python package on the MSYS2 repo
 $PythonVer = uv run python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
 $RepoUrl = 'https://repo.msys2.org/mingw/mingw64/'

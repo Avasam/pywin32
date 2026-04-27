@@ -261,9 +261,15 @@ class WinExt(Extension):
                     break
         else:
             # Set our C++ standard
+            # TOOD: Try -std=gnu++17 (instead of -std=c++17) (The gnu++ variants enable GNU extensions that cover some MSVC idioms)
             self.extra_compile_args.append("-std=c++17")
             # More lenient about non-standard C++ code as this project was based on MSVC
             self.extra_compile_args.append("-fpermissive")
+            # TODO: Check which -f below were actually necessary
+            # Enables MS-specific syntax: anonymous structs/unions without tags, __declspec, some MS-specific idioms
+            self.extra_compile_args.append("-fms-extensions")
+            # HACK REMOVE ME (temporarily mute all warnings to clear up logs whilst debugging builds)
+            self.extra_compile_args.append("-w")
 
             # If someone needs a specially named implib created, handle that
             if self.implib_name:
