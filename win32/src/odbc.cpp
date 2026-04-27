@@ -13,7 +13,7 @@
 #include <math.h>
 #include <limits.h>
 #include <string.h>
-
+#include <algorithm>
 #include "PyWinTypes.h"
 #include "PyWinObjects.h"
 #include "structmember.h"
@@ -93,8 +93,8 @@ typedef struct {
 static cursorObject *cursor(PyObject *o) { return (cursorObject *)o; }
 
 static void cursorDealloc(PyObject *self);
-PyMethodDef cursorMethods[];
-PyMemberDef cursorMembers[];
+extern PyMethodDef cursorMethods[];
+extern PyMemberDef cursorMembers[];
 
 static PyTypeObject Cursor_Type = {
     PYWIN_OBJECT_HEAD "odbccur", /*tp_name */
@@ -137,8 +137,8 @@ static PyTypeObject Cursor_Type = {
 };
 
 static void connectionDealloc(PyObject *self);
-PyMethodDef connectionMethods[];
-PyMemberDef connectionMembers[];
+extern PyMethodDef connectionMethods[];
+extern PyMemberDef connectionMembers[];
 static PyTypeObject Connection_Type = {
     PYWIN_OBJECT_HEAD "odbcconn", /*tp_name */
     sizeof(connectionObject),     /*tp_basicsize */
@@ -933,21 +933,21 @@ static int display_size(short coltype, int collen, const TCHAR *colname)
         case SQL_DATE:
         case SQL_TIMESTAMP:
         case SQL_BIT:
-            return (max(collen, (int)_tcslen(colname)));
+            return (std::max(collen, (int)_tcslen(colname)));
         case SQL_SMALLINT:
         case SQL_INTEGER:
         case SQL_TINYINT:
-            return (max(collen + 1, (int)_tcslen(colname)));
+            return (std::max(collen + 1, (int)_tcslen(colname)));
         case SQL_DECIMAL:
         case SQL_NUMERIC:
-            return (max(collen + 2, (int)_tcslen(colname)));
+            return (std::max(collen + 2, (int)_tcslen(colname)));
         case SQL_REAL:
         case SQL_FLOAT:
         case SQL_DOUBLE:
-            return (max(20, (int)_tcslen(colname)));
+            return (std::max(20, (int)_tcslen(colname)));
         case SQL_BINARY:
         case SQL_VARBINARY:
-            return (max(2 * collen, (int)_tcslen(colname)));
+            return (std::max(2 * collen, (int)_tcslen(colname)));
         case SQL_LONGVARBINARY:
         case SQL_LONGVARCHAR:
         default:

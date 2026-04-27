@@ -31,6 +31,7 @@ See - I told you the implementation was simple :-)
 */
 
 #define PY_SSIZE_T_CLEAN
+#include <algorithm>
 #include "PyWinTypes.h"
 #include "PyWinObjects.h"
 
@@ -313,7 +314,7 @@ BOOL PyTraceObject::WriteData(const char *data, unsigned len)
     BOOL rc = TRUE;
     Py_BEGIN_ALLOW_THREADS const char *data_this = data;
     while (len) {
-        unsigned len_this = min(len, BUFFER_SIZE / 2);
+        unsigned len_this = std::min(len, (unsigned)(BUFFER_SIZE / 2));
         BOOL ok = GetMyMutex();
         if (ok) {
             // must use types with identical size on win32 and win64

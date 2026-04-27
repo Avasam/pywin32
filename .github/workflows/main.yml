@@ -13,183 +13,276 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Build and test
-    runs-on: ${{ matrix.os }}
+  build_msys2_mingw:
+    # Temporarily suppress warnings to focus on fixing errors
+    env:
+      CFLAGS: "-w"
+      CXXFLAGS: "-w"
+    runs-on: windows-2022
     timeout-minutes: &timeout-minutes 25
+    defaults:
+      run:
+        shell: msys2 {0}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        python-architecture: [x64, x86, arm64]
         include:
-          - os: windows-2022
-          - python-architecture: arm64
-            os: windows-11-arm
-        exclude:
-          # actions/setup-python does not provide prebuilt arm64 Python before 3.11
-          - python-architecture: arm64
-            python-version: "3.9"
-          - python-architecture: arm64
-            python-version: "3.10"
-    env:
-      # TODO: We can't yet run tests with PYTHONDEVMODE=1, let's emulated it as much as we can
-      # https://docs.python.org/3/library/devmode.html#effects-of-the-python-development-mode
-      PYTHONMALLOC: debug
-      PYTHONASYNCIODEBUG: 1
-      PYTHONWARNINGS: always
-      # PYTHONFAULTHANDLER: 1 # This causes our tests to fail
-
+          - { sys: mingw64, env: x86_64, plat-name: win-amd64 }
+          # - { sys: mingw32, env: i686, plat-name: win32  }
+          # - { sys: ucrt64,  env: ucrt-x86_64, plat-name: win-amd64 }
+          # No ARM yet, that currently requires using clang
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+      - uses: msys2/setup-msys2@v2
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.python-architecture }}
-          check-latest: true
-          allow-prereleases: true
+          msystem: ${{matrix.sys}}
+          update: true
+          # TODO: check if toolchain is needed
+          # git: temp for debugging
+          install: |
+            mingw-w64-${{matrix.env}}-toolchain
+            mingw-w64-${{matrix.env}}-python
+            mingw-w64-${{matrix.env}}-python-build
+            mingw-w64-${{matrix.env}}-cc
+            mingw-w64-${{matrix.env}}-git
 
       - name: Build and install
-        run: pip install . -v --user
-
-      # This needs to happen *after* installing pywin32 since
-      # AutoDuck/py2d.py currently relies on runtime imports for introspection
-      # This isn't included in the wheel (TODO: could we?)
-      # and only serves as a PR test for the docs.yaml workflow
-      - name: Generate PyWin32.chm help file
-        run: python AutoDuck/make.py
-
-      # Smokescreen test to validate postinstall doesn't crash, dlls can be found, and both pathless invocation methods work
-      - name: Run postinstall install/remove
-        run: |
-          $UserSite = "$(python -m site --user-site)"
-          python -m win32.scripts.pywin32_postinstall -install -destination "$UserSite"
-          pywin32_postinstall -remove -destination "$UserSite"
-
-      # Compilation and registration of the PyCOMTest server dll
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Build and register the PyCOMTest server dll
-        # Pass Silent flag to regsvr32 to avoid hanging on confirmation window
-        run: com/TestSources/PyCOMTest/buildAndRegister.bat /s
-
-      - name: Run tests
-        # Run the tests directly from the source dir so support files (eg, .wav files etc)
-        # can be found - they aren't installed into the Python tree.
-        run: python win32/scripts/pywin32_testall.py -v -skip-adodbapi
-
-      - name: Build wheels
-        run: pip wheel . -v --wheel-dir=dist
-
+        # Having to specify plat-name here is definitely hacky, not sure why setuptools fails with
+        # error: --plat-name must be one of ('win32', 'win-amd64', 'win-arm32', 'win-arm64')
+        #
+        # We don't actually need wheels, but this causes a direct-from-source build,
+        # so we can reference files that wouldn't be copied in a temp sdist folder
+        run: python -m build --wheel -v --config-setting=--build-option="build_ext
+          --plat-name=${{matrix.plat-name}} build --plat-name=${{matrix.plat-name}} bdist_wheel
+          --plat-name=${{matrix.plat-name}}"
       - uses: actions/upload-artifact@v4
         # Upload artifacts even if tests fail
         if: ${{ always() }}
         with:
-          name: artifacts-${{ matrix.python-version }}-${{ matrix.python-architecture }}
+          name: artifacts-${{matrix.sys}}-${{matrix.env}}-${{matrix.plat-name}}
           path: dist/*.whl
           if-no-files-found: error
+  # build_cygwin:
+  #   # Temporarily suppress warnings to focus on fixing errors
+  #   env:
+  #     CFLAGS : '-w'
+  #     CXXFLAGS : '-w'
+  #   runs-on: windows-2022
+  #   timeout-minutes: *timeout-minutes
+  #   defaults:
+  #     run:
+  #       # shell: C:\cygwin\bin\env.exe CYGWIN_NOWINPATH=1 CHERE_INVOKING=1 C:\cygwin\bin\bash.exe -o igncr -eo pipefail '{0}'
+  #       shell: bash -o igncr -eo pipefail '{0}'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: cygwin/cygwin-install-action@master
+  #       with:
+  #         platform: x86_64
+  #         # Note: No provided caches yet: https://github.com/cygwin/cygwin-install-action/pull/6
+  #         packages: >-
+  #           gcc-core
+  #           gcc-g++
+  #           python3-devel
+  #           python3-build
+  #           python3-tomli
+  #     - name: Debug python
+  #       run: |
+  #         python --version
+  #         python -c "import sysconfig; print(sysconfig.get_paths())"
+  #         ls -R /usr/include | grep Python.h || true
+  #     - name: Disable CRLF line endings in git checkout
+  #       run: git config --global core.autocrlf input
+  #     - name: Build and install
+  #       # We don't actually need wheels, but this causes a direct-from-source build,
+  #       # so we can reference files that wouldn't be copied in a temp sdist folder
+  #       run: python -m build --wheel -v
+  #     - uses: actions/upload-artifact@v4
+  #       # Upload artifacts even if tests fail
+  #       if: ${{ always() }}
+  #       with:
+  #         name: artifacts-cygwin
+  #         path: dist/*.whl
+  #         if-no-files-found: error
 
-  # actions/setup-python does not provide prebuilt arm64 Python before 3.11, so we cross-compile.
-  cross_compile_arm64:
-    name: Cross-compile ARM64
-    runs-on: windows-2022
-    timeout-minutes: *timeout-minutes
-    strategy:
-      fail-fast: false
-      matrix:
-        # pythonarm64 NuGet has no download for Python ~=3.9.11
-        python-version: ["3.9.10", "3.10"]
-    steps:
-      - uses: actions/checkout@v4
+  # test:
+  #   name: Build and test
+  #   runs-on: ${{ matrix.os }}
+  #   timeout-minutes: *timeout-minutes
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+  #       python-architecture: [x64, x86, arm64]
+  #       include:
+  #         - os: windows-2022
+  #         - python-architecture: arm64
+  #           os: windows-11-arm
+  #       exclude:
+  #         # actions/setup-python does not provide prebuilt arm64 Python before 3.11
+  #         - python-architecture: arm64
+  #           python-version: "3.9"
+  #         - python-architecture: arm64
+  #           python-version: "3.10"
+  #   env:
+  #     # TODO: We can't yet run tests with PYTHONDEVMODE=1, let's emulated it as much as we can
+  #     # https://docs.python.org/3/library/devmode.html#effects-of-the-python-development-mode
+  #     PYTHONMALLOC: debug
+  #     PYTHONASYNCIODEBUG: 1
+  #     PYTHONWARNINGS: always
+  #     # PYTHONFAULTHANDLER: 1 # This causes our tests to fail
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: astral-sh/setup-uv@v7
-        with:
-          python-version: ${{ matrix.python-version }}
-          activate-environment: true
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Obtain ARM64 library files
-        run: python .github\workflows\download-arm64-libs.py ./arm64libs
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v6
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #         architecture: ${{ matrix.python-architecture }}
+  #         check-latest: true
+  #         allow-prereleases: true
 
-      - name: Build wheels
-        run: uv build --wheel --config-setting=--build-option="build_ext -L./arm64libs --plat-name=win-arm64 build --plat-name=win-arm64 bdist_wheel --plat-name=win-arm64"
+  #     - name: Build and install
+  #       run: pip install . -v --user
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifacts-${{ matrix.python-version }}-arm64
-          path: dist/*.whl
-          if-no-files-found: error
+  #     # This needs to happen *after* installing pywin32 since
+  #     # AutoDuck/py2d.py currently relies on runtime imports for introspection
+  #     # This isn't included in the wheel (TODO: could we?)
+  #     # and only serves as a PR test for the docs.yaml workflow
+  #     - name: Generate PyWin32.chm help file
+  #       run: python AutoDuck/make.py
 
-  merge:
-    runs-on: ubuntu-latest
-    needs: [test, cross_compile_arm64]
-    steps:
-      - name: Merge Artifacts
-        uses: actions/upload-artifact/merge@v4
-        with:
-          name: artifacts
-          pattern: artifacts-*
-      - name: Delete standalone Artifacts
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: artifacts-*
+  #     # Smokescreen test to validate postinstall doesn't crash, dlls can be found, and both pathless invocation methods work
+  #     - name: Run postinstall install/remove
+  #       run: |
+  #         $UserSite = "$(python -m site --user-site)"
+  #         python -m win32.scripts.pywin32_postinstall -install -destination "$UserSite"
+  #         pywin32_postinstall -remove -destination "$UserSite"
 
-  # This job can be run locally by running `pre-commit run`
-  checkers:
-    runs-on: ubuntu-latest
-    timeout-minutes: *timeout-minutes
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v7
-        with:
-          # This job only needs to target the oldest supported version
-          python-version: "3.9"
-          activate-environment: true
-      - run: uv pip install --group=checkers
+  #     # Compilation and registration of the PyCOMTest server dll
+  #     - name: Add msbuild to PATH
+  #       uses: microsoft/setup-msbuild@v2
 
-      # !cancelled(): Show issues even if the previous steps failed. But still fail the job
-      - name: Run Ruff linter
-        uses: astral-sh/ruff-action@v3
-        if: ${{ !cancelled() }}
-      - name: Run Ruff formatter
-        run: ruff format --check
-        if: ${{ !cancelled() }}
+  #     - name: Build and register the PyCOMTest server dll
+  #       # Pass Silent flag to regsvr32 to avoid hanging on confirmation window
+  #       run: com/TestSources/PyCOMTest/buildAndRegister.bat /s
 
-      # Too many files to fit in a single command, also exclude vendored Scintilla and MAPIStubLibrary
-      - run: |
-          clang-format --Werror --dry-run $(git ls-files '*.cpp' ':!:com/win32comext/mapi/src/MAPIStubLibrary/')
-          if ($LastExitCode -ne 0) { exit $LastExitCode }
-        shell: pwsh
-        if: ${{ !cancelled() }}
-      - run: |
-          clang-format --Werror --dry-run $(git ls-files '*.h' ':!:Pythonwin/Scintilla/' ':!:com/win32comext/mapi/src/MAPIStubLibrary/')
-          if ($LastExitCode -ne 0) { exit $LastExitCode }
-        shell: pwsh
-        if: ${{ !cancelled() }}
+  #     - name: Run tests
+  #       # Run the tests directly from the source dir so support files (eg, .wav files etc)
+  #       # can be found - they aren't installed into the Python tree.
+  #       run: python win32/scripts/pywin32_testall.py -v -skip-adodbapi
 
-  type-checkers:
-    runs-on: ubuntu-latest
-    timeout-minutes: *timeout-minutes
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v7
-        with:
-          python-version: ${{ matrix.python-version }}
-          activate-environment: true
-      - run: uv pip install --group=type-checkers
+  #     - name: Build wheels
+  #       run: pip wheel . -v --wheel-dir=dist
 
-      - run: mypy . --python-version=${{ matrix.python-version }}
+  #     - uses: actions/upload-artifact@v4
+  #       # Upload artifacts even if tests fail
+  #       if: ${{ always() }}
+  #       with:
+  #         name: artifacts-${{ matrix.python-version }}-${{ matrix.python-architecture }}
+  #         path: dist/*.whl
+  #         if-no-files-found: error
 
-      - uses: jakebailey/pyright-action@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-          version: PATH
-          annotate: errors
-        if: ${{ !cancelled() }} # Show issues even if the previous steps failed. But still fail the job
+  # # actions/setup-python does not provide prebuilt arm64 Python before 3.11, so we cross-compile.
+  # cross_compile_arm64:
+  #   name: Cross-compile ARM64
+  #   runs-on: windows-2022
+  #   timeout-minutes: *timeout-minutes
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       # pythonarm64 NuGet has no download for Python ~=3.9.11
+  #       python-version: ["3.9.10", "3.10"]
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: astral-sh/setup-uv@v7
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #         activate-environment: true
+
+  #     - name: Obtain ARM64 library files
+  #       run: python .github\workflows\download-arm64-libs.py ./arm64libs
+
+  #     - name: Build wheels
+  #       run: uv build --wheel --config-setting=--build-option="build_ext -L./arm64libs --plat-name=win-arm64 build --plat-name=win-arm64 bdist_wheel --plat-name=win-arm64"
+
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: artifacts-${{ matrix.python-version }}-arm64
+  #         path: dist/*.whl
+  #         if-no-files-found: error
+
+  # merge:
+  #   runs-on: ubuntu-latest
+  #   needs: [test, cross_compile_arm64]
+  #   steps:
+  #     - name: Merge Artifacts
+  #       uses: actions/upload-artifact/merge@v4
+  #       with:
+  #         name: artifacts
+  #         pattern: artifacts-*
+  #     - name: Delete standalone Artifacts
+  #       uses: geekyeggo/delete-artifact@v5
+  #       with:
+  #         name: artifacts-*
+
+  # # This job can be run locally by running `pre-commit run`
+  # checkers:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: *timeout-minutes
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: astral-sh/setup-uv@v7
+  #       with:
+  #         # This job only needs to target the oldest supported version
+  #         python-version: "3.9"
+  #         activate-environment: true
+  #     - run: uv pip install --group=checkers
+
+  #     # !cancelled(): Show issues even if the previous steps failed. But still fail the job
+  #     - run: pycln . --config=pycln.toml --check
+
+  #     - name: Run Ruff linter
+  #       uses: astral-sh/ruff-action@v3
+  #       if: ${{ !cancelled() }}
+  #     - name: Run Ruff formatter
+  #       run: ruff format --check
+  #       if: ${{ !cancelled() }}
+
+  #     # Too many files to fit in a single command, also exclude vendored Scintilla and MAPIStubLibrary
+  #     - run: |
+  #         clang-format --Werror --dry-run $(git ls-files '*.cpp' ':!:com/win32comext/mapi/src/MAPIStubLibrary/')
+  #         if ($LastExitCode -ne 0) { exit $LastExitCode }
+  #       shell: pwsh
+  #       if: ${{ !cancelled() }}
+  #     - run: |
+  #         clang-format --Werror --dry-run $(git ls-files '*.h' ':!:Pythonwin/Scintilla/' ':!:com/win32comext/mapi/src/MAPIStubLibrary/')
+  #         if ($LastExitCode -ne 0) { exit $LastExitCode }
+  #       shell: pwsh
+  #       if: ${{ !cancelled() }}
+
+  # type-checkers:
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: *timeout-minutes
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: astral-sh/setup-uv@v7
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #         activate-environment: true
+  #     - run: uv pip install --group=type-checkers
+
+  #     - run: mypy . --python-version=${{ matrix.python-version }}
+
+  #     - uses: jakebailey/pyright-action@v2
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #         version: PATH
+  #         annotate: errors
+  #       if: ${{ !cancelled() }} # Show issues even if the previous steps failed. But still fail the job
