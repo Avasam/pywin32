@@ -245,17 +245,17 @@ class PyScript(framework.COMScript):
             if item.IsVisible():
                 self.globalNameSpaceModule.__dict__[item.name] = item.attributeObject
             if item.IsGlobal():
-                # Global items means sub-items are also added...
-                for subitem in item.subItems.values():
-                    self.globalNameSpaceModule.__dict__[subitem.name] = (
-                        subitem.attributeObject
-                    )
-                # Also add all methods
-                for name, entry in item.dispatchContainer._olerepr_.mapFuncs.items():
-                    if not entry.hidden:
-                        self.globalNameSpaceModule.__dict__[name] = getattr(
-                            item.dispatchContainer, name
-                        )
+                self.globalNameSpaceModule.__dict__.update(
+                    {  # Global items means sub-items are also added...
+                        subitem.name: subitem.attributeObject
+                        for subitem in item.subItems.values()
+                    }
+                    | {  # Also add all methods
+                        name: getattr(item.dispatchContainer, name)
+                        for name, entry in item.dispatchContainer._olerepr_.mapFuncs.items()
+                        if not entry.hidden
+                    }
+                )
 
     def DoExecutePendingScripts(self):
         try:

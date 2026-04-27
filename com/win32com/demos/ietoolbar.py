@@ -67,8 +67,7 @@ class WIN32STRUCT:
                 full_fmt += "pi"
             else:
                 full_fmt += fmt
-        for name, val in kw.items():
-            self.__dict__[name] = val
+        self.__dict__.update(kw)
 
     def __setattr__(self, attr, val):
         if not attr.startswith("_") and attr not in self.__dict__:

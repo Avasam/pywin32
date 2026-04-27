@@ -614,24 +614,23 @@ def _ResolveType(typerepr, itypeinfo):
 
 
 def _BuildArgList(fdesc, names):
-    "Builds list of args to the underlying Invoke method."
+    """Builds list of args to the underlying Invoke method."""
     # Word has TypeInfo for Insert() method, but says "no args"
     numArgs = max(fdesc[6], len(fdesc[2]))
-    names = list(names)
-    while None in names:
-        i = names.index(None)
-        names[i] = "arg%d" % (i,)
-    # We've seen 'source safe' libraries offer the name of 'ret' params in
-    # 'names' - although we can't reproduce this, it would be insane to offer
-    # more args than we have arg infos for - hence the upper limit on names...
-    names = list(map(MakePublicAttributeName, names[1 : (numArgs + 1)]))
-    name_num = 0
-    while len(names) < numArgs:
-        names.append("arg%d" % (len(names),))
-    # As per BuildCallList(), avoid huge lines.
-    # Hack a "\n" at the end of every 5th name
-    for i in range(0, len(names), 5):
-        names[i] += "\n\t\t\t"
+    names = (
+        [
+            MakePublicAttributeName(f"arg{i}" if name is None else name)
+            # As per BuildCallList(), avoid huge lines.
+            # Hack a "\n" at the end of every 5th name
+            + ("\n\t\t\t" if (i % 5 == 0) else "")
+            # We've seen 'source safe' libraries offer the name of 'ret' params in
+            # 'names' - although we can't reproduce this, it would be insane to offer
+            # more args than we have arg infos for - hence the upper limit on names...
+            for i, name in enumerate(names[1 : (numArgs + 1)])
+        ]
+        + [f"arg{i}" for i in range(len(names) - 1, numArgs)]
+    )
+
     return "," + ", ".join(names)
 
 

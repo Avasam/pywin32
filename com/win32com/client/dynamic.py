@@ -529,9 +529,12 @@ class CDispatch:
         Calling: ob._FlagAsMethod("SomeFunc")
         should then allow this to work.
         """
-        for name in methodNames:
-            details = build.MapEntry(self.__AttrToID__(name), (name,))
-            self._olerepr_.mapFuncs[name] = details
+        self._olerepr_.mapFuncs.update(
+            {
+                name: build.MapEntry(self.__AttrToID__(name), (name,))
+                for name in methodNames
+            }
+        )
 
     def __AttrToID__(self, attr):
         debug_attr_print(
