@@ -703,19 +703,15 @@ class CEnterLeavePython {
 };
 
 // A helper for simple exception handling.
-// try/__try
 #if defined(__MINGW32__) || defined(MAINWIN)
+#define __try try
 #define PYWINTYPES_TRY try
-#else
-#define PYWINTYPES_TRY __try
-#endif /* MAINWIN */
-
-// catch/__except
-#if defined(__MINGW32__) || defined(MAINWIN)
+#define __except(filter) catch (...)
 #define PYWINTYPES_EXCEPT catch (...)
 #else
+#define PYWINTYPES_TRY __try
 #define PYWINTYPES_EXCEPT __except (EXCEPTION_EXECUTE_HANDLER)
-#endif
+#endif /* MAINWIN */
 // End of exception helper macros.
 
 // Class to hold a temporary reference that decrements itself

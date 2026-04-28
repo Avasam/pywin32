@@ -1,7 +1,7 @@
 // PyGatewayBase - the IUnknown Gateway Interface
 
 #include "stdafx.h"
-
+#include <algorithm>
 #include "PythonCOM.h"
 #include "PyFactory.h"
 
@@ -373,7 +373,7 @@ static HRESULT invoke_setup(DISPPARAMS FAR *params, LCID lcid, PyObject **pPyArg
         // make sure it's not a special DISPID we don't understand.
         if (params->rgdispidNamedArgs[i] < 0)
             return DISP_E_PARAMNOTFOUND;
-        numArgs = max(numArgs, (UINT)params->rgdispidNamedArgs[i] + 1);
+        numArgs = std::max(numArgs, (UINT)params->rgdispidNamedArgs[i] + 1);
     }
 
     PyObject *argList = PyTuple_New(numArgs);
@@ -588,7 +588,7 @@ static HRESULT invoke_finish(PyObject *dispatcher,    /* The dispatcher for the 
             ob = NULL;
             firstByRef = 1;
         }
-        UINT max_args = min(cUserResult - firstByRef, pDispParams->cArgs);
+        UINT max_args = std::min(cUserResult - firstByRef, pDispParams->cArgs);
         UINT *offsets = (UINT *)_malloca(sizeof(UINT) * max_args);
         // Get the offsets into our params of all BYREF args, in order.
         fill_byref_offsets(pDispParams, offsets, max_args);

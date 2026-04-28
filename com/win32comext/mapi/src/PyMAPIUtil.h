@@ -1,6 +1,14 @@
 // PyMAPIUtil.h
 
-#include "mapix.h"
+// Must include before MAPIX.h,
+// because of casing that header will cause imports of mingw shared headers instead
+// Which actually has some differences in param types, causing build failures
+#include <MAPIDefS.h>
+#include <MAPICode.h>
+#include <MAPIGuid.h>
+#include <MAPITags.h>
+
+#include <MAPIX.h>
 
 // We should not be using this!
 #define OleSetOleError PyCom_BuildPyException
