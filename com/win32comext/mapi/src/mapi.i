@@ -25,7 +25,8 @@
 %include "mapilib.i"
 
 %{
-#include "mapiaux.h"
+#define USES_IID_IMsgServiceAdmin2
+#include "MAPIAux.h"
 
 #include "PythonCOMServer.h"
 #include "PythonCOMRegister.h"

@@ -98,7 +98,7 @@
 #include <oleidl.h>
 #include <oaidl.h>
 #include <objidl.h>
-#include <mapiguid.h>
+// #include <MAPIGuid.h>
 #include <shlguid.h>
 #include <initguid.h>
 #endif  // __MINGW32__

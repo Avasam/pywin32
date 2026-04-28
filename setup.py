@@ -1676,7 +1676,7 @@ com_extensions = [
     ),
     WinExt_win32com(
         "bits",
-        libraries="Bits",
+        libraries="bits",
         sources=(
             """
                         {bits}/bits.cpp
