@@ -322,7 +322,7 @@ class WinExt_ISAPI(WinExt):
 # itself - thus, output is "win32comext"
 class WinExt_win32com(WinExt):
     def __init__(self, name, **kw):
-        kw["libraries"] = kw.get("libraries", "") + " oleaut32 ole32"
+        kw["libraries"] = kw.get("libraries", "") + " oleaut32 ole32 uuid pythoncom"
         WinExt.__init__(self, name, **kw)
 
     def get_pywin32_dir(self):
@@ -337,6 +337,16 @@ class WinExt_win32com_mapi(WinExt_win32com):
         if not platform.machine() in ("AMD64", "ARM64"):
             libs += " version user32 advapi32 Ex2KSdk sadapi netapi32"
         kw["libraries"] = libs
+        # if is_mingw:
+        #     # Force-include sal_compat.h before every MAPI translation unit so
+        #     # SAL annotations (__in, __out, etc.) are defined as no-ops without
+        #     # modifying the third-party MAPIStubLibrary headers.
+        #     kw.setdefault("extra_compile_args", []).extend(
+        #         [
+        #             "-include",
+        #             "com/win32comext/mapi/src/sal_compat.h",
+        #         ]
+        #     )
         super().__init__(name, **kw)
 
     def get_pywin32_dir(self):
@@ -1352,7 +1362,7 @@ pythoncom = WinExt_system32(
                         {win32com}/include/PyIServerSecurity.h
                         """.format(**dirs)
     ).split(),
-    libraries="oleaut32 ole32 user32 urlmon oleacc",
+    libraries="oleaut32 ole32 user32 urlmon oleacc uuid",
     export_symbol_file="com/win32com/src/PythonCOM.def",
     extra_compile_args=["-DBUILD_PYTHONCOM"],
     implib_name="pythoncom",
@@ -1361,7 +1371,7 @@ com_extensions = [
     pythoncom,
     WinExt_win32com(
         "adsi",
-        libraries="ACTIVEDS ADSIID user32 advapi32",
+        libraries="activeds adsiid user32 advapi32",
         sources=(
             """
                         {adsi}/adsi.i                 {adsi}/adsi.cpp
@@ -1400,7 +1410,7 @@ com_extensions = [
         sources=(
             """
                         {axscript}/AXScript.cpp
-                        {axscript}/GUIDS.cpp                   {axscript}/PyGActiveScript.cpp
+                        {axscript}/GUIDs.cpp                   {axscript}/PyGActiveScript.cpp
                         {axscript}/PyGActiveScriptError.cpp    {axscript}/PyGActiveScriptParse.cpp
                         {axscript}/PyGActiveScriptSite.cpp     {axscript}/PyGObjectSafety.cpp
                         {axscript}/PyIActiveScript.cpp         {axscript}/PyIActiveScriptError.cpp
@@ -1490,7 +1500,10 @@ com_extensions = [
     WinExt_win32com(
         "mapi",
         libraries="advapi32",
-        include_dirs=["{mapi}/MapiStubLibrary/include".format(**dirs)],
+        include_dirs=["{mapi}/MAPIStubLibrary/include".format(**dirs)],
+        # extra_compile_args=(
+        #     ["-include", "com/win32comext/mapi/src/sal_compat.h"] if is_mingw else []
+        # ),
         sources=(
             """
                         {mapi}/mapi.i                 {mapi}/mapi.cpp
@@ -1524,7 +1537,7 @@ com_extensions = [
     WinExt_win32com_mapi(
         "exchange",
         libraries="advapi32 legacy_stdio_definitions",
-        include_dirs=["{mapi}/MapiStubLibrary/include".format(**dirs)],
+        include_dirs=["{mapi}/MAPIStubLibrary/include".format(**dirs)],
         sources=(
             """
                                   {mapi}/exchange.i         {mapi}/exchange.cpp

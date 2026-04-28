@@ -94,13 +94,13 @@
 // Special Mingw32 considerations.
 #define __try try
 #define __except(filter) catch (...)
-#include <initguid.h>
 #include <olectl.h>
 #include <oleidl.h>
 #include <oaidl.h>
 #include <objidl.h>
 #include <mapiguid.h>
 #include <shlguid.h>
+#include <initguid.h>
 #endif  // __MINGW32__
 
 #include <PyWinTypes.h>  // Standard Win32 Types
