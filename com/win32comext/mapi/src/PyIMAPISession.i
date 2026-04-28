@@ -183,7 +183,7 @@ PyObject *PyIMAPISession::Advise(PyObject *self, PyObject *args)
 	IMAPIAdviseSink *psink = NULL;
 	if (!PyCom_InterfaceFromPyObject(obSink, IID_IMAPIAdviseSink, (void **)&psink, FALSE))
 		return NULL;
-	ULONG connection;
+	ULONG_PTR connection;
 	HRESULT _result;
 	PyObject *rc;
 	Py_BEGIN_ALLOW_THREADS
