@@ -72,12 +72,10 @@ class AXSite:
     _public_methods_ = IActiveScriptSite_methods
     _com_interfaces_ = [axscript.IID_IActiveScriptSite]
 
-    def __init__(self, objModel={}, engine=None, lcid=0):
+    def __init__(self, objModel: dict = {}, engine=None, lcid=0):
         self.lcid = lcid
-        self.objModel = {}
-        for name, object in objModel.items():
-            # Gregs code did str.lower this - I think that is callers job if he wants!
-            self.objModel[name] = object
+        # Gregs code did str.lower this - I think that is callers job if he wants!
+        self.objModel = objModel.copy()
 
         self.engine = None
         if engine:

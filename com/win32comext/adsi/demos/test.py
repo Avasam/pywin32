@@ -132,11 +132,7 @@ def DumpAllObjects():
 # Example Code for Enumerating Schema Classes, Attributes, and Syntaxes
 
 # Fill a map with VT_ datatypes, to give us better names:
-vt_map = {}
-for name, val in pythoncom.__dict__.items():
-    if name[:3] == "VT_":
-        vt_map[val] = name
-
+vt_map = {val: name for name, val in pythoncom.__dict__.items() if name[:3] == "VT_"}
 
 def DumpSchema2():
     "Dumps the schema using an alternative technique"

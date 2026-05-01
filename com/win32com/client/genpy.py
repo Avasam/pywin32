@@ -1282,9 +1282,7 @@ class Generator:
                 f"Can't find the '{child}' interface in the CoClasses, or the interfaces"
             )
             # Make a map of iid: dispitem, vtableitem)
-            items = {}
-            for key, value in oleItems.items():
-                items[key] = (value, None)
+            items = {key: (value, None) for key, value in oleItems.items()}
             for key, value in vtableItems.items():
                 existing = items.get(key, None)
                 if existing is not None:
