@@ -475,6 +475,26 @@ class my_build_ext(build_ext):
             ext.libraries = patched_libs
             return None  # no reason - it can be built!
 
+    def _generate_missing_import_libs(self):
+        """Generate import libraries missing from some MinGW toolchains.
+
+        i686 MSYS2 MinGW ships loadperf.h but not libloadperf.a.
+        Generate it from a .def file using dlltool so perfmon.pyd can link.
+        Only runs on win32 (i686) builds; x86_64 ships the library already.
+        """
+        if self.plat_name != "win32":
+            return
+        loadperf_def = os.path.join("win32", "src", "PerfMon", "loadperf.def")
+        loadperf_a = os.path.join(self.build_temp, "libloadperf.a")
+        if os.path.exists(loadperf_def) and not os.path.exists(loadperf_a):
+            self.mkpath(self.build_temp)
+            dlltool = os.environ.get("DLLTOOL", "dlltool")
+            # -k / --kill-at: strip @N stdcall decoration so i686 stubs
+            # resolve against Windows DLLs that export undecorated names.
+            self.compiler.spawn(
+                [dlltool, "-k", "--input-def", loadperf_def, "--output-lib", loadperf_a]
+            )
+
     def _build_scintilla(self):
         path = "Pythonwin/Scintilla"
         if is_mingw:
@@ -630,6 +650,9 @@ class my_build_ext(build_ext):
             print("-- FIX ME ! distutils may expose complete inc/lib dirs again")
 
         vcbase, vcverdir = self._check_vc()
+
+        if is_mingw:
+            self._generate_missing_import_libs()
 
         # Here we hack a "pywin32" directory (one of 'win32', 'win32com',
         # 'Pythonwin' etc), as distutils doesn't seem to like the concept
