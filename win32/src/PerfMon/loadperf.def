@@ -1,20 +1,7 @@
 ; Import definition for loadperf.dll (Windows Performance Counter API)
-; Used to generate libloadperf.a for MinGW toolchains that don't ship it.
-; Function names are undecorated (Windows system DLLs export without @N);
-; pass -k (--kill-at) to dlltool so i686 stdcall @N stubs resolve correctly.
+; Used to generate libloadperf.a for i686 MinGW toolchains that don't ship it.
+; @8 stdcall decoration (2 args x 4 bytes) matches the real DLL's PE export names.
 LIBRARY "loadperf.dll"
 EXPORTS
-BackupPerfRegistryToFileW
-InstallPerfDllA
-InstallPerfDllW
-LoadPerfCounterTextStringsA
-LoadPerfCounterTextStringsW
-LpAcquireInstallationMutex
-LpReleaseInstallationMutex
-RestorePerfRegistryFromFileW
-SetServiceAsTrustedA
-SetServiceAsTrustedW
-UnloadPerfCounterTextStringsA
-UnloadPerfCounterTextStringsW
-UpdatePerfNameFilesA
-UpdatePerfNameFilesW
+LoadPerfCounterTextStringsA@8
+UnloadPerfCounterTextStringsA@8

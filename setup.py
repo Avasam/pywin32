@@ -489,10 +489,8 @@ class my_build_ext(build_ext):
         if os.path.exists(loadperf_def) and not os.path.exists(loadperf_a):
             self.mkpath(self.build_temp)
             dlltool = os.environ.get("DLLTOOL", "dlltool")
-            # -k / --kill-at: strip @N stdcall decoration so i686 stubs
-            # resolve against Windows DLLs that export undecorated names.
             self.compiler.spawn(
-                [dlltool, "-k", "--input-def", loadperf_def, "--output-lib", loadperf_a]
+                [dlltool, "--input-def", loadperf_def, "--output-lib", loadperf_a]
             )
 
     def _build_scintilla(self):
