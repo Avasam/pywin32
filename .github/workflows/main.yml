@@ -45,6 +45,7 @@ jobs:
             mingw-w64-${{matrix.env}}-python-build
             mingw-w64-${{matrix.env}}-cc
             mingw-w64-${{matrix.env}}-git
+            mingw-w64-${{matrix.env}}-make
 
       - name: Build and install
         # Having to specify plat-name here is definitely hacky, not sure why setuptools fails with
