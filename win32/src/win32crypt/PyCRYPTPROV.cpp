@@ -343,7 +343,7 @@ PyObject *PyCRYPTPROV::PyCryptGenRandom(PyObject *self, PyObject *args, PyObject
     // initialize buffer with char string if passed if
     ZeroMemory(pbBuffer, dwLen + 1);
     if (seeddata != NULL)
-        memcpy(pbBuffer, seeddata, min(dwLen, (unsigned long)seedlen));
+        memcpy(pbBuffer, seeddata, min(dwLen, seedlen));
     if (CryptGenRandom(hcryptprov, dwLen, pbBuffer))
         ret = PyBytes_FromStringAndSize((char *)pbBuffer, dwLen);
     else

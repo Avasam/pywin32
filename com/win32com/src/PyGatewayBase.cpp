@@ -1,6 +1,7 @@
 // PyGatewayBase - the IUnknown Gateway Interface
 
 #include "stdafx.h"
+
 #include "PythonCOM.h"
 #include "PyFactory.h"
 
