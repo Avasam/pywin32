@@ -11,7 +11,6 @@ generates Windows .hlp files.
 
 ******************************************************************/
 
-#include <algorithm>
 #include "PyWinTypes.h"
 #include "pdh.h"
 #include "pdhmsg.h"
@@ -879,7 +878,7 @@ static PyObject *PyBrowseCounters(PyObject *self, PyObject *args, PyObject *kwar
     // Initialize the return buffer if starting path is passed in. (bInitializePath will also be set)
     if (!PyWinObject_AsTCHAR(obInitialPath, &InitialPath, TRUE, &cchInitialPath))
         return NULL;  // Last exit without cleanup
-    myCfg.cfg.cchReturnPathLength = std::max(cchInitialPath + 1, (DWORD)1024);
+    myCfg.cfg.cchReturnPathLength = max(cchInitialPath + 1, 1024);
     myCfg.cfg.szReturnPathBuffer = (TCHAR *)malloc(myCfg.cfg.cchReturnPathLength * sizeof(TCHAR));
     if (myCfg.cfg.szReturnPathBuffer == NULL) {
         PyErr_NoMemory();

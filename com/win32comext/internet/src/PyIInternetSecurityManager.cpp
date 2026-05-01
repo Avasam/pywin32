@@ -4,7 +4,6 @@
 #define PY_SSIZE_T_CLEAN
 #include "internet_pch.h"
 #include "PyIInternetSecurityManager.h"
-#include <algorithm>
 
 // @doc - This file contains autoduck documentation
 // ---------------------------------------------------
@@ -337,7 +336,7 @@ STDMETHODIMP PyGInternetSecurityManager::GetSecurityId(
         Py_DECREF(result);
         return MAKE_PYCOM_GATEWAY_FAILURE_CODE("GetSecurityId");
     }
-    *pcbSecurityId = std::min(pybuf.len(), *pcbSecurityId);
+    *pcbSecurityId = min(pybuf.len(), *pcbSecurityId);
     memcpy(pbSecurityId, pybuf.ptr(), *pcbSecurityId);
     Py_DECREF(result);
     return hr;

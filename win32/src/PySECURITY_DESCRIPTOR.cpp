@@ -1,7 +1,6 @@
 //
 // @doc
 
-#include <algorithm>
 #include "PyWinTypes.h"
 #include "PyWinObjects.h"
 #include "PySecurityObjects.h"
@@ -751,7 +750,7 @@ PySECURITY_DESCRIPTOR::PySECURITY_DESCRIPTOR(Py_ssize_t cb /*= 0*/)
 {
     ob_type = &PySECURITY_DESCRIPTORType;
     _Py_NewReference(this);
-    cb = std::max(cb, (Py_ssize_t)SECURITY_DESCRIPTOR_MIN_LENGTH);
+    cb = max(cb, SECURITY_DESCRIPTOR_MIN_LENGTH);
     PSECURITY_DESCRIPTOR psd = malloc(cb);
     this->m_psd = NULL;
     if (::InitializeSecurityDescriptor(psd, SECURITY_DESCRIPTOR_REVISION))

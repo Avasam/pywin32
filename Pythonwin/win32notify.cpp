@@ -5,7 +5,6 @@
     Created May 1995, Mark Hammond (MHammond@skippinet.com.au)
 
 */
-#include <algorithm>
 #include "stdafx.h"
 #include "win32win.h"
 
@@ -205,7 +204,7 @@ void PyNotifyParseExtraTuple(NMHDR *ptr, PyObject *args, char *fmt)
                         MY_RET_ERR("Expected string object")
                     char *val = PyBytes_AsString(ob);
                     SSIZE_T slen = strlen(val);
-                    SSIZE_T copylen = std::max(bufSize - 1, slen);
+                    SSIZE_T copylen = max(bufSize - 1, slen);
                     strncpy(pUse, val, copylen);
                     pUse[copylen] = '\0';
                 }
@@ -226,7 +225,7 @@ void PyNotifyParseExtraTuple(NMHDR *ptr, PyObject *args, char *fmt)
                     if (!PyWinObject_AsWCHAR(ob, &wchar_buf, FALSE, &wchar_cnt))
                         return;
                     ZeroMemory(pUse, bufSize * sizeof(wchar_t));
-                    wcsncpy((WCHAR *)pUse, wchar_buf, std::min(wchar_cnt, bufSize - 1));
+                    wcsncpy((WCHAR *)pUse, wchar_buf, min(wchar_cnt, bufSize - 1));
                     PyWinObject_FreeWCHAR(wchar_buf);
                 }
                 pUse += bufSize * sizeof(wchar_t);

@@ -13,7 +13,6 @@
 #include <math.h>
 #include <limits.h>
 #include <string.h>
-#include <algorithm>
 #include "PyWinTypes.h"
 #include "PyWinObjects.h"
 #include "structmember.h"
@@ -933,21 +932,21 @@ static int display_size(short coltype, int collen, const TCHAR *colname)
         case SQL_DATE:
         case SQL_TIMESTAMP:
         case SQL_BIT:
-            return (std::max(collen, (int)_tcslen(colname)));
+            return (max(collen, (int)_tcslen(colname)));
         case SQL_SMALLINT:
         case SQL_INTEGER:
         case SQL_TINYINT:
-            return (std::max(collen + 1, (int)_tcslen(colname)));
+            return (max(collen + 1, (int)_tcslen(colname)));
         case SQL_DECIMAL:
         case SQL_NUMERIC:
-            return (std::max(collen + 2, (int)_tcslen(colname)));
+            return (max(collen + 2, (int)_tcslen(colname)));
         case SQL_REAL:
         case SQL_FLOAT:
         case SQL_DOUBLE:
-            return (std::max(20, (int)_tcslen(colname)));
+            return (max(20, (int)_tcslen(colname)));
         case SQL_BINARY:
         case SQL_VARBINARY:
-            return (std::max(2 * collen, (int)_tcslen(colname)));
+            return (max(2 * collen, (int)_tcslen(colname)));
         case SQL_LONGVARBINARY:
         case SQL_LONGVARCHAR:
         default:

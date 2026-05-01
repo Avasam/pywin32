@@ -13,7 +13,6 @@ generates Windows .hlp files.
 
 */
 #include "stdafx.h"
-#include <algorithm>
 #include "win32win.h"
 #include "win32doc.h"
 #include "win32control.h"
@@ -964,7 +963,7 @@ BOOL ParseParaFormatTuple(PyObject *args, PARAFORMAT *pFmt)
         if (!PySequence_Check(obTabStops))
             RETURN_ERR("tabStops object must be None or a sequence");
         Py_ssize_t tabCount = PyObject_Length(obTabStops);
-        tabCount = std::min(MAX_TAB_STOPS, tabCount);
+        tabCount = min(MAX_TAB_STOPS, tabCount);
         for (Py_ssize_t i = 0; rc && i < tabCount; i++) {
             pFmt->rgxTabs[i] = PyLong_AsLong(PySequence_GetItem(obTabStops, i));
             rc = PyErr_Occurred() == FALSE;

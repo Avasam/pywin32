@@ -704,6 +704,12 @@ class CEnterLeavePython {
 
 // A helper for simple exception handling.
 #if defined(__MINGW32__) || defined(MAINWIN)
+#ifndef min
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#endif
 #define __try try
 #define PYWINTYPES_TRY try
 #define __except(filter) catch (...)

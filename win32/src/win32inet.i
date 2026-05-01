@@ -1820,7 +1820,7 @@ BOOL PyWinObject_AsINTERNET_CACHE_GROUP_INFO(PyObject *ob, INTERNET_CACHE_GROUP_
 			}
 		}
 	if (bsuccess && GroupName)
-		_tcsncpy(GroupInfo->szGroupName, GroupName, std::min(namelen, (DWORD)GROUPNAME_MAX_LENGTH));
+		_tcsncpy(GroupInfo->szGroupName, GroupName, min(namelen, (DWORD)GROUPNAME_MAX_LENGTH));
 	Py_DECREF(dummy_tuple);
 	PyWinObject_FreeTCHAR(GroupName);
 	if (OwnerStorage)

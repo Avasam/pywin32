@@ -3632,7 +3632,7 @@ static PyObject *PyExtractIconEx(PyObject *self, PyObject *args)
         goto done;
     }
     // Asking for 1 always says it got 2!?
-    nicons = std::min(nicons, nicons_got);
+    nicons = min(nicons, nicons_got);
     objects_large = PyList_New(nicons);
     if (!objects_large) goto done;
     objects_small = PyList_New(nicons);
@@ -6315,7 +6315,7 @@ BOOL PyParse_OPENFILENAMEW_Args(PyObject *args, PyObject *kwargs, OPENFILENAMEW 
 	// lpstrFile buffer receives full path and possibly multiple file names, allocate extra space
 	if (!PyWinObject_AsWCHAR(obFile, &initfile, TRUE, &initfilechars))
 		goto done;
-	pofn->nMaxFile=std::max(pofn->nMaxFile, initfilechars+1);
+	pofn->nMaxFile=max(pofn->nMaxFile, initfilechars+1);
 	bufsize=pofn->nMaxFile*sizeof(WCHAR);
 	pofn->lpstrFile=(LPWSTR)malloc(bufsize);
 	if (pofn->lpstrFile==NULL){

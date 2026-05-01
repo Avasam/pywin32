@@ -10,7 +10,6 @@ generates Windows .hlp files.
 @doc
 
 */
-#include <algorithm>
 #include "stdafx.h"
 #include <commdlg.h>
 #include "Win32uiHostGlue.h"
@@ -430,7 +429,7 @@ void PYW_EXPORT Python_addpath(const TCHAR *paths)
         while (paths[posFirst] == ';') posFirst++;
         posLast = posFirst;
         while (paths[posLast] != 0 && paths[posLast] != ';') posLast++;
-        int len = std::min(sizeof(workBuf) - 1, posLast - posFirst);
+        int len = min(sizeof(workBuf) - 1, posLast - posFirst);
         if (len > 0) {
             _tcsncpy(workBuf, paths + posFirst, len);
             workBuf[len] = 0;
