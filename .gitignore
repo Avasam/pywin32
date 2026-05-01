@@ -58,7 +58,7 @@ win32/src/win32service_messages.h
 win32/src/win32evtlog_messages.h
 isapi/src/pyISAPI_messages.h
 
-# Scintilla buil output
+# Scintilla build output
 Pythonwin/Scintilla/win32/*.o
 
 # Eclipse + PyDev

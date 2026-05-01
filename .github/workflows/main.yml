@@ -24,7 +24,7 @@ jobs:
       run:
         shell: msys2 {0}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - { sys: mingw64, env: x86_64, plat-name: win-amd64 }
@@ -53,9 +53,7 @@ jobs:
         #
         # We don't actually need wheels, but this causes a direct-from-source build,
         # so we can reference files that wouldn't be copied in a temp sdist folder
-        run: python -m build --wheel -v --config-setting=--build-option="build_ext
-          --plat-name=${{matrix.plat-name}} build --plat-name=${{matrix.plat-name}} bdist_wheel
-          --plat-name=${{matrix.plat-name}}"
+        run: python -m build --wheel -v --config-setting=--build-option="build_ext --plat-name=${{matrix.plat-name}} build --plat-name=${{matrix.plat-name}} bdist_wheel --plat-name=${{matrix.plat-name}}"
       - uses: actions/upload-artifact@v4
         # Upload artifacts even if tests fail
         if: ${{ always() }}
@@ -110,7 +108,7 @@ jobs:
   #   runs-on: ${{ matrix.os }}
   #   timeout-minutes: *timeout-minutes
   #   strategy:
-  #     fail-fast: false
+  #     fail-fast: true
   #     matrix:
   #       python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
   #       python-architecture: [x64, x86, arm64]
@@ -190,7 +188,7 @@ jobs:
   #   runs-on: windows-2022
   #   timeout-minutes: *timeout-minutes
   #   strategy:
-  #     fail-fast: false
+  #     fail-fast: true
   #     matrix:
   #       # pythonarm64 NuGet has no download for Python ~=3.9.11
   #       python-version: ["3.9.10", "3.10"]
@@ -268,7 +266,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   timeout-minutes: *timeout-minutes
   #   strategy:
-  #     fail-fast: false
+  #     fail-fast: true
   #     matrix:
   #       python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
   #   steps:
