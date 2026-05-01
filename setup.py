@@ -992,44 +992,21 @@ class MyCygwinCompiler(BaseCygwinCompiler):
                 rc_dir = os.path.dirname(obj)
                 # first compile .mc to .rc and .h file
                 self.spawn(
-                    [
-                        # HACK: Not the best way to find exec, but I'm lazy and will do for now
-                        "windmc"
-                        if sys.platform == "win32"
-                        else "x86_64-w64-mingw32-windmc",
-                        "-h",
-                        h_dir,
-                        "-r",
-                        rc_dir,
-                        src,
-                    ]
+                    [os.environ.get("WINDMC", "windmc"), "-h", h_dir, "-r", rc_dir, src]
                 )
                 # then compile .rc to .res file
                 base, _ = os.path.splitext(os.path.basename(src))
                 src = os.path.join(rc_dir, base + ".rc")
             if ext in (".rc", ".res", ".mc"):
                 # gcc needs '.res' and '.rc' compiled to object files !!!
-                self.spawn(
-                    [
-                        os.environ.get("WINDRES", "windres"),
-                        "-i",
-                        src,
-                        "-o",
-                        obj,
-                    ]
-                )
+                self.spawn([os.environ.get("WINDRES", "windres"), "-i", src, "-o", obj])
             else:  # for other files use the C-compiler
                 if self.detect_language(src) == "c++":
-                    self.spawn(
-                        self.compiler_so_cxx
-                        + cc_args
-                        + [src, "-o", obj]
-                        + extra_postargs
-                    )
+                    compiler_so = self.compiler_so_cxx
                 else:
-                    self.spawn(
-                        self.compiler_so + cc_args + [src, "-o", obj] + extra_postargs
-                    )
+                    compiler_so = self.compiler_so
+                self.spawn(compiler_so + cc_args + [src, "-o", obj] + extra_postargs)
+
         except DistutilsExecError as msg:
             raise CompileError(msg)
 

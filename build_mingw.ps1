@@ -44,6 +44,7 @@ $Env:_PYTHON_HOST_PLATFORM = 'win-amd64'
 
 $Env:RC = 'x86_64-w64-mingw32-windres'
 $Env:WINDRES = 'x86_64-w64-mingw32-windres'
+$Env:WINDMC = 'x86_64-w64-mingw32-windmc'
 $Env:SWIG = 'SWIG/swig_wine.ps1' | Resolve-Path
 
 uv run python -m build --wheel --no-isolation --config-setting=--build-option="build_ext --plat-name=win-amd64"
