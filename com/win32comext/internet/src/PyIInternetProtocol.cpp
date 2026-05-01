@@ -178,7 +178,7 @@ STDMETHODIMP PyGInternetProtocol::Read(
     }
     else {
         char *buf = PyBytes_AsString(result);
-        *pcbRead = min(cb, PyBytes_Size(result));
+        *pcbRead = min(cb, (ULONG)PyBytes_Size(result));
         memcpy(pv, buf, *pcbRead);
     }
     return hr;

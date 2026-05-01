@@ -373,7 +373,7 @@ static HRESULT invoke_setup(DISPPARAMS FAR *params, LCID lcid, PyObject **pPyArg
         // make sure it's not a special DISPID we don't understand.
         if (params->rgdispidNamedArgs[i] < 0)
             return DISP_E_PARAMNOTFOUND;
-        numArgs = max(numArgs, params->rgdispidNamedArgs[i] + 1);
+        numArgs = max(numArgs, (UINT)params->rgdispidNamedArgs[i] + 1);
     }
 
     PyObject *argList = PyTuple_New(numArgs);
