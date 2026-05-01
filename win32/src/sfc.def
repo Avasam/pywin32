@@ -1,0 +1,7 @@
+; Import definition for sfc.dll (Windows System File Checker API)
+; Used to generate libsfc.a for i686 MinGW toolchains that don't ship it.
+; @N stdcall decoration matches what MinGW i686 expects for the import stubs.
+LIBRARY "sfc.dll"
+EXPORTS
+SfcGetNextProtectedFile@8
+SfcIsFileProtected@8

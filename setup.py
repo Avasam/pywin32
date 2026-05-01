@@ -478,20 +478,30 @@ class my_build_ext(build_ext):
     def _generate_missing_import_libs(self):
         """Generate import libraries missing from some MinGW toolchains.
 
-        i686 MSYS2 MinGW ships loadperf.h but not libloadperf.a.
-        Generate it from a .def file using dlltool so perfmon.pyd can link.
-        Only runs on win32 (i686) builds; x86_64 ships the library already.
+        i686 MSYS2 MinGW ships headers but not all import .a files.
+        Generate them from bundled .def files using dlltool.
+        Only runs on win32 (i686) builds; x86_64 ships these already.
         """
         if self.plat_name != "win32":
             return
-        loadperf_def = os.path.join("win32", "src", "PerfMon", "loadperf.def")
-        loadperf_a = os.path.join(self.build_temp, "libloadperf.a")
-        if os.path.exists(loadperf_def) and not os.path.exists(loadperf_a):
-            self.mkpath(self.build_temp)
-            dlltool = os.environ.get("DLLTOOL", "dlltool")
-            self.compiler.spawn(
-                [dlltool, "--input-def", loadperf_def, "--output-lib", loadperf_a]
-            )
+        # (def_file, output_lib)
+        missing_libs = [
+            (
+                os.path.join("win32", "src", "PerfMon", "loadperf.def"),
+                os.path.join(self.build_temp, "libloadperf.a"),
+            ),
+            (
+                os.path.join("win32", "src", "sfc.def"),
+                os.path.join(self.build_temp, "libsfc.a"),
+            ),
+        ]
+        dlltool = os.environ.get("DLLTOOL", "dlltool")
+        for def_file, out_lib in missing_libs:
+            if os.path.exists(def_file) and not os.path.exists(out_lib):
+                self.mkpath(self.build_temp)
+                self.compiler.spawn(
+                    [dlltool, "--input-def", def_file, "--output-lib", out_lib]
+                )
 
     def _build_scintilla(self):
         path = "Pythonwin/Scintilla"
