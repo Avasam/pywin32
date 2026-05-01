@@ -13,6 +13,7 @@ generates Windows .hlp files.
 
 */
 #include "stdafx.h"
+
 #include "win32win.h"
 #include "win32doc.h"
 #include "win32control.h"
