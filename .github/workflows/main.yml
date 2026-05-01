@@ -24,7 +24,7 @@ jobs:
       run:
         shell: msys2 {0}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - { sys: mingw64, env: x86_64, plat-name: win-amd64 }
@@ -98,7 +98,7 @@ jobs:
   #   runs-on: ${{ matrix.os }}
   #   timeout-minutes: *timeout-minutes
   #   strategy:
-  #     fail-fast: true
+  #     fail-fast: false
   #     matrix:
   #       python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
   #       python-architecture: [x64, x86, arm64]
@@ -178,7 +178,7 @@ jobs:
   #   runs-on: windows-2022
   #   timeout-minutes: *timeout-minutes
   #   strategy:
-  #     fail-fast: true
+  #     fail-fast: false
   #     matrix:
   #       # pythonarm64 NuGet has no download for Python ~=3.9.11
   #       python-version: ["3.9.10", "3.10"]
@@ -256,7 +256,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   timeout-minutes: *timeout-minutes
   #   strategy:
-  #     fail-fast: true
+  #     fail-fast: false
   #     matrix:
   #       python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
   #   steps:
