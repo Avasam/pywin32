@@ -99,6 +99,8 @@ version_file_path = Path(gettempdir(), "pywin32.version.txt")
 scintilla_licence_path = Path(gettempdir(), "Scintilla-License.txt")
 mapi_stubs_licence_path = Path(gettempdir(), "MAPIStubLibrary-License.txt")
 
+EXCHANGE_SKIP_WHITELIST = {"exchange", "axdebug"}
+MFC_SKIP_WHITELIST = {"win32ui", "win32uiole", "dde", "Pythonwin"}
 
 def remove_manifest_flags(ldflags: list[str]):
     ldflags[:] = [ldflag for ldflag in ldflags if not ldflag.startswith("/MANIFEST")]
@@ -433,11 +435,11 @@ class my_build_ext(build_ext):
     def _why_cant_build_extension(self, ext):
         """Return None, or a reason it can't be built."""
         if is_mingw:
-            if ext.name in ["exchange", "exchdapi"]:
+            if ext.name in EXCHANGE_SKIP_WHITELIST:
                 return "No library for utility functions available."
 
             # Comment out below to enable Pythonwin extensions
-            if ext.name in ["win32ui", "win32uiole", "dde", "Pythonwin"]:
+            if ext.name in MFC_SKIP_WHITELIST:
                 return "Unsupported due to ATL/MFC usage."
         else:
             include_dirs = self.compiler.include_dirs + os.environ.get(
@@ -2247,7 +2249,9 @@ if "build_ext" in dist.command_obj:
     # Print the list of extension modules we skipped building.
     excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
     if excluded_extensions:
-        skip_whitelist = {"exchange", "axdebug"}
+        skip_whitelist = EXCHANGE_SKIP_WHITELIST
+        if is_mingw:
+            skip_whitelist |= MFC_SKIP_WHITELIST
         skipped_ex = []
         print("*** NOTE: The following extensions were NOT %s:" % what_string)
         for ext, why in excluded_extensions:
@@ -2258,8 +2262,7 @@ if "build_ext" in dist.command_obj:
         print("please execute this script with no arguments (or see the docstring)")
         if skipped_ex:
             print(
-                "*** Non-zero exit status. Missing for complete release build: %s"
-                % skipped_ex
+                f"*** Non-zero exit status. Missing for complete release build: {skipped_ex}"
             )
             sys.exit(1000 + len(skipped_ex))
     else:
