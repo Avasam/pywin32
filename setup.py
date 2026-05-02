@@ -278,6 +278,7 @@ class WinExt(Extension):
                 implib = os.path.join(build_ext.build_temp, self.implib_name)
                 suffix = "_d" if build_ext.debug else ""
                 self.extra_link_args.append(f"-Wl,--out-implib,{implib}{suffix}.dll.a")
+            # TODO: Forces output type, do we need that ?
             # if "64 bit" in sys.version:
             #     self.extra_link_args.append("-m64")
             # else:
