@@ -2,5 +2,5 @@
 ; Used to generate libsfc.a for i686 MinGW toolchains that don't ship it.
 LIBRARY "sfc.dll"
 EXPORTS
-    SfcGetNextProtectedFile @8
-    SfcIsFileProtected      @8
+    SfcGetNextProtectedFile@8
+    SfcIsFileProtected@8
