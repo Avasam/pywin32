@@ -99,7 +99,6 @@ version_file_path = Path(gettempdir(), "pywin32.version.txt")
 scintilla_licence_path = Path(gettempdir(), "Scintilla-License.txt")
 mapi_stubs_licence_path = Path(gettempdir(), "MAPIStubLibrary-License.txt")
 
-MISSING_LIB_SKIP_WHITELIST = {"axdebug"}
 MFC_SKIP_WHITELIST = {"win32ui", "win32uiole", "dde", "Pythonwin"}
 
 def remove_manifest_flags(ldflags: list[str]):
@@ -437,46 +436,46 @@ class my_build_ext(build_ext):
 
     def _why_cant_build_extension(self, ext):
         """Return None, or a reason it can't be built."""
+        # header-based auto-skip detection is broken for MinGGW (at least on Linux)
+        # So just explicitly skip extensions we know we can't build
         if is_mingw:
-            if ext.name in MISSING_LIB_SKIP_WHITELIST:
-                return "No library for utility functions available."
-
             # Comment out below to enable Pythonwin extensions
             if ext.name in MFC_SKIP_WHITELIST:
                 return "Unsupported due to ATL/MFC usage."
-        else:
-            include_dirs = self.compiler.include_dirs + os.environ.get(
-                "INCLUDE", ""
-            ).split(os.pathsep)
+            return None
 
-            look_dirs = include_dirs
-            for h in ext.optional_headers:
-                for d in look_dirs:
-                    if os.path.isfile(os.path.join(d, h)):
-                        break
-                else:
-                    logging.debug("Header '%s' not found  in %s", h, look_dirs)
-                    return f"The header '{h}' can not be located."
+        include_dirs = self.compiler.include_dirs + os.environ.get("INCLUDE", "").split(
+            os.pathsep
+        )
 
-            common_dirs = self.compiler.library_dirs[:]
-            common_dirs += os.environ.get("LIB", "").split(os.pathsep)
-            patched_libs = []
-            for lib in ext.libraries:
-                if lib.lower() in self.found_libraries:
-                    found = self.found_libraries[lib.lower()]
-                else:
-                    look_dirs = common_dirs + ext.library_dirs
-                    found = self.compiler.find_library_file(look_dirs, lib, self.debug)
-                    if not found:
-                        logging.debug("Lib '%s' not found in %s", lib, look_dirs)
-                        return "No library '%s'" % lib
-                    self.found_libraries[lib.lower()] = found
-                patched_libs.append(os.path.splitext(os.path.basename(found))[0])
+        look_dirs = include_dirs
+        for h in ext.optional_headers:
+            for d in look_dirs:
+                if os.path.isfile(os.path.join(d, h)):
+                    break
+            else:
+                logging.debug("Header '%s' not found  in %s", h, look_dirs)
+                return f"The header '{h}' can not be located."
 
-            # We update the .libraries list with the resolved library name.
-            # This is really only so "_d" works.
-            ext.libraries = patched_libs
-            return None  # no reason - it can be built!
+        common_dirs = self.compiler.library_dirs[:]
+        common_dirs += os.environ.get("LIB", "").split(os.pathsep)
+        patched_libs = []
+        for lib in ext.libraries:
+            if lib.lower() in self.found_libraries:
+                found = self.found_libraries[lib.lower()]
+            else:
+                look_dirs = common_dirs + ext.library_dirs
+                found = self.compiler.find_library_file(look_dirs, lib, self.debug)
+                if not found:
+                    logging.debug("Lib '%s' not found in %s", lib, look_dirs)
+                    return "No library '%s'" % lib
+                self.found_libraries[lib.lower()] = found
+            patched_libs.append(os.path.splitext(os.path.basename(found))[0])
+
+        # We update the .libraries list with the resolved library name.
+        # This is really only so "_d" works.
+        ext.libraries = patched_libs
+        return None  # no reason - it can be built!
 
     def _generate_missing_import_libs(self):
         """Generate import libraries missing from some MinGW toolchains.
@@ -2260,9 +2259,9 @@ if "build_ext" in dist.command_obj:
     # Print the list of extension modules we skipped building.
     excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
     if excluded_extensions:
-        skip_whitelist = MISSING_LIB_SKIP_WHITELIST
+        skip_whitelist = ()
         if is_mingw:
-            skip_whitelist |= MFC_SKIP_WHITELIST
+            skip_whitelist = MFC_SKIP_WHITELIST
         skipped_ex = []
         print("*** NOTE: The following extensions were NOT %s:" % what_string)
         for ext, why in excluded_extensions:
