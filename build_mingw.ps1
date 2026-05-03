@@ -8,7 +8,7 @@ uv pip install build setuptools
 
 $Msys2PythonTmpDir = '/tmp/msys2-python'
 
-if ((Get-ChildItem -Path $Msys2PythonTmpDir).Count -eq 0) {
+if ((Test-Path $Msys2PythonTmpDir) -and (Get-ChildItem -Path $Msys2PythonTmpDir).Count -eq 0) {
     # Find the correct Python package on the MSYS2 repo
     $PythonVer = uv run python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
     $RepoUrl = 'https://repo.msys2.org/mingw/mingw64/'

@@ -99,7 +99,7 @@ version_file_path = Path(gettempdir(), "pywin32.version.txt")
 scintilla_licence_path = Path(gettempdir(), "Scintilla-License.txt")
 mapi_stubs_licence_path = Path(gettempdir(), "MAPIStubLibrary-License.txt")
 
-EXCHANGE_SKIP_WHITELIST = {"exchange", "axdebug"}
+MISSING_LIB_SKIP_WHITELIST = {"axdebug"}
 MFC_SKIP_WHITELIST = {"win32ui", "win32uiole", "dde", "Pythonwin"}
 
 def remove_manifest_flags(ldflags: list[str]):
@@ -341,8 +341,10 @@ class WinExt_win32com_mapi(WinExt_win32com):
         libs = kw.get("libraries", "")
         # The stand-alone exchange SDK has these libs
         # Additional utility functions are only available for 32-bit builds.
-        if not platform.machine() in ("AMD64", "ARM64"):
+        if not platform.machine() in ("AMD64", "ARM64", "x86_64"):
             libs += " version user32 advapi32 Ex2KSdk sadapi netapi32"
+        if not is_mingw:
+            libs += " legacy_stdio_definitions"
         kw["libraries"] = libs
         # if is_mingw:
         #     # Force-include sal_compat.h before every MAPI translation unit so
@@ -436,7 +438,7 @@ class my_build_ext(build_ext):
     def _why_cant_build_extension(self, ext):
         """Return None, or a reason it can't be built."""
         if is_mingw:
-            if ext.name in EXCHANGE_SKIP_WHITELIST:
+            if ext.name in MISSING_LIB_SKIP_WHITELIST:
                 return "No library for utility functions available."
 
             # Comment out below to enable Pythonwin extensions
@@ -1555,7 +1557,7 @@ com_extensions = [
     ),
     WinExt_win32com_mapi(
         "exchange",
-        libraries="advapi32 legacy_stdio_definitions",
+        libraries="advapi32",
         include_dirs=["{mapi}/MAPIStubLibrary/include".format(**dirs)],
         sources=(
             """
@@ -2258,7 +2260,7 @@ if "build_ext" in dist.command_obj:
     # Print the list of extension modules we skipped building.
     excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
     if excluded_extensions:
-        skip_whitelist = EXCHANGE_SKIP_WHITELIST
+        skip_whitelist = MISSING_LIB_SKIP_WHITELIST
         if is_mingw:
             skip_whitelist |= MFC_SKIP_WHITELIST
         skipped_ex = []
