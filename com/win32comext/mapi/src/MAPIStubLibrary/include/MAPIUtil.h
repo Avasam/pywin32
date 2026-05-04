@@ -39,6 +39,7 @@ extern "C" {
 #define BEGIN_INTERFACE
 #endif
 
+
 /* IMAPITable in memory */
 
 /* ITableData Interface ---------------------------------------------------- */
