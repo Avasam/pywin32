@@ -9,6 +9,7 @@ construct the necessary Python object, and dispatch COM events.
 
 import os
 import sys
+import tempfile
 
 import pythoncom
 import win32api
@@ -541,10 +542,8 @@ def UnregisterInfoClasses(*classes, **flags):
 
 # Attempt to 're-execute' our current process with elevation.
 def ReExecuteElevated(flags):
-    import tempfile
-
     import win32console
-    import win32event  # we've already checked we are running XP above
+    import win32event
     import win32process
     from win32com.shell import shellcon
     from win32com.shell.shell import ShellExecuteEx
@@ -574,7 +573,7 @@ def ReExecuteElevated(flags):
     #  pythonwin will just open script for editting
     current_exe = os.path.split(sys.executable)[1].lower()
     exe_to_run = None
-    if current_exe == "pythonwin.exe":
+    if current_exe == "Pythonwin.exe":
         exe_to_run = os.path.join(sys.prefix, "python.exe")
     elif current_exe == "pythonwin_d.exe":
         exe_to_run = os.path.join(sys.prefix, "python_d.exe")
@@ -646,14 +645,9 @@ def UseCommandLine(*classes, **flags):
         else:
             RegisterClasses(*classes, **flags)
     except win32api.error as exc:
-        # If we are on xp+ and have "access denied", retry using
-        # ShellExecuteEx with 'runas' verb to force elevation (vista) and/or
-        # admin login dialog (vista/xp)
-        if (
-            flags["unattended"]
-            or exc.winerror != winerror.ERROR_ACCESS_DENIED
-            or sys.getwindowsversion()[0] < 5
-        ):
+        # If we have "access denied", retry using
+        # ShellExecuteEx with 'runas' verb to force elevation
+        if flags["unattended"] or exc.winerror != winerror.ERROR_ACCESS_DENIED:
             raise
         ReExecuteElevated(flags)
 
