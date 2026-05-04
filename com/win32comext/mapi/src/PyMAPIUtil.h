@@ -1,7 +1,7 @@
 // PyMAPIUtil.h
 
-// Must include before MAPIX.h,
-// because of casing that header will cause imports of mingw shared headers instead
+// Must include before MAPIX.h, which includes mapidefs.h and mapicode.h.
+// Because of casing that will import from mingw shared headers instead,
 // Which actually has some differences in param types, causing build failures
 #include <MAPIDefS.h>
 #include <MAPICode.h>
