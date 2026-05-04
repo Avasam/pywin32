@@ -71,20 +71,20 @@ jobs:
           packages: >-
             gcc-core
             gcc-g++
-            python3-devel
-            python3-build
-            python3-tomli
+            python312-devel
+            python312-build
+            python312-tomli
       - name: Debug python
         run: |
           python --version
-          python -c "import sysconfig; print(sysconfig.get_paths())"
+          python3.12 -c "import sysconfig; print(sysconfig.get_paths())"
           ls -R /usr/include | grep Python.h || true
       - name: Disable CRLF line endings in git checkout
         run: git config --global core.autocrlf input
       - name: Build and install
         # We don't actually need wheels, but this causes a direct-from-source build,
         # so we can reference files that wouldn't be copied in a temp sdist folder
-        run: python -m build --wheel -v
+        run: python3.12 -m build --wheel -v
       - uses: actions/upload-artifact@v4
         # Upload artifacts even if tests fail
         if: ${{ always() }}
