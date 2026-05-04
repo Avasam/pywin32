@@ -20,7 +20,6 @@ generates Windows .hlp files.
 #include "oleacc.h"    // for ObjectFromLresult proto...
 #include "iaccess.h"   // for IAccessControl
 #include "pyerrors.h"  // for PyErr_Warn in 2.5 and earlier...
-#include <objidl.h>
 
 extern int PyCom_RegisterCoreIIDs(PyObject *dict);
 
