@@ -13,7 +13,7 @@ else
 _DEFAULT_DIR_O = ../Build/Temp/Scintilla/Release
 endif
 
-# DIR_BIN / DIR_O: relative to this file's directory (Pythonwin/Scintilla/)
+# DIR_BIN / DIR_O: relative to this file's directory (pythonwin/Scintilla/)
 DIR_BIN ?= ../Build
 DIR_O   ?= $(_DEFAULT_DIR_O)
 

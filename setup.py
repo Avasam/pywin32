@@ -397,7 +397,7 @@ class my_build(build):
     def run(self) -> None:
         super().run()
         version_file_path.write_text(f"{build_id}\n")
-        shutil.copyfile("Pythonwin/Scintilla/License.txt", scintilla_licence_path)
+        shutil.copyfile("pythonwin/Scintilla/License.txt", scintilla_licence_path)
         shutil.copyfile(
             "com/win32comext/mapi/src/MAPIStubLibrary/LICENSE", mapi_stubs_licence_path
         )
@@ -509,7 +509,7 @@ class my_build_ext(build_ext):
                 )
 
     def _build_scintilla(self):
-        path = "Pythonwin/Scintilla"
+        path = "pythonwin/Scintilla"
         if is_mingw:
             makefile = "GNUmakefile"
         else:
@@ -2171,10 +2171,10 @@ dist = setup(
     + convert_data_files(
         [
             "Pythonwin/start_pythonwin.pyw",
-            "Pythonwin/pywin/*.cfg",
-            "Pythonwin/pywin/Demos/*.py",
-            "Pythonwin/pywin/Demos/app/*.py",
-            "Pythonwin/pywin/Demos/ocx/*.py",
+            "pythonwin/pywin/*.cfg",
+            "pythonwin/pywin/Demos/*.py",
+            "pythonwin/pywin/Demos/app/*.py",
+            "pythonwin/pywin/Demos/ocx/*.py",
             "win32/scripts/*.py",
             "win32/test/*.py",
             "win32/test/win32rcparser/test.rc",
@@ -2187,7 +2187,7 @@ dist = setup(
             # Licenses
             "com/win32comext/mapi/NOTICE.md",
             "Pythonwin/License.txt",
-            "Pythonwin/pywin/idle/*.txt",
+            "pythonwin/pywin/idle/*.txt",
             "win32/License.txt",
             # win32com test utility files.
             "com/win32com/test/*.idl",
