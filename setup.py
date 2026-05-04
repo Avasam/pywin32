@@ -244,7 +244,7 @@ class WinExt(Extension):
             if self.implib_name:
                 implib = os.path.join(build_ext.build_temp, self.implib_name)
                 suffix = "_d" if build_ext.debug else ""
-                self.extra_link_args.append(f"/IMPLIB:{implib}{suffix}")
+                self.extra_link_args.append(f"/IMPLIB:{implib}{suffix}.lib")
             # Try and find the MFC headers, so we can reach inside for
             # some of the ActiveX support we need.  We need to do this late, so
             # the environment is setup correctly.
@@ -301,7 +301,7 @@ class WinExt_pythonwin(WinExt):
         WinExt.__init__(self, name, **kw)
 
     def get_pywin32_dir(self):
-        return "Pythonwin"
+        return "pythonwin"
 
 
 class WinExt_pythonwin_subsys_win(WinExt_pythonwin):
@@ -668,7 +668,7 @@ class my_build_ext(build_ext):
             self._generate_missing_import_libs()
 
         # Here we hack a "pywin32" directory (one of 'win32', 'win32com',
-        # 'Pythonwin' etc), as distutils doesn't seem to like the concept
+        # 'pythonwin' etc), as distutils doesn't seem to like the concept
         # of multiple top-level directories.
         assert self.package is None
 
@@ -2246,7 +2246,7 @@ dist = setup(
     # And data files convert_data_files can't handle.
     + [
         ("", (str(version_file_path),)),
-        ("Pythonwin", (str(scintilla_licence_path),)),
+        ("pythonwin", (str(scintilla_licence_path),)),
         ("win32comext/mapi", (str(mapi_stubs_licence_path),)),
         ("win32com", ("com/License.txt",)),
         ("win32comext", ("com/License.txt",)),
