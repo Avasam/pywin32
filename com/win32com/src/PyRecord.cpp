@@ -717,9 +717,7 @@ int PyRecord::setattro(PyObject *self, PyObject *obname, PyObject *v)
     HRESULT hr;
     WCHAR *wname;
     VARTYPE vt;
-#ifdef __MINGW32__
     PyThreadState *_save;
-#endif
 
     if (!PyWinObject_AsWCHAR(obname, &wname, FALSE))
         return -1;
@@ -797,11 +795,7 @@ int PyRecord::setattro(PyObject *self, PyObject *obname, PyObject *v)
         }
     }
 
-#ifdef __MINGW32__
-    _save = PyEval_SaveThread();
-#else
-    PY_INTERFACE_PRECALL;
-#endif
+    _save = PyEval_SaveThread();  // PY_INTERFACE_PRECALL;
     hr = pyrec->pri->PutField(INVOKE_PROPERTYPUT, pyrec->pdata, wname, &val);
     PY_INTERFACE_POSTCALL;
 

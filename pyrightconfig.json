@@ -25,7 +25,7 @@
   "extraPaths": [
     "com",
     "win32/Lib",
-    "Pythonwin",
+    "pythonwin",
   ],
   "reportConstantRedefinition": "error",
   // TODO: For now this allows us to at least put pyright in place by massively reducing checked code

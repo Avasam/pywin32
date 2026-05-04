@@ -509,7 +509,7 @@ class my_build_ext(build_ext):
                 )
 
     def _build_scintilla(self):
-        path = "pythonwin/Scintilla"
+        scintilla_path = "pythonwin/Scintilla"
         if is_mingw:
             makefile = "GNUmakefile"
         else:
@@ -540,7 +540,7 @@ class my_build_ext(build_ext):
         makeargs.append(f"SUB_DIR_BIN={build_temp}")
 
         cwd = os.getcwd()
-        os.chdir(path)
+        os.chdir(scintilla_path)
         if is_mingw:
             try:
                 self.compiler.spawn(["make", "-f", makefile] + makeargs)
@@ -563,7 +563,7 @@ class my_build_ext(build_ext):
             old_env = os.environ.copy()
             os.environ["INCLUDE"] = os.pathsep.join(self.compiler.include_dirs)
             os.environ["LIB"] = os.pathsep.join(self.compiler.library_dirs)
-            os.chdir(path)
+            os.chdir(scintilla_path)
             try:
                 self.compiler.spawn([nmake, "/nologo", "/f", makefile] + makeargs)
             finally:
@@ -763,8 +763,9 @@ class my_build_ext(build_ext):
     def build_exefile(self, ext):
         suffix = "_d" if self.debug else ""
         logging.info("building exe '%s'", ext.name)
-        leaf_name = f"{ext.get_pywin32_dir()}/{ext.name}{suffix}.exe"
-        full_name = os.path.join(self.build_lib, leaf_name)
+        full_name = os.path.join(
+            self.build_lib, ext.get_pywin32_dir(), f"{ext.name}{suffix}.exe"
+        )
 
         sources = list(ext.sources)
         depends = sources + ext.depends

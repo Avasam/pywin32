@@ -3489,7 +3489,7 @@ py_RemoveUsersFromEncryptedFile(PyObject *self, PyObject *args)
 	// @pyparm ((<o PySID>,bytes,string),...)|pHashes||Sequence representing an ENCRYPTION_CERTIFICATE_HASH_LIST structure, as returned by QueryUsersOnEncryptedFile
 	PyObject *ret=NULL, *obfname=NULL, *obechl=NULL;
 	WCHAR *fname=NULL;
-	DWORD err=0;
+    DWORD err=0;
 	ENCRYPTION_CERTIFICATE_HASH_LIST echl;
 	ZeroMemory(&echl,sizeof(ENCRYPTION_CERTIFICATE_HASH_LIST));
 	if (!PyArg_ParseTuple(args,"OO:RemoveUsersFromEncryptedFile", &obfname, &obechl))
