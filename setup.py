@@ -103,6 +103,7 @@ mapi_stubs_licence_path = Path(gettempdir(), "MAPIStubLibrary-License.txt")
 
 MFC_SKIP_WHITELIST = {"win32ui", "win32uiole", "dde", "Pythonwin"}
 
+
 def remove_manifest_flags(ldflags: list[str]):
     ldflags[:] = [ldflag for ldflag in ldflags if not ldflag.startswith("/MANIFEST")]
 
@@ -2263,7 +2264,7 @@ if "build_ext" in dist.command_obj:
     # Print the list of extension modules we skipped building.
     excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
     if excluded_extensions:
-        skip_whitelist = ()
+        skip_whitelist = set()
         if is_mingw:
             skip_whitelist = MFC_SKIP_WHITELIST
         skipped_ex = []
