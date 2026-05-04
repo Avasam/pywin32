@@ -1,5 +1,5 @@
 #include "stdafxole.h"
-#include "Win32app.h"
+#include "win32app.h"
 #include "win32uioledoc.h"
 #include "win32template.h"
 #include "PyWinTypes.h"

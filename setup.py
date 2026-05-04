@@ -1831,7 +1831,7 @@ pythonwin_extensions = [
             "Pythonwin/pythonRichEditDoc.h",
             "Pythonwin/pythonview.h",
             "Pythonwin/pythonwin.h",
-            "Pythonwin/Win32app.h",
+            "Pythonwin/win32app.h",
             "Pythonwin/win32assoc.h",
             "Pythonwin/win32bitmap.h",
             "Pythonwin/win32brush.h",

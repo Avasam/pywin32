@@ -48,6 +48,6 @@ programmers who forget to use the new names. */
 
 #include "win32assoc.h"
 #include "win32cmd.h"
-#include "Win32app.h"
+#include "win32app.h"
 
 // --- EOF --- //
