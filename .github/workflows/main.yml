@@ -51,40 +51,41 @@ jobs:
         # so we can reference files that wouldn't be copied in a temp sdist folder
         run: python -m build --wheel -v --config-setting=--build-option="build_ext --plat-name=${{matrix.plat-name}} build --plat-name=${{matrix.plat-name}} bdist_wheel --plat-name=${{matrix.plat-name}}"
 
-  build_cygwin:
-    # Temporarily suppress warnings to focus on fixing errors
-    env:
-      CFLAGS : '-w'
-      CXXFLAGS : '-w'
-    runs-on: windows-2022
-    timeout-minutes: *timeout-minutes
-    defaults:
-      run:
-        # shell: C:\cygwin\bin\env.exe CYGWIN_NOWINPATH=1 CHERE_INVOKING=1 C:\cygwin\bin\bash.exe -o igncr -eo pipefail '{0}'
-        shell: bash -o igncr -eo pipefail '{0}'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cygwin/cygwin-install-action@master
-        with:
-          platform: x86_64
-          # Note: No provided caches yet: https://github.com/cygwin/cygwin-install-action/pull/6
-          packages: >-
-            gcc-core
-            gcc-g++
-            python312-build
-            python312-devel
-            python312-tomli
-            python312-virtualenv
-      - name: Debug python
-        run: |
-          python3.12 -c "import sysconfig; print(sysconfig.get_paths())"
-          ls -R /usr/include | grep Python.h || true
-      - name: Disable CRLF line endings in git checkout
-        run: git config --global core.autocrlf input
-      - name: Build and install
-        # We don't actually need wheels, but this causes a direct-from-source build,
-        # so we can reference files that wouldn't be copied in a temp sdist folder
-        run: python3.12 -m build --wheel -v
+  # FIXME: Conflicting declarations between sys and win32api (probably more). That's a mess for another time
+  # build_cygwin:
+  #   # Temporarily suppress warnings to focus on fixing errors
+  #   env:
+  #     CFLAGS : '-w'
+  #     CXXFLAGS : '-w'
+  #   runs-on: windows-2022
+  #   timeout-minutes: *timeout-minutes
+  #   defaults:
+  #     run:
+  #       # shell: C:\cygwin\bin\env.exe CYGWIN_NOWINPATH=1 CHERE_INVOKING=1 C:\cygwin\bin\bash.exe -o igncr -eo pipefail '{0}'
+  #       shell: bash -o igncr -eo pipefail '{0}'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: cygwin/cygwin-install-action@master
+  #       with:
+  #         platform: x86_64
+  #         # Note: No provided caches yet: https://github.com/cygwin/cygwin-install-action/pull/6
+  #         packages: >-
+  #           gcc-core
+  #           gcc-g++
+  #           python312-build
+  #           python312-devel
+  #           python312-tomli
+  #           python312-virtualenv
+  #     - name: Debug python
+  #       run: |
+  #         python3.12 -c "import sysconfig; print(sysconfig.get_paths())"
+  #         ls -R /usr/include | grep Python.h || true
+  #     - name: Disable CRLF line endings in git checkout
+  #       run: git config --global core.autocrlf input
+  #     - name: Build and install
+  #       # We don't actually need wheels, but this causes a direct-from-source build,
+  #       # so we can reference files that wouldn't be copied in a temp sdist folder
+  #       run: python3.12 -m build --wheel -v
 
   # test:
   #   name: Build and test
