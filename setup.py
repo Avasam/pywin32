@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-build_id = "308.1"  # may optionally include a ".{patchno}" suffix.
+build_id = "311.1"  # may optionally include a ".{patchno}" suffix.
 
 __doc__ = """This is a distutils setup-script for the pywin32 extensions.
 
@@ -13,13 +13,13 @@ which is capable of building the version of Python you are targeting, then:
 
 For a debug (_d) version, you need a local debug build of Python, but must use
 the release version executable for the build. eg:
-  pip install . -v --config-setting=--build-option=build --config-setting=--build-option=--debug
+  pip install . -v --config-setting=--build-option="build --debug"
 
 Cross-compilation from x86 to ARM is well supported (assuming installed vs tools etc) - eg:
-  python -m build --wheel --config-setting=--build-option=build_ext --config-setting=--build-option=--plat-name=win-arm64 --config-setting=--build-option=build --config-setting=--build-option=--plat-name=win-arm64 --config-setting=--build-option=bdist_wheel --config-setting=--build-option=--plat-name=win-arm64
+  python -m build --wheel --config-setting=--build-option="build_ext --plat-name=win-arm64 build --plat-name=win-arm64 bdist_wheel --plat-name=win-arm64"
 
-Some modules require special SDKs or toolkits to build (eg, mapi/exchange),
-which often aren't available in CI. The build process treats them as optional -
+Some modules require special SDKs or toolkits to build (eg, ATL/MFC), which
+often aren't available in all environments. The build process treats them as optional -
 instead of a failing, it will report what was skipped, and why. See also
 build_env.md, which is getting out of date but might help getting everything
 required for an official build - see README.md for that process.
@@ -31,21 +31,41 @@ import os
 import platform
 import re
 import shutil
-import subprocess
 import sys
-import winreg
+from abc import abstractmethod
+from collections.abc import Iterable
 from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build import build
-from setuptools.command.build_ext import build_ext
-from setuptools.command.install import install
 from setuptools.modified import newer_group
 from tempfile import gettempdir
-from typing import Iterable
+from typing import TYPE_CHECKING
 
-from distutils import ccompiler
-from distutils._msvccompiler import MSVCCompiler
-from distutils.command.install_data import install_data
+# We must import from distutils directly at runtime
+# But this prevents typing issues across Python 3.11-3.12
+if TYPE_CHECKING:
+    from setuptools._distutils import ccompiler
+    from setuptools._distutils._msvccompiler import MSVCCompiler
+    from setuptools._distutils.command.install_data import install_data
+else:
+    from distutils import ccompiler
+    from distutils._msvccompiler import MSVCCompiler
+    from distutils.command.install_data import install_data
+
+
+def my_new_compiler(**kw):
+    if "compiler" in kw and kw["compiler"] in (None, "msvc"):
+        return my_compiler()
+    return orig_new_compiler(**kw)
+
+
+# No way to cleanly wedge our compiler sub-class in.
+orig_new_compiler = ccompiler.new_compiler
+ccompiler.new_compiler = my_new_compiler  # type: ignore[assignment] # Assuming the caller will always use only kwargs
+
+
+# This import has to be delayed to AFTER the compiler hack
+from setuptools.command.build_ext import build_ext  # noqa: E402
 
 build_id_patch = build_id
 if not "." in build_id_patch:
@@ -57,20 +77,19 @@ pywin32_version = "%d.%d.%s" % (
 )
 print("Building pywin32", pywin32_version)
 
-try:
-    this_file = __file__
-except NameError:
-    this_file = sys.argv[0]
-
-this_file = os.path.abspath(this_file)
+this_file = os.path.abspath(__file__)
 # We get upset if the cwd is not our source dir, but it is a PITA to
 # insist people manually CD there first!
 if os.path.dirname(this_file):
     os.chdir(os.path.dirname(this_file))
 
-# Start address we assign base addresses from.  See comment re
-# dll_base_address later in this file...
-dll_base_address = 0x1E200000
+version_file_path = Path(gettempdir(), "pywin32.version.txt")
+scintilla_licence_path = Path(gettempdir(), "Scintilla-License.txt")
+mapi_stubs_licence_path = Path(gettempdir(), "MAPIStubLibrary-License.txt")
+
+
+def remove_manifest_flags(ldflags: list[str]):
+    ldflags[:] = [ldflag for ldflag in ldflags if not ldflag.startswith("/MANIFEST")]
 
 
 class WinExt(Extension):
@@ -93,15 +112,11 @@ class WinExt(Extension):
         extra_link_args=None,
         export_symbols=None,
         export_symbol_file=None,
-        pch_header=None,
-        extra_swig_commands=None,
         is_regular_dll=False,  # regular Windows DLL?
         # list of headers which may not be installed forcing us to
         # skip this extension
         optional_headers=[],
-        base_address=None,
         depends=None,
-        platforms=None,  # none means 'all platforms'
         implib_name=None,
         delay_load_libraries="",
     ):
@@ -114,28 +129,22 @@ class WinExt(Extension):
         if export_symbol_file:
             extra_link_args.append("/DEF:" + export_symbol_file)
 
-        # Some of our swigged files behave differently in distutils vs
-        # MSVC based builds.  Always define DISTUTILS_BUILD so they can tell.
         define_macros = define_macros or []
         define_macros.extend(
             (
-                ("DISTUTILS_BUILD", None),
                 ("_CRT_SECURE_NO_WARNINGS", None),
                 # CRYPT_DECRYPT_MESSAGE_PARA.dwflags is in an ifdef for some unknown reason
-                # See github PR #1444 for more details...
+                # See GitHub PR #1444 for more details...
                 ("CRYPT_DECRYPT_MESSAGE_PARA_HAS_EXTRA_FIELDS", None),
-                # Minimum Windows version supported (Vista)
+                # Minimum Windows version supported (Windows 7)
                 # https://learn.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt
-                ("_WIN32_WINNT", hex(0x0600)),
-                ("WINVER", hex(0x0600)),
+                # Technically official Python 3.9 builds require at least Windows 8.1, but we had no reason to bump this
+                ("_WIN32_WINNT", hex(0x0601)),
+                ("WINVER", hex(0x0601)),
             )
         )
-        self.pch_header = pch_header
-        self.extra_swig_commands = extra_swig_commands or []
         self.optional_headers = optional_headers
         self.is_regular_dll = is_regular_dll
-        self.base_address = base_address
-        self.platforms = platforms
         self.implib_name = implib_name
         Extension.__init__(
             self,
@@ -151,16 +160,13 @@ class WinExt(Extension):
             extra_compile_args,
             extra_link_args,
             export_symbols,
+            depends=depends,
         )
-        self.depends = depends or []  # stash it here, as py22 doesn't have it.
 
     def finalize_options(self, build_ext):
         # distutils doesn't define this function for an Extension - it is
         # our own invention, and called just before the extension is built.
         if not build_ext.mingw32:
-            if self.pch_header:
-                self.extra_compile_args = self.extra_compile_args or []
-
             # bugger - add this to python!
             if build_ext.plat_name == "win32":
                 self.extra_link_args.append("/MACHINE:x86")
@@ -218,11 +224,14 @@ class WinExt(Extension):
         self.extra_compile_args.append("-D_UNICODE")
         self.extra_compile_args.append("-DWINNT")
 
+    @abstractmethod
+    def get_pywin32_dir(self) -> str:
+        raise NotImplementedError
+
 
 class WinExt_pythonwin(WinExt):
     def __init__(self, name, **kw):
         kw.setdefault("extra_compile_args", []).extend(["-D_AFXDLL", "-D_AFXEXT"])
-
         WinExt.__init__(self, name, **kw)
 
     def get_pywin32_dir(self):
@@ -243,9 +252,6 @@ class WinExt_pythonwin_subsys_win(WinExt_pythonwin):
 
 
 class WinExt_win32(WinExt):
-    def __init__(self, name, **kw):
-        WinExt.__init__(self, name, **kw)
-
     def get_pywin32_dir(self):
         return "win32"
 
@@ -266,48 +272,15 @@ class WinExt_win32com(WinExt):
         return "win32comext/" + self.name
 
 
-# Exchange extensions get special treatment:
-# * Look for the Exchange SDK in the registry.
-# * Output directory is different than the module's basename.
-# * Require use of the Exchange 2000 SDK - this works for both VC6 and 7
-# NOTE: sadly the old Exchange SDK does *not* include MAPI files - these used
-# to be bundled with the Windows SDKs and/or Visual Studio, but no longer are.
 class WinExt_win32com_mapi(WinExt_win32com):
     def __init__(self, name, **kw):
-        # The Exchange 2000 SDK seems to install itself without updating
-        # LIB or INCLUDE environment variables.  It does register the core
-        # directory in the registry tho - look it up
-        sdk_install_dir = None
         libs = kw.get("libraries", "")
-        keyname = r"SOFTWARE\Microsoft\Exchange\SDK"
-        flags = winreg.KEY_READ
-        try:
-            flags |= winreg.KEY_WOW64_32KEY
-        except AttributeError:
-            pass  # this version doesn't support 64 bits, so must already be using 32bit key.
-        for root in winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER:
-            try:
-                keyob = winreg.OpenKey(root, keyname, 0, flags)
-                value, type_id = winreg.QueryValueEx(keyob, "INSTALLDIR")
-                if type_id == winreg.REG_SZ:
-                    sdk_install_dir = value
-                    break
-            except OSError:
-                pass
-        if sdk_install_dir is not None:
-            d = os.path.join(sdk_install_dir, "SDK", "Include")
-            if os.path.isdir(d):
-                kw.setdefault("include_dirs", []).insert(0, d)
-            d = os.path.join(sdk_install_dir, "SDK", "Lib")
-            if os.path.isdir(d):
-                kw.setdefault("library_dirs", []).insert(0, d)
-
         # The stand-alone exchange SDK has these libs
         # Additional utility functions are only available for 32-bit builds.
         if not platform.machine() in ("AMD64", "ARM64"):
             libs += " version user32 advapi32 Ex2KSdk sadapi netapi32"
         kw["libraries"] = libs
-        WinExt_win32com.__init__(self, name, **kw)
+        super().__init__(name, **kw)
 
     def get_pywin32_dir(self):
         # 'win32com.mapi.exchange' is currently the only
@@ -342,23 +315,22 @@ class WinExt_pythonservice(WinExt):
 # Extensions to the distutils commands.
 
 
-# 'build' command
 class my_build(build):
-    def run(self):
-        build.run(self)
-        # write a pywin32.version.txt.
-        ver_fname = os.path.join(gettempdir(), "pywin32.version.txt")
-        try:
-            f = open(ver_fname, "w")
-            f.write("%s\n" % build_id)
-            f.close()
-        except OSError as why:
-            print(f"Failed to open '{ver_fname}': {why}")
+    def run(self) -> None:
+        super().run()
+        version_file_path.write_text(f"{build_id}\n")
+        shutil.copyfile("pythonwin/Scintilla/License.txt", scintilla_licence_path)
+        shutil.copyfile(
+            "com/win32comext/mapi/src/MAPIStubLibrary/LICENSE", mapi_stubs_licence_path
+        )
 
 
 class my_build_ext(build_ext):
-    def finalize_options(self):
-        build_ext.finalize_options(self)
+    compiler: ccompiler.CCompiler
+    extensions: list[WinExt]
+
+    def finalize_options(self) -> None:
+        super().finalize_options()
 
         self.plat_dir = {
             "win-amd64": "x64",
@@ -368,21 +340,16 @@ class my_build_ext(build_ext):
         # The pywintypes library is created in the build_temp
         # directory, so we need to add this to library_dirs
         self.library_dirs.append(self.build_temp)
-        self.mingw32 = self.compiler == "mingw32"
+        self.mingw32 = self.compiler == "mingw32"  # type: ignore[comparison-overlap] # compiler is a string until `run` is run
         if self.mingw32:
             self.libraries.append("stdc++")
 
-        self.excluded_extensions = []  # list of (ext, why)
-        self.swig_cpp = True  # hrm - deprecated - should use swig_opts=-c++??
+        self.excluded_extensions: list[tuple[WinExt, str]] = []
+        """List of excluded extensions and their reason"""
+        self.swig_opts.append("-c++")
 
     def _why_cant_build_extension(self, ext):
         """Return None, or a reason it can't be built."""
-        # axdebug fails to build on 3.11 due to Python "frame" objects changing.
-        # This could be fixed, but is almost certainly not in use any more, so
-        # just skip it.
-        if ext.name == "axdebug" and sys.version_info >= (3, 11):
-            return "AXDebug no longer builds on 3.11 and up"
-
         include_dirs = self.compiler.include_dirs + os.environ.get("INCLUDE", "").split(
             os.pathsep
         )
@@ -411,16 +378,13 @@ class my_build_ext(build_ext):
                 self.found_libraries[lib.lower()] = found
             patched_libs.append(os.path.splitext(os.path.basename(found))[0])
 
-        if ext.platforms and self.plat_name not in ext.platforms:
-            return f"Only available on platforms {ext.platforms}"
-
         # We update the .libraries list with the resolved library name.
         # This is really only so "_d" works.
         ext.libraries = patched_libs
         return None  # no reason - it can be built!
 
     def _build_scintilla(self):
-        path = "pythonwin\\Scintilla"
+        scintilla_path = "pythonwin/Scintilla"
         makefile = "makefile_pythonwin"
         makeargs = []
 
@@ -463,7 +427,7 @@ class my_build_ext(build_ext):
         old_env = os.environ.copy()
         os.environ["INCLUDE"] = os.pathsep.join(self.compiler.include_dirs)
         os.environ["LIB"] = os.pathsep.join(self.compiler.library_dirs)
-        os.chdir(path)
+        os.chdir(scintilla_path)
         try:
             cmd = [nmake, "/nologo", "/f", makefile] + makeargs
             self.compiler.spawn(cmd)
@@ -472,7 +436,7 @@ class my_build_ext(build_ext):
             os.environ["INCLUDE"] = old_env.get("INCLUDE", "")
             os.environ["LIB"] = old_env.get("LIB", "")
 
-        # The DLL goes in the Pythonwin directory.
+        # The DLL goes in the pythonwin directory.
         if self.debug:
             base_name = "scintilla_d.dll"
         else:
@@ -518,6 +482,25 @@ class my_build_ext(build_ext):
                 print("-- ATLMFC paths likely missing (Required for win32ui)")
         return vcbase, vcverdir
 
+    def _verstamp(self, filename):
+        """
+        Stamp the version of the built target.
+        Do this externally to avoid suddenly dragging in the
+        modules needed by this process.
+        """
+        self.spawn(
+            [
+                sys.executable,
+                Path(__file__).parent / "win32" / "Lib" / "win32verstamp.py",
+                f"--version={pywin32_version}",
+                "--comments=https://github.com/mhammond/pywin32",
+                f"--original-filename={os.path.basename(filename)}",
+                "--product=PyWin32",
+                "--quiet" if "-v" not in sys.argv else "",
+                filename,
+            ]
+        )
+
     def build_extensions(self):
         # First, sanity-check the 'extensions' list
         self.check_extensions_list(self.extensions)
@@ -551,11 +534,23 @@ class my_build_ext(build_ext):
         # 'pythonwin' etc), as distutils doesn't seem to like the concept
         # of multiple top-level directories.
         assert self.package is None
+
+        if self.compiler.compiler_type == "msvc":
+            # We provide our own manifest, so pass in "/MANIFEST:NO",
+            # then remove "/MANIFESTFILE:", "/MANIFEST:EMBED", and "/MANIFESTUAC:"
+            # to avoid LNK4075 warning spam
+            for ext in self.extensions:
+                remove_manifest_flags(ext.extra_link_args)
+                ext.extra_link_args.append("/MANIFEST:NO")
+            remove_manifest_flags(self.compiler.ldflags_exe)
+            remove_manifest_flags(self.compiler.ldflags_exe_debug)
+            remove_manifest_flags(self.compiler.ldflags_shared)
+            remove_manifest_flags(self.compiler.ldflags_shared_debug)
+
         for ext in self.extensions:
-            try:
-                self.package = ext.get_pywin32_dir()
-            except AttributeError:
+            if not isinstance(ext, WinExt):
                 raise RuntimeError("Not a win32 package!")
+            self.package = ext.get_pywin32_dir()
             self.build_extension(ext)
 
         for ext in W32_exe_files:
@@ -606,7 +601,7 @@ class my_build_ext(build_ext):
         m = re.search(r"\\VC\\Tools\\", vcbase)
         if m:
             # typical path on newer Visual Studios
-            # prefere corresponding version but accept different version
+            # prefer corresponding version but accept different version
             same_version = vcverdir is not None and os.path.isdir(
                 vcbase[: m.start()]
                 + r"\VC\Redist\MSVC\{}{}".format(vcverdir, self.plat_dir)
@@ -629,8 +624,9 @@ class my_build_ext(build_ext):
     def build_exefile(self, ext):
         suffix = "_d" if self.debug else ""
         logging.info("building exe '%s'", ext.name)
-        leaf_name = f"{ext.get_pywin32_dir()}\\{ext.name}{suffix}.exe"
-        full_name = os.path.join(self.build_lib, leaf_name)
+        full_name = os.path.join(
+            self.build_lib, ext.get_pywin32_dir(), f"{ext.name}{suffix}.exe"
+        )
 
         sources = list(ext.sources)
         depends = sources + ext.depends
@@ -662,9 +658,11 @@ class my_build_ext(build_ext):
             build_temp=self.build_temp,
         )
 
+        self._verstamp(full_name)
+
     def build_extension(self, ext):
         # Some of these extensions are difficult to build, requiring various
-        # hard-to-track libraries et (eg, exchange sdk, etc).  So we
+        # hard-to-track libraries (eg, ATL/MFC, etc).  So we
         # check the extension list for the extra libraries explicitly
         # listed.  We then search for this library the same way the C
         # compiler would - if we can't find a library, we exclude the
@@ -678,7 +676,6 @@ class my_build_ext(build_ext):
             self.excluded_extensions.append((ext, why))
             print(f"Skipping {ext.name}: {why}")
             return
-        self.current_extension = ext
 
         ext.finalize_options(self)
 
@@ -702,6 +699,7 @@ class my_build_ext(build_ext):
 
         try:
             build_ext.build_extension(self, ext)
+            self._verstamp(self.get_ext_fullpath(ext.name))
             # Convincing distutils to create .lib files with the name we
             # need is difficult, so we just hack around it by copying from
             # the created name to the name we need.
@@ -757,12 +755,12 @@ class my_build_ext(build_ext):
             swig = os.environ["SWIG"]
         else:
             # We know where our swig is
-            swig = os.path.abspath("swig\\swig.exe")
+            swig = os.path.abspath("SWIG/swig.exe")
         lib = os.path.join(os.path.dirname(swig), "swig_lib")
         os.environ["SWIG_LIB"] = lib
         return swig
 
-    def swig_sources(self, sources, ext=None):
+    def swig_sources(self, sources, ext):
         new_sources = []
         swig_sources = []
         swig_targets = {}
@@ -797,11 +795,11 @@ class my_build_ext(build_ext):
             swig_cmd = [
                 swig,
                 "-python",
-                "-c++",
                 # we never use the .doc files.
                 "-dnone",
             ]
-            swig_cmd.extend(self.current_extension.extra_swig_commands)
+            swig_cmd.extend(self.swig_opts)
+            swig_cmd.extend(ext.swig_opts)
             if platform.machine() in ("AMD64", "ARM64"):
                 swig_cmd.append("-DSWIG_PY64BIT")
             else:
@@ -830,6 +828,7 @@ class my_build_ext(build_ext):
             )
 
             # can remove once edklib is no longer used for 32-bit builds
+            # (see edk-related includes in that file)
             if source == "com/win32comext/mapi/src/exchange.i":
                 rebuild = True
 
@@ -850,102 +849,10 @@ class my_build_ext(build_ext):
         return new_sources
 
 
-class my_install(install):
-    def run(self):
-        """Custom script we run at the end of installing
-        This is only run for local installs. Wheel-based installs won't run this code.
-        """
-        install.run(self)
-        # If self.root has a value, it means we are being "installed" into some other
-        # directory than Python itself - in which case we must *not* run our installer.
-        # bdist_wininst used to trigger this by using a temp directory.
-        # Is this still a concern ?
-        if self.root:
-            print(
-                "Not executing post install script when "
-                + f"not installing in Python itself (self.root={self.root})"
-            )
-            return
-        self.execute(self._postinstall, (), msg="Executing post install script...")
-
-    def _postinstall(self):
-        filename = os.path.join(self.install_scripts, "pywin32_postinstall.py")
-        if not os.path.isfile(filename):
-            raise RuntimeError(f"Can't find '{filename}'")
-        # As of setuptools>=74.0.0, we no longer need to
-        # be concerned about distutils calling win32api
-        subprocess.Popen(
-            [
-                sys.executable,
-                filename,
-                "-install",
-                "-destination",
-                self.install_lib,
-                "-quiet",
-                "-wait",
-                str(os.getpid()),
-            ]
-        )
-
-
-def my_new_compiler(**kw):
-    if "compiler" in kw and kw["compiler"] in (None, "msvc"):
-        return my_compiler()
-    return orig_new_compiler(**kw)
-
-
-# No way to cleanly wedge our compiler sub-class in.
-orig_new_compiler = ccompiler.new_compiler
-ccompiler.new_compiler = my_new_compiler  # type: ignore[assignment] # Assuming the caller will always use only kwargs
-
-
 class my_compiler(MSVCCompiler):
-    def link(
-        self,
-        target_desc,
-        objects,
-        output_filename,
-        output_dir=None,
-        libraries=None,
-        library_dirs=None,
-        runtime_library_dirs=None,
-        export_symbols=None,
-        debug=0,
-        *args,
-        **kw,
-    ):
-        super().link(
-            target_desc,
-            objects,
-            output_filename,
-            output_dir,
-            libraries,
-            library_dirs,
-            runtime_library_dirs,
-            export_symbols,
-            debug,
-            *args,
-            **kw,
-        )
-        # Here seems a good place to stamp the version of the built
-        # target.  Do this externally to avoid suddenly dragging in the
-        # modules needed by this process, and which we will soon try and
-        # update.
-        args = [
-            sys.executable,
-            # NOTE: On Python 3.7, all args must be str
-            str(Path(__file__).parent / "win32" / "Lib" / "win32verstamp.py"),
-            f"--version={pywin32_version}",
-            "--comments=https://github.com/mhammond/pywin32",
-            f"--original-filename={os.path.basename(output_filename)}",
-            "--product=PyWin32",
-            "--quiet" if "-v" not in sys.argv else "",
-            output_filename,
-        ]
-        self.spawn(args)
-
-    # Work around bpo-36302/bpo-42009 - it sorts sources but this breaks
-    # support for building .mc files etc :(
+    # Work around python/cpython#80483 / python/cpython#86175
+    # it sorts sources but this breaks support for building .mc files etc :(
+    # See pypa/setuptools#4986 / pypa/distutils#370 for potential upstream fix.
     def compile(self, sources, **kwargs):
         # re-sort the list of source files but ensure all .mc files come first.
         def key_reverse_mc(a):
@@ -954,34 +861,7 @@ class my_compiler(MSVCCompiler):
             return (e, b)
 
         sources = sorted(sources, key=key_reverse_mc)
-        return MSVCCompiler.compile(self, sources, **kwargs)
-
-    def spawn(self, cmd):
-        is_link = cmd[0].endswith("link.exe") or cmd[0].endswith('"link.exe"')
-        is_mt = cmd[0].endswith("mt.exe") or cmd[0].endswith('"mt.exe"')
-        if is_mt:
-            # We don't want mt.exe run...
-            return
-        if is_link:
-            # remove /MANIFESTFILE:... and add MANIFEST:NO
-            for i in range(len(cmd)):
-                if cmd[i].startswith(("/MANIFESTFILE:", "/MANIFEST:EMBED")):
-                    cmd[i] = "/MANIFEST:NO"
-                    break
-        if is_mt:
-            # We want mt.exe run with the original manifest
-            for i in range(len(cmd)):
-                if cmd[i] == "-manifest":
-                    cmd[i + 1] += ".orig"
-                    break
-        super().spawn(cmd)
-        if is_link:
-            # We want a copy of the original manifest so we can use it later.
-            for i in range(len(cmd)):
-                if cmd[i].startswith("/MANIFESTFILE:"):
-                    mfname = cmd[i][14:]
-                    shutil.copyfile(mfname, mfname + ".orig")
-                    break
+        return super().compile(sources, **kwargs)
 
     # CCompiler's implementations of these methods completely replace the values
     # determined by the build environment. This seems like a design that must
@@ -1039,7 +919,6 @@ pywintypes = WinExt_system32(
     ],
     extra_compile_args=["-DBUILD_PYWINTYPES"],
     libraries="advapi32 user32 ole32 oleaut32",
-    pch_header="PyWinTypes.h",
 )
 
 win32_extensions: list[WinExt] = [pywintypes]
@@ -1066,7 +945,7 @@ for name, libraries, sources in (
     ("odbc", "odbc32 odbccp32", "win32/src/odbc.cpp"),
     (
         "perfmon",
-        "",
+        "loadperf",
         """
         win32/src/PerfMon/MappingManager.cpp
         win32/src/PerfMon/PerfCounterDefn.cpp
@@ -1075,10 +954,10 @@ for name, libraries, sources in (
         """,
     ),
     ("timer", "user32", "win32/src/timermodule.cpp"),
-    ("win32cred", "AdvAPI32 credui", "win32/src/win32credmodule.cpp"),
+    ("win32cred", "advapi32 credui", "win32/src/win32credmodule.cpp"),
     (
         "win32crypt",
-        "Crypt32 Advapi32",
+        "crypt32 advapi32",
         """
         win32/src/win32crypt/win32cryptmodule.cpp
         win32/src/win32crypt/win32crypt_structs.cpp
@@ -1093,7 +972,7 @@ for name, libraries, sources in (
     ),
     (
         "win32file",
-        "ws2_32 mswsock",
+        "ws2_32 mswsock sfc advapi32",
         """
         win32/src/win32file.i
         win32/src/win32file_comm.cpp
@@ -1121,7 +1000,7 @@ for name, libraries, sources in (
         win32/src/win32net/win32netuser.cpp
         """,
     ),
-    ("win32pdh", "", "win32/src/win32pdhmodule.cpp"),
+    ("win32pdh", "pdh", "win32/src/win32pdhmodule.cpp"),
     ("win32pipe", "", "win32/src/win32pipe.i"),
     (
         "win32print",
@@ -1129,11 +1008,11 @@ for name, libraries, sources in (
         "win32/src/win32print/win32print.cpp",
     ),
     ("win32process", "advapi32 user32", "win32/src/win32process.i"),
-    ("win32profile", "Userenv", "win32/src/win32profilemodule.cpp"),
+    ("win32profile", "userenv", "win32/src/win32profilemodule.cpp"),
     ("win32ras", "rasapi32 user32", "win32/src/win32rasmodule.cpp"),
     (
         "win32security",
-        "advapi32 user32 netapi32",
+        "advapi32 user32 netapi32 secur32 ntdsapi",
         """
         win32/src/win32security.i
         win32/src/win32security_sspi.cpp
@@ -1160,16 +1039,16 @@ for name, libraries, sources in (
     ),
     (
         "win32inet",
-        "wininet",
+        "wininet winhttp",
         """
         win32/src/win32inet.i
         win32/src/win32inet_winhttp.cpp
         """,
     ),
     ("win32console", "kernel32", "win32/src/win32consolemodule.cpp"),
-    ("win32ts", "WtsApi32", "win32/src/win32tsmodule.cpp"),
+    ("win32ts", "wtsapi32", "win32/src/win32tsmodule.cpp"),
     ("_win32sysloader", "", "win32/src/_win32sysloader.cpp"),
-    ("win32transaction", "kernel32", "win32/src/win32transactionmodule.cpp"),
+    ("win32transaction", "kernel32 ktmw32", "win32/src/win32transactionmodule.cpp"),
 ):
     ext = WinExt_win32(
         name,
@@ -1192,9 +1071,9 @@ win32_extensions += [
     WinExt_win32(
         "win32api",
         sources="""
-                win32/src/win32apimodule.cpp win32/src/win32api_display.cpp
+                win32/src/win32apimodule.cpp win32/src/win32api_display.cpp win32/src/win32api_cputopo.cpp
                 """.split(),
-        libraries="user32 advapi32 shell32 version",
+        libraries="user32 advapi32 shell32 version secur32",
         delay_load_libraries="powrprof",
     ),
     WinExt_win32(
@@ -1203,14 +1082,13 @@ win32_extensions += [
                 win32/src/win32dynamicdialog.cpp
                 win32/src/win32gui.i
                """.split(),
-        libraries="gdi32 user32 comdlg32 comctl32 shell32",
+        libraries="gdi32 user32 comdlg32 comctl32 shell32 msimg32",
         define_macros=[("WIN32GUI", None)],
     ),
-    # winxptheme
     WinExt_win32(
         "_winxptheme",
         sources=["win32/src/_winxptheme.i"],
-        libraries="gdi32 user32 comdlg32 comctl32 shell32 Uxtheme",
+        libraries="gdi32 user32 comdlg32 comctl32 shell32 uxtheme",
     ),
 ]
 win32_extensions += [
@@ -1322,18 +1200,15 @@ pythoncom = WinExt_system32(
                         {win32com}/include\\PyIServerSecurity.h
                         """.format(**dirs)
     ).split(),
-    libraries="oleaut32 ole32 user32 urlmon",
+    libraries="oleaut32 ole32 user32 urlmon oleacc",
     export_symbol_file="com/win32com/src/PythonCOM.def",
     extra_compile_args=["-DBUILD_PYTHONCOM"],
-    pch_header="stdafx.h",
-    base_address=dll_base_address,
 )
-dll_base_address += 0x80000  # pythoncom is large!
 com_extensions = [
     pythoncom,
     WinExt_win32com(
         "adsi",
-        libraries="ACTIVEDS ADSIID user32 advapi32",
+        libraries="activeds adsiid user32 advapi32",
         sources=(
             """
                         {adsi}/adsi.i                 {adsi}/adsi.cpp
@@ -1352,7 +1227,6 @@ com_extensions = [
     ),
     WinExt_win32com(
         "axcontrol",
-        pch_header="axcontrol_pch.h",
         sources=(
             """
                         {axcontrol}/AXControl.cpp
@@ -1373,7 +1247,7 @@ com_extensions = [
         sources=(
             """
                         {axscript}/AXScript.cpp
-                        {axscript}/GUIDS.cpp                   {axscript}/PyGActiveScript.cpp
+                        {axscript}/GUIDs.cpp                   {axscript}/PyGActiveScript.cpp
                         {axscript}/PyGActiveScriptError.cpp    {axscript}/PyGActiveScriptParse.cpp
                         {axscript}/PyGActiveScriptSite.cpp     {axscript}/PyGObjectSafety.cpp
                         {axscript}/PyIActiveScript.cpp         {axscript}/PyIActiveScriptError.cpp
@@ -1393,12 +1267,10 @@ com_extensions = [
         ).split(),
         extra_compile_args=["-DPY_BUILD_AXSCRIPT"],
         implib_name="axscript",
-        pch_header="stdafx.h",
     ),
     WinExt_win32com(
         "axdebug",
         libraries="axscript",
-        pch_header="stdafx.h",
         sources=(
             """
                     {axdebug}/AXDebug.cpp
@@ -1450,7 +1322,7 @@ com_extensions = [
     ),
     WinExt_win32com(
         "internet",
-        pch_header="internet_pch.h",
+        libraries="urlmon",
         sources=(
             """
                         {internet}/internet.cpp                   {internet}/PyIDocHostUIHandler.cpp
@@ -1465,8 +1337,7 @@ com_extensions = [
     WinExt_win32com(
         "mapi",
         libraries="advapi32",
-        pch_header="PythonCOM.h",
-        include_dirs=["{mapi}/MapiStubLibrary/include".format(**dirs)],
+        include_dirs=["{mapi}/MAPIStubLibrary/include".format(**dirs)],
         sources=(
             """
                         {mapi}/mapi.i                 {mapi}/mapi.cpp
@@ -1500,7 +1371,7 @@ com_extensions = [
     WinExt_win32com_mapi(
         "exchange",
         libraries="advapi32 legacy_stdio_definitions",
-        include_dirs=["{mapi}/MapiStubLibrary/include".format(**dirs)],
+        include_dirs=["{mapi}/MAPIStubLibrary/include".format(**dirs)],
         sources=(
             """
                                   {mapi}/exchange.i         {mapi}/exchange.cpp
@@ -1515,8 +1386,7 @@ com_extensions = [
     ),
     WinExt_win32com(
         "shell",
-        libraries="shell32",
-        pch_header="shell_pch.h",
+        libraries="shell32 shlwapi",
         sources=(
             """
                         {shell}/PyIActiveDesktop.cpp
@@ -1640,8 +1510,7 @@ com_extensions = [
     ),
     WinExt_win32com(
         "bits",
-        libraries="Bits",
-        pch_header="bits_pch.h",
+        libraries="bits",
         sources=(
             """
                         {bits}/bits.cpp
@@ -1667,7 +1536,6 @@ com_extensions = [
     ),
     WinExt_win32com(
         "directsound",
-        pch_header="directsound_pch.h",
         sources=(
             """
                         {directsound}/directsound.cpp     {directsound}/PyDSBCAPS.cpp
@@ -1705,148 +1573,141 @@ pythonwin_extensions = [
     WinExt_pythonwin(
         "win32ui",
         sources=[
-            "Pythonwin/dbgthread.cpp",
-            "Pythonwin/dibapi.cpp",
-            "Pythonwin/dllmain.cpp",
-            "Pythonwin/pythondoc.cpp",
-            "Pythonwin/pythonppage.cpp",
-            "Pythonwin/pythonpsheet.cpp",
-            "Pythonwin/pythonRichEditCntr.cpp",
-            "Pythonwin/pythonRichEditDoc.cpp",
-            "Pythonwin/pythonview.cpp",
-            "Pythonwin/stdafx.cpp",
-            "Pythonwin/win32app.cpp",
-            "Pythonwin/win32assoc.cpp",
-            "Pythonwin/win32bitmap.cpp",
-            "Pythonwin/win32brush.cpp",
-            "Pythonwin/win32cmd.cpp",
-            "Pythonwin/win32cmdui.cpp",
-            "Pythonwin/win32context.cpp",
-            "Pythonwin/win32control.cpp",
-            "Pythonwin/win32ctledit.cpp",
-            "Pythonwin/win32ctrlList.cpp",
-            "Pythonwin/win32ctrlRichEdit.cpp",
-            "Pythonwin/win32ctrlTree.cpp",
-            "Pythonwin/win32dc.cpp",
-            "Pythonwin/win32dlg.cpp",
-            "Pythonwin/win32dlgbar.cpp",
-            "Pythonwin/win32dll.cpp",
-            "Pythonwin/win32doc.cpp",
+            "pythonwin/dbgthread.cpp",
+            "pythonwin/dibapi.cpp",
+            "pythonwin/dllmain.cpp",
+            "pythonwin/pythondoc.cpp",
+            "pythonwin/pythonppage.cpp",
+            "pythonwin/pythonpsheet.cpp",
+            "pythonwin/pythonRichEditCntr.cpp",
+            "pythonwin/pythonRichEditDoc.cpp",
+            "pythonwin/pythonview.cpp",
+            "pythonwin/stdafx.cpp",
+            "pythonwin/win32app.cpp",
+            "pythonwin/win32assoc.cpp",
+            "pythonwin/win32bitmap.cpp",
+            "pythonwin/win32brush.cpp",
+            "pythonwin/win32cmd.cpp",
+            "pythonwin/win32cmdui.cpp",
+            "pythonwin/win32context.cpp",
+            "pythonwin/win32control.cpp",
+            "pythonwin/win32ctledit.cpp",
+            "pythonwin/win32ctrlList.cpp",
+            "pythonwin/win32ctrlRichEdit.cpp",
+            "pythonwin/win32ctrlTree.cpp",
+            "pythonwin/win32dc.cpp",
+            "pythonwin/win32dlg.cpp",
+            "pythonwin/win32dlgbar.cpp",
+            "pythonwin/win32dll.cpp",
+            "pythonwin/win32doc.cpp",
             "win32/src/win32dynamicdialog.cpp",
-            "Pythonwin/win32font.cpp",
-            "Pythonwin/win32gdi.cpp",
-            "Pythonwin/win32ImageList.cpp",
-            "Pythonwin/win32menu.cpp",
-            "Pythonwin/win32notify.cpp",
-            "Pythonwin/win32pen.cpp",
-            "Pythonwin/win32prinfo.cpp",
-            "Pythonwin/win32prop.cpp",
-            "Pythonwin/win32rgn.cpp",
-            "Pythonwin/win32RichEdit.cpp",
-            "Pythonwin/win32RichEditDocTemplate.cpp",
-            "Pythonwin/win32splitter.cpp",
-            "Pythonwin/win32template.cpp",
-            "Pythonwin/win32thread.cpp",
-            "Pythonwin/win32toolbar.cpp",
-            "Pythonwin/win32tooltip.cpp",
-            "Pythonwin/win32ui.rc",
-            "Pythonwin/win32uimodule.cpp",
-            "Pythonwin/win32util.cpp",
-            "Pythonwin/win32view.cpp",
-            "Pythonwin/win32virt.cpp",
-            "Pythonwin/win32win.cpp",
+            "pythonwin/win32font.cpp",
+            "pythonwin/win32gdi.cpp",
+            "pythonwin/win32ImageList.cpp",
+            "pythonwin/win32menu.cpp",
+            "pythonwin/win32notify.cpp",
+            "pythonwin/win32pen.cpp",
+            "pythonwin/win32prinfo.cpp",
+            "pythonwin/win32prop.cpp",
+            "pythonwin/win32rgn.cpp",
+            "pythonwin/win32RichEdit.cpp",
+            "pythonwin/win32RichEditDocTemplate.cpp",
+            "pythonwin/win32splitter.cpp",
+            "pythonwin/win32template.cpp",
+            "pythonwin/win32thread.cpp",
+            "pythonwin/win32toolbar.cpp",
+            "pythonwin/win32tooltip.cpp",
+            "pythonwin/win32ui.rc",
+            "pythonwin/win32uimodule.cpp",
+            "pythonwin/win32util.cpp",
+            "pythonwin/win32view.cpp",
+            "pythonwin/win32virt.cpp",
+            "pythonwin/win32win.cpp",
         ],
         extra_compile_args=["-DBUILD_PYW"],
-        pch_header="stdafx.h",
-        base_address=dll_base_address,
         depends=[
-            "Pythonwin/stdafx.h",
-            "Pythonwin/win32uiExt.h",
+            "pythonwin/stdafx.h",
+            "pythonwin/win32uiExt.h",
             "win32/src/PyWinTypes.h",
-            "Pythonwin/dibapi.h",
-            "Pythonwin/pythoncbar.h",
-            "Pythonwin/pythondoc.h",
-            "Pythonwin/pythonframe.h",
-            "Pythonwin/pythonppage.h",
-            "Pythonwin/pythonpsheet.h",
-            "Pythonwin/pythonRichEdit.h",
-            "Pythonwin/pythonRichEditCntr.h",
-            "Pythonwin/pythonRichEditDoc.h",
-            "Pythonwin/pythonview.h",
-            "Pythonwin/pythonwin.h",
-            "Pythonwin/Win32app.h",
-            "Pythonwin/win32assoc.h",
-            "Pythonwin/win32bitmap.h",
-            "Pythonwin/win32brush.h",
-            "Pythonwin/win32cmd.h",
-            "Pythonwin/win32cmdui.h",
-            "Pythonwin/win32control.h",
-            "Pythonwin/win32ctrlList.h",
-            "Pythonwin/win32ctrlTree.h",
-            "Pythonwin/win32dc.h",
-            "Pythonwin/win32dlg.h",
-            "Pythonwin/win32dlgbar.h",
+            "pythonwin/dibapi.h",
+            "pythonwin/pythoncbar.h",
+            "pythonwin/pythondoc.h",
+            "pythonwin/pythonframe.h",
+            "pythonwin/pythonppage.h",
+            "pythonwin/pythonpsheet.h",
+            "pythonwin/pythonRichEdit.h",
+            "pythonwin/pythonRichEditCntr.h",
+            "pythonwin/pythonRichEditDoc.h",
+            "pythonwin/pythonview.h",
+            "pythonwin/pythonwin.h",
+            "pythonwin/Win32app.h",
+            "pythonwin/win32assoc.h",
+            "pythonwin/win32bitmap.h",
+            "pythonwin/win32brush.h",
+            "pythonwin/win32cmd.h",
+            "pythonwin/win32cmdui.h",
+            "pythonwin/win32control.h",
+            "pythonwin/win32ctrlList.h",
+            "pythonwin/win32ctrlTree.h",
+            "pythonwin/win32dc.h",
+            "pythonwin/win32dlg.h",
+            "pythonwin/win32dlgbar.h",
             "win32/src/win32dynamicdialog.h",
-            "Pythonwin/win32dll.h",
-            "Pythonwin/win32doc.h",
-            "Pythonwin/win32font.h",
-            "Pythonwin/win32gdi.h",
-            "Pythonwin/win32hl.h",
-            "Pythonwin/win32ImageList.h",
-            "Pythonwin/win32menu.h",
-            "Pythonwin/win32pen.h",
-            "Pythonwin/win32prinfo.h",
-            "Pythonwin/win32prop.h",
-            "Pythonwin/win32rgn.h",
-            "Pythonwin/win32RichEdit.h",
-            "Pythonwin/win32RichEditDocTemplate.h",
-            "Pythonwin/win32splitter.h",
-            "Pythonwin/win32template.h",
-            "Pythonwin/win32toolbar.h",
-            "Pythonwin/win32ui.h",
-            "Pythonwin/Win32uiHostGlue.h",
-            "Pythonwin/win32win.h",
+            "pythonwin/win32dll.h",
+            "pythonwin/win32doc.h",
+            "pythonwin/win32font.h",
+            "pythonwin/win32gdi.h",
+            "pythonwin/win32hl.h",
+            "pythonwin/win32ImageList.h",
+            "pythonwin/win32menu.h",
+            "pythonwin/win32pen.h",
+            "pythonwin/win32prinfo.h",
+            "pythonwin/win32prop.h",
+            "pythonwin/win32rgn.h",
+            "pythonwin/win32RichEdit.h",
+            "pythonwin/win32RichEditDocTemplate.h",
+            "pythonwin/win32splitter.h",
+            "pythonwin/win32template.h",
+            "pythonwin/win32toolbar.h",
+            "pythonwin/win32ui.h",
+            "pythonwin/Win32uiHostGlue.h",
+            "pythonwin/win32win.h",
         ],
         optional_headers=["afxres.h"],
     ),
     WinExt_pythonwin(
         "win32uiole",
         sources=[
-            "Pythonwin/stdafxole.cpp",
-            "Pythonwin/win32oleDlgInsert.cpp",
-            "Pythonwin/win32oleDlgs.cpp",
-            "Pythonwin/win32uiole.cpp",
-            "Pythonwin/win32uioleClientItem.cpp",
-            "Pythonwin/win32uioledoc.cpp",
+            "pythonwin/stdafxole.cpp",
+            "pythonwin/win32oleDlgInsert.cpp",
+            "pythonwin/win32oleDlgs.cpp",
+            "pythonwin/win32uiole.cpp",
+            "pythonwin/win32uioleClientItem.cpp",
+            "pythonwin/win32uioledoc.cpp",
         ],
         depends=[
-            "Pythonwin/stdafxole.h",
-            "Pythonwin/win32oleDlgs.h",
-            "Pythonwin/win32uioledoc.h",
+            "pythonwin/stdafxole.h",
+            "pythonwin/win32oleDlgs.h",
+            "pythonwin/win32uioledoc.h",
         ],
-        pch_header="stdafxole.h",
         optional_headers=["afxres.h"],
     ),
     WinExt_pythonwin(
         "dde",
         sources=[
-            "Pythonwin/stddde.cpp",
-            "Pythonwin/ddetopic.cpp",
-            "Pythonwin/ddeconv.cpp",
-            "Pythonwin/ddeitem.cpp",
-            "Pythonwin/ddemodule.cpp",
-            "Pythonwin/ddeserver.cpp",
+            "pythonwin/stddde.cpp",
+            "pythonwin/ddetopic.cpp",
+            "pythonwin/ddeconv.cpp",
+            "pythonwin/ddeitem.cpp",
+            "pythonwin/ddemodule.cpp",
+            "pythonwin/ddeserver.cpp",
         ],
-        pch_header="stdafxdde.h",
         depends=["win32/src/stddde.h", "pythonwin/ddemodule.h"],
         optional_headers=["afxres.h"],
     ),
 ]
-# win32ui is large, so we reserve more bytes than normal
-dll_base_address += 0x100000
 
-other_extensions = []
-other_extensions.append(
+other_extensions = [
     WinExt_ISAPI(
         "PyISAPI_loader",
         sources=[
@@ -1867,7 +1728,6 @@ other_extensions.append(
                   PythonEng.h StdAfx.h Utils.h
                """.split()
         ],
-        pch_header="StdAfx.h",
         is_regular_dll=1,
         export_symbols="""HttpExtensionProc GetExtensionVersion
                            TerminateExtension GetFilterVersion
@@ -1876,9 +1736,9 @@ other_extensions.append(
                            """.split(),
         libraries="advapi32",
     )
-)
+]
 
-W32_exe_files = [
+W32_exe_files: list[WinExt] = [
     WinExt_pythonservice(
         "pythonservice",
         sources=[
@@ -1890,13 +1750,13 @@ W32_exe_files = [
     WinExt_pythonwin_subsys_win(
         "Pythonwin",
         sources=[
-            "Pythonwin/pythonwin.cpp",
-            "Pythonwin/pythonwin.rc",
-            "Pythonwin/stdafxpw.cpp",
+            "pythonwin/pythonwin.cpp",
+            "pythonwin/pythonwin.rc",
+            "pythonwin/stdafxpw.cpp",
         ],
         depends=[
-            "Pythonwin/Win32uiHostGlue.h",
-            "Pythonwin/pythonwin.h",
+            "pythonwin/Win32uiHostGlue.h",
+            "pythonwin/pythonwin.h",
         ],
         optional_headers=["afxres.h"],
     ),
@@ -1951,9 +1811,9 @@ def expand_modules(module_dir: str | os.PathLike[str]):
 
 
 # NOTE: somewhat counter-intuitively, a result list a-la:
-#  [('Lib/site-packages\\pythonwin', ('pythonwin/license.txt',)),]
-# will 'do the right thing' in terms of installing licence.txt into
-# 'Lib/site-packages/pythonwin/licence.txt'.  We exploit this to
+#  [('Lib/site-packages\\pythonwin', ('pythonwin/License.txt',)),]
+# will 'do the right thing' in terms of installing License.txt into
+# 'Lib/site-packages/pythonwin/License.txt'.  We exploit this to
 # get 'com/win32com/whatever' installed to 'win32com/whatever'
 def convert_data_files(files: Iterable[str]):
     ret: list[tuple[str, tuple[str]]] = []
@@ -1973,9 +1833,7 @@ def convert_data_files(files: Iterable[str]):
                 raise RuntimeError("No file '%s'" % file)
             files_use = (file,)
         for fname in files_use:
-            path_use = os.path.dirname(fname)
-            if path_use.startswith("com\\"):
-                path_use = path_use[4:]
+            path_use = os.path.dirname(fname).removeprefix("com\\")
             ret.append((path_use, (fname,)))
     return ret
 
@@ -2045,7 +1903,6 @@ ext_modules = (
 )
 
 cmdclass = {
-    "install": my_install,
     "build": my_build,
     "build_ext": my_build_ext,
     "install_data": my_install_data,
@@ -2055,29 +1912,56 @@ classifiers = [
     "Environment :: Win32 (MS Windows)",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Python Software Foundation License",
+    "Development Status :: 5 - Production/Stable",
     "Operating System :: Microsoft :: Windows",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
 ]
 
 dist = setup(
     name="pywin32",
     version=build_id,
-    description="Python for Window Extensions",
+    description="Python for Windows Extensions",
     long_description=(Path(__file__).parent / "README.md").read_text(),
     long_description_content_type="text/markdown",
     author="Mark Hammond (et al)",
     author_email="mhammond@skippinet.com.au",
-    url="https://github.com/mhammond/pywin32",
+    python_requires=">=3.9",
+    project_urls={
+        # https://docs.pypi.org/project_metadata/#general-url
+        "Homepage": "https://github.com/mhammond/pywin32",
+        "Changes": "https://github.com/mhammond/pywin32/blob/main/CHANGES.md",
+        "Docs": "https://mhammond.github.io/pywin32/",
+        "Bugs": "https://github.com/mhammond/pywin32/issues",
+        # Arbitrary URLs (icons still recognized)
+        "Support Requests": "https://github.com/mhammond/pywin32/discussions",
+        "Mailing List": "https://mail.python.org/mailman/listinfo/python-win32",
+    },
     license="PSF",
+    license_files=(
+        "**/[Ll]icense.txt",
+        "**/LICENSE*",
+        "isapi/README.txt",
+    ),
     classifiers=classifiers,
     cmdclass=cmdclass,
-    scripts=["pywin32_postinstall.py", "pywin32_testall.py"],
+    # This adds the scripts under Python3XX/Scripts, but doesn't actually do much
+    scripts=[
+        "win32/scripts/pywin32_postinstall.py",
+        "win32/scripts/pywin32_testall.py",
+    ],
+    # This shortcuts `python -m win32.scripts.some_script` to just `some_script`
+    entry_points={
+        "console_scripts": [
+            "pywin32_postinstall = win32.scripts.pywin32_postinstall:main",
+            "pywin32_testall = win32.scripts.pywin32_testall:main",
+        ]
+    },
     ext_modules=ext_modules,
     package_dir={
         "win32com": "com/win32com",
@@ -2086,21 +1970,14 @@ dist = setup(
     },
     packages=packages,
     py_modules=py_modules,
-    data_files=[("", (os.path.join(gettempdir(), "pywin32.version.txt"),))]
-    + convert_optional_data_files(
-        [
-            "PyWin32.chm",
-        ]
-    )
+    data_files=convert_optional_data_files(["PyWin32.chm"])
     + convert_data_files(
         [
-            "Pythonwin/start_pythonwin.pyw",
+            "pythonwin/start_pythonwin.pyw",
             "pythonwin/pywin/*.cfg",
             "pythonwin/pywin/Demos/*.py",
             "pythonwin/pywin/Demos/app/*.py",
             "pythonwin/pywin/Demos/ocx/*.py",
-            "pythonwin/license.txt",
-            "win32/license.txt",
             "win32/scripts/*.py",
             "win32/test/*.py",
             "win32/test/win32rcparser/test.rc",
@@ -2110,6 +1987,11 @@ dist = setup(
             "win32/Demos/*.py",
             "win32/Demos/images/*.bmp",
             "com/win32com/readme.html",
+            # Licenses
+            "com/win32comext/mapi/NOTICE.md",
+            "pythonwin/License.txt",
+            "pythonwin/pywin/idle/*.txt",
+            "win32/License.txt",
             # win32com test utility files.
             "com/win32com/test/*.idl",
             "com/win32com/test/*.js",
@@ -2125,33 +2007,34 @@ dist = setup(
             "com/win32comext/axscript/test/*.py",
             "com/win32comext/axscript/test/*.pys",
             "com/win32comext/axscript/test/*.vbs",
-            "com/win32comext/axscript/Demos/*.pys",
-            "com/win32comext/axscript/Demos/*.htm*",
-            "com/win32comext/axscript/Demos/*.gif",
-            "com/win32comext/axscript/Demos/*.asp",
+            "com/win32comext/axscript/demos/*.pys",
+            "com/win32comext/axscript/demos/*.htm*",
+            "com/win32comext/axscript/demos/*.gif",
+            "com/win32comext/axscript/demos/*.asp",
             "com/win32comext/mapi/demos/*.py",
             "com/win32comext/propsys/test/*.py",
             "com/win32comext/shell/test/*.py",
             "com/win32comext/shell/demos/servers/*.py",
             "com/win32comext/shell/demos/*.py",
             "com/win32comext/taskscheduler/test/*.py",
-            "com/win32comext/ifilter/demo/*.py",
+            "com/win32comext/ifilter/demos/*.py",
             "com/win32comext/authorization/demos/*.py",
             "com/win32comext/bits/test/*.py",
+            # ISAPI
             "isapi/*.txt",
             "isapi/samples/*.py",
             "isapi/samples/*.txt",
             "isapi/doc/*.html",
             "isapi/test/*.py",
             "isapi/test/*.txt",
+            # adodbapi
             "adodbapi/*.txt",
             "adodbapi/test/*.py",
             "adodbapi/examples/*.py",
         ]
     )
-    +
     # The headers and .lib files
-    [
+    + [
         ("win32/include", ("win32/src/PyWinTypes.h",)),
         (
             "win32com/include",
@@ -2162,10 +2045,13 @@ dist = setup(
             ),
         ),
     ]
-    +
     # And data files convert_data_files can't handle.
-    [
+    + [
+        ("", (str(version_file_path),)),
+        ("pythonwin", (str(scintilla_licence_path),)),
+        ("win32comext/mapi", (str(mapi_stubs_licence_path),)),
         ("win32com", ("com/License.txt",)),
+        ("win32comext", ("com/License.txt",)),
         # pythoncom.py doesn't quite fit anywhere else.
         # Note we don't get an auto .pyc - but who cares?
         ("", ("com/pythoncom.py",)),
@@ -2181,9 +2067,9 @@ if "build_ext" in dist.command_obj:
     # Print the list of extension modules we skipped building.
     excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
     if excluded_extensions:
-        skip_whitelist = {"exchange", "axdebug"}
+        skip_whitelist = {"axdebug"}
         skipped_ex = []
-        print("*** NOTE: The following extensions were NOT %s:" % what_string)
+        print(f"*** NOTE: The following extensions were NOT {what_string}:")
         for ext, why in excluded_extensions:
             print(f" {ext.name}: {why}")
             if ext.name not in skip_whitelist:
@@ -2192,8 +2078,7 @@ if "build_ext" in dist.command_obj:
         print("please execute this script with no arguments (or see the docstring)")
         if skipped_ex:
             print(
-                "*** Non-zero exit status. Missing for complete release build: %s"
-                % skipped_ex
+                f"*** Non-zero exit status. Missing for complete release build: {skipped_ex}"
             )
             sys.exit(1000 + len(skipped_ex))
     else:

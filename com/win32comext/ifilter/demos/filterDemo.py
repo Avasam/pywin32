@@ -239,15 +239,11 @@ def _usage():
     print("by default .htm, .txt, .doc, .dot, .xls, .xlt, .ppt are supported")
     print("you can filter .pdf's by downloading adobes ifilter component. ")
     print(
-        "(currently found at http://download.adobe.com/pub/adobe/acrobat/win/all/ifilter50.exe)."
+        "(currently found at https://download.adobe.com/pub/adobe/acrobat/win/all/ifilter50.exe)."
     )
     print("ifilters for other filetypes are also available.")
     print()
-    print(
-        "This extension is only supported on win2000 & winXP - because thats the only"
-    )
-    print("place the ifilter stuff is supported. For more info on the API check out ")
-    print("MSDN under ifilters")
+    print("For more info on the API check out MSDN under ifilters")
 
 
 if __name__ == "__main__":
