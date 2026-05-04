@@ -6,7 +6,7 @@ extend-include = [
   # "**/default.cfg",
 ]
 # This file is not UTF-8
-extend-exclude = ["Pythonwin/pywin/test/_dbgscript.py"]
+extend-exclude = ["pythonwin/pywin/test/_dbgscript.py"]
 
 [format]
 line-ending = "cr-lf"
