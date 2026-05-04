@@ -802,7 +802,7 @@ int PyRecord::setattro(PyObject *self, PyObject *obname, PyObject *v)
 #else
     PY_INTERFACE_PRECALL;
 #endif
-        hr = pyrec->pri->PutField(INVOKE_PROPERTYPUT, pyrec->pdata, wname, &val);
+    hr = pyrec->pri->PutField(INVOKE_PROPERTYPUT, pyrec->pdata, wname, &val);
     PY_INTERFACE_POSTCALL;
 
     VariantClear(&val);
