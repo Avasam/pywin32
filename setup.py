@@ -18,8 +18,8 @@ the release version executable for the build. eg:
 Cross-compilation from x86 to ARM is well supported (assuming installed vs tools etc) - eg:
   python -m build --wheel --config-setting=--build-option="build_ext --plat-name=win-arm64 build --plat-name=win-arm64 bdist_wheel --plat-name=win-arm64"
 
-Some modules require special SDKs or toolkits to build (eg, mapi/exchange),
-which often aren't available in CI. The build process treats them as optional -
+Some modules require special SDKs or toolkits to build (eg, ATL/MFC), which
+often aren't available in all environments. The build process treats them as optional -
 instead of a failing, it will report what was skipped, and why. See also
 build_env.md, which is getting out of date but might help getting everything
 required for an official build - see README.md for that process.
@@ -800,7 +800,7 @@ class my_build_ext(build_ext):
 
     def build_extension(self, ext):
         # Some of these extensions are difficult to build, requiring various
-        # hard-to-track libraries et (eg, exchange sdk, etc).  So we
+        # hard-to-track libraries (eg, ATL/MFC, etc).  So we
         # check the extension list for the extra libraries explicitly
         # listed.  We then search for this library the same way the C
         # compiler would - if we can't find a library, we exclude the
@@ -2264,11 +2264,12 @@ if "build_ext" in dist.command_obj:
     # Print the list of extension modules we skipped building.
     excluded_extensions = dist.command_obj["build_ext"].excluded_extensions
     if excluded_extensions:
+        # Set of extension names that are acceptable to skip for a release build
         skip_whitelist = set()
         if is_mingw:
             skip_whitelist = MFC_SKIP_WHITELIST
         skipped_ex = []
-        print("*** NOTE: The following extensions were NOT %s:" % what_string)
+        print(f"*** NOTE: The following extensions were NOT {what_string}:")
         for ext, why in excluded_extensions:
             print(f" {ext.name}: {why}")
             if ext.name not in skip_whitelist:
