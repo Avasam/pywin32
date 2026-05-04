@@ -12,11 +12,6 @@
 // smarter integration with Python IDispatch support, so offers a more
 // convenient technique.
 
-//%{
-//#define UNICODE
-//%}
-
-
 %include "typemaps.i"
 %include "pywin32.i"
 %include "pythoncom.i"
@@ -34,7 +29,7 @@
 #include "PyIADsUser.h"
 #include "PyIADsDeleteOps.h"
 #include "PyIDsObjectPicker.h"
-#include "ADSIID.h"
+#include "adsiid.h"
 
 extern PyTypeObject PyDSOP_SCOPE_INIT_INFOsType;
 extern PyObject* PyIADs_getattro(PyObject *ob, PyObject *obname);

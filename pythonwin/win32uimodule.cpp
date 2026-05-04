@@ -12,7 +12,7 @@ generates Windows .hlp files.
 */
 #include "stdafx.h"
 #include <commdlg.h>
-#include "win32uiHostGlue.h"
+#include "Win32uiHostGlue.h"
 #include "win32win.h"
 #include "win32control.h"
 #include "win32doc.h"
@@ -705,7 +705,7 @@ PyObject *Python_do_callback(PyObject *themeth, PyObject *thearglst)
     return result;
 }
 
-// Copied from PyRecord.cpp, should move into pywintypes.h
+// Copied from PyRecord.cpp, should move into PyWinTypes.h
 // Unicode versions of '_Concat' etc have different sigs.  Make them the
 // same here...
 void PyWinCoreString_Concat(register PyObject **pv, register PyObject *w)
@@ -916,12 +916,7 @@ static PyObject *ui_enable_3d_controls(PyObject *self, PyObject *args)
     if (!pApp)
         return NULL;
     GUI_BGN_SAVE;
-#ifdef _AFX_NO_CTL3D_SUPPORT
-    // This is defined for _WIN64 in earlier SDKs.
-    int rc = 0;
-#else
     int rc = pApp->Enable3dControls();
-#endif
     GUI_END_SAVE;
 
     return Py_BuildValue("i", rc);
@@ -2043,8 +2038,6 @@ int AddConstants(PyObject *module)
     int debug = 0;
 #endif
     ADD_CONSTANT(debug);  // @const win32ui|debug|1 if we are current using a _DEBUG build of win32ui, else 0.
-    if (PyModule_AddIntConstant(module, "UNICODE", 1) == -1)
-        return -1;
     ADD_CONSTANT(AFX_IDW_PANE_FIRST);   // @const win32ui|AFX_IDW_PANE_FIRST|Id of the first splitter pane
     ADD_CONSTANT(AFX_IDW_PANE_LAST);    // @const win32ui|AFX_IDW_PANE_LAST|Id of the last splitter pane
     ADD_CONSTANT(AFX_WS_DEFAULT_VIEW);  // @const win32ui|AFX_WS_DEFAULT_VIEW|

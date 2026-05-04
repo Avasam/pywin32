@@ -81,7 +81,7 @@ def main():
     extras.extend(remains)
     scripts = [
         "win32/test/testall.py",
-        "Pythonwin/pywin/test/all.py",
+        "pythonwin/pywin/test/all.py",
     ]
     for script in scripts:
         maybes = [os.path.join(directory, script) for directory in code_directories]
