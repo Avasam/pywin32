@@ -20,13 +20,6 @@
 #pragma once
 #endif
 
-#ifndef _MSC_VER
-#define __in
-#define __in_opt
-#define __out
-#define __deref_out_ecount_full(x)
-#endif
-
 /*
  *  Types.
  */
