@@ -1,15 +1,17 @@
-# basic module browser.
+"""
+basic module browser.
 
-# usage:
-# >>> import browser
-# >>> browser.Browse()
-# or
-# >>> browser.Browse(your_module)
+usage:
+>>> import browser
+>>> browser.Browse()
+or
+>>> browser.Browse(your_module)
+"""
 from __future__ import annotations
 
 import sys
 import types
-from typing import TYPE_CHECKING, Any, Dict, Generic, List, Tuple, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 import __main__
 import win32ui
@@ -272,17 +274,17 @@ class HLISeq(HLIPythonObject[_SequenceT]):
         return ret
 
 
-class HLIList(HLISeq[List[_T]]):
+class HLIList(HLISeq[list[_T]]):
     def GetHLIType(self):
         return "List"
 
 
-class HLITuple(HLISeq[Tuple[_T]]):
+class HLITuple(HLISeq[tuple[_T]]):
     def GetHLIType(self):
         return "Tuple"
 
 
-class HLIDict(HLIPythonObject[Dict[_KT, _VT]]):
+class HLIDict(HLIPythonObject[dict[_KT, _VT]]):
     def GetHLIType(self):
         return "Dict"
 
