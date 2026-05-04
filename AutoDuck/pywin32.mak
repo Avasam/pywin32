@@ -29,7 +29,7 @@ HTML_FILES = $(WIN32_HELP_DIR)\*.html \
 		$(WIN32COM_HELP_DIR)/*.htm* \
 		$(ISAPI_DIR)/doc/*.html \
 		$(PYTHONWIN_DIR)/readme.html $(PYTHONWIN_DIR)/doc/* $(PYTHONWIN_DIR)/doc/debugger/* \
-		../CHANGES.txt \
+		../CHANGES.md \
 
 
 WIN32_SOURCE = $(WIN32_SOURCE_DIR)/*.cpp \

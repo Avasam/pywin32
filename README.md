@@ -10,7 +10,7 @@
 
 This is the readme for the Python for Win32 (pywin32) extensions, which provides access to many of the Windows APIs from Python, including COM support.
 
-See [CHANGES.txt](https://github.com/mhammond/pywin32/blob/main/CHANGES.txt) for recent notable changes.
+See [CHANGES.md](https://github.com/mhammond/pywin32/blob/main/CHANGES.md) for recent notable changes.
 
 adodbapi's documentation can be found in: [adodbapi/readme.txt](https://github.com/mhammond/pywin32/blob/main/adodbapi/readme.txt)
 
@@ -146,10 +146,10 @@ to form a checklist so @mhammond doesn't forget what to do :)
 
 Since build 307 the release process is based on the artifacts created by Github actions.
 
-* Ensure CHANGES.txt has everything worth noting. Update the header to reflect
+* Ensure CHANGES.md has everything worth noting. Update the header to reflect
   the about-to-be released build and date, commit it.
 
-* Update setup.py with the new build number. Update CHANGES.txt to have a new heading
+* Update setup.py with the new build number. Update CHANGES.md to have a new heading
   section for the next unreleased version. (ie, a new, empty "Coming in build XXX, as yet unreleased"
   section)
 
@@ -169,12 +169,17 @@ Since build 307 the release process is based on the artifacts created by Github 
 
 * Send mail to python-win32
 
+<details>
+<summary>
+
 ### Older Manual Release Process
+
+</summary>
 
 This is the old process used when a local dev environment was used to create
 the builds. Build 306 was the last released with this process.
 
-* Ensure CHANGES.txt has everything worth noting. Update the header to reflect
+* Ensure CHANGES.md has everything worth noting. Update the header to reflect
   the about-to-be released build and date, commit it.
 
 * Update setup.py with the new build number.
@@ -195,3 +200,15 @@ the builds. Build 306 was the last released with this process.
   `git push --tags`)
 
 * Send mail to python-win32
+
+</details>
+
+## Versioning
+
+pywin32 uses a simple incremental version numbering scheme. Any increase in the version number may correspond to a breaking interface change. It is recommended that projects using pywin32 pin the dependency to a specific version.
+
+## Licenses
+
+pywin32 contains a mix of differently licensed code. The license files in the source tree are the source of truth.[^1]. So are individual Copyright notices at the top of files. You can also find license information through the [License-File Packaging Metadata](https://packaging.python.org/en/latest/specifications/core-metadata/#license-file-multiple-use).
+
+[^1]: <https://github.com/mhammond/pywin32/issues/1127#issuecomment-393364022>
