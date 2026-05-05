@@ -286,10 +286,6 @@ class WinExt(Extension):
             # else:
             #     self.extra_link_args.append("-m32")
 
-        # TODO: Why doesn't define_macros work for this ???
-        self.extra_compile_args.append("-DUNICODE")
-        self.extra_compile_args.append("-D_UNICODE")
-
     @abstractmethod
     def get_pywin32_dir(self) -> str:
         raise NotImplementedError
@@ -779,6 +775,7 @@ class my_build_ext(build_ext):
         objects = self.compiler.compile(
             sources,
             output_dir=os.path.join(self.build_temp, ext.name),
+            macros=ext.define_macros,
             include_dirs=ext.include_dirs,
             debug=self.debug,
             extra_postargs=ext.extra_compile_args,
