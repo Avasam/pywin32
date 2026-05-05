@@ -2010,11 +2010,8 @@ def expand_modules(module_dir: str | os.PathLike[str]):
 def convert_data_files(files: Iterable[str]):
     ret: list[tuple[str, tuple[str]]] = []
     for file in files:
-        print("file:", file)
         file = os.path.normpath(file)
         if file.find("*") >= 0:
-            print('if file.find("*") >= 0', True)
-
             files_use = tuple(
                 str(path)
                 for path in Path(file).parent.rglob(os.path.basename(file))
@@ -2024,12 +2021,10 @@ def convert_data_files(files: Iterable[str]):
             if not files_use:
                 raise RuntimeError("No files match '%s'" % file)
         else:
-            print('if file.find("*") >= 0', False)
             if not os.path.isfile(file):
                 raise RuntimeError("No file '%s'" % file)
             files_use = (file,)
         for fname in files_use:
-            print("fname:", fname)
             path_use = os.path.dirname(fname).removeprefix("com\\").removeprefix("com/")
             ret.append((path_use, (fname,)))
     return ret
