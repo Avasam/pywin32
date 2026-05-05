@@ -118,7 +118,7 @@ class WinExt(Extension):
         name,
         sources,
         include_dirs=[],
-        define_macros=[],
+        define_macros=None,
         undef_macros=None,
         library_dirs=[],
         libraries="",
