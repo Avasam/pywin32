@@ -51,6 +51,13 @@
 #include <stddef.h>
 #endif
 
+#ifndef _MSC_VER
+#define __in
+#define __in_opt
+#define __out
+#define __deref_out_ecount_full(x)
+#endif
+
 /* Array dimension for structures with variable-sized arrays at the end. */
 
 #pragma warning(push)

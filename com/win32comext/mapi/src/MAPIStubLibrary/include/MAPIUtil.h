@@ -39,6 +39,12 @@ extern "C" {
 #define BEGIN_INTERFACE
 #endif
 
+#ifndef _MSC_VER
+#define __in
+#define __in_opt
+#define __out
+#define __deref_out_ecount_full(x)
+#endif
 
 /* IMAPITable in memory */
 
@@ -849,7 +855,7 @@ STDAPI_(VOID)			DeinitMapiUtil(VOID);
 
 /*
  *	Entry point names.
- *	
+ *
  *	These are for new entry points defined since MAPI first shipped
  *	in Windows 95. Using these names in a GetProcAddress call makes
  *	it easier to write code which uses them optionally.
