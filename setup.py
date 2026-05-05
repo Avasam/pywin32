@@ -118,7 +118,7 @@ class WinExt(Extension):
         name,
         sources,
         include_dirs=[],
-        define_macros=None,
+        define_macros=[],
         undef_macros=None,
         library_dirs=[],
         libraries="",
@@ -293,8 +293,10 @@ class WinExt(Extension):
 
 class WinExt_pythonwin(WinExt):
     def __init__(self, name, **kw):
-        kw.setdefault("extra_compile_args", []).extend(["-D_AFXDLL", "-D_AFXEXT"])
-        WinExt.__init__(self, name, **kw)
+        kw.setdefault("define_macros", []).extend(
+            [("_AFXDLL", None), ("_AFXEXT", None)]
+        )
+        super().__init__(name, **kw)
 
     def get_pywin32_dir(self):
         return "pythonwin"
@@ -959,9 +961,9 @@ class my_build_ext(build_ext):
                 "-python",
                 # we never use the .doc files.
                 "-dnone",
+                *self.swig_opts,
+                *ext.swig_opts,
             ]
-            swig_cmd.extend(self.swig_opts)
-            swig_cmd.extend(ext.swig_opts)
             if platform.machine() in ("AMD64", "ARM64", "x86_64"):
                 swig_cmd.append("-DSWIG_PY64BIT")
             else:
@@ -1113,7 +1115,7 @@ win32_extensions = [
             "win32/src/PySoundObjects.h",
             "win32/src/PySecurityObjects.h",
         ],
-        extra_compile_args=["-DBUILD_PYWINTYPES"],
+        define_macros=[("BUILD_PYWINTYPES", None)],
         libraries="advapi32 user32 ole32 oleaut32",
         implib_name="pywintypes",
     ),
@@ -1283,7 +1285,7 @@ win32_extensions += [
     WinExt_win32(
         "servicemanager",
         sources=["win32/src/PythonServiceMessages.mc", "win32/src/PythonService.cpp"],
-        extra_compile_args=["-DPYSERVICE_BUILD_DLL"],
+        define_macros=[("PYSERVICE_BUILD_DLL", None)],
         libraries="user32 ole32 advapi32 shell32",
     ),
     WinExt_win32(
@@ -1387,7 +1389,7 @@ pythoncom = WinExt_system32(
     ).split(),
     libraries="oleaut32 ole32 user32 urlmon oleacc uuid",
     export_symbol_file="com/win32com/src/PythonCOM.def",
-    extra_compile_args=["-DBUILD_PYTHONCOM"],
+    define_macros=[("BUILD_PYTHONCOM", None)],
     implib_name="pythoncom",
 )
 com_extensions = [
@@ -1451,7 +1453,7 @@ com_extensions = [
                              {axscript}/stdafx.h
                              """.format(**dirs)
         ).split(),
-        extra_compile_args=["-DPY_BUILD_AXSCRIPT"],
+        define_macros=[("PY_BUILD_AXSCRIPT", None)],
         implib_name="axscript",
     ),
     WinExt_win32com(
