@@ -340,24 +340,24 @@ class WinExt_win32com(WinExt):
 
 class WinExt_win32com_mapi(WinExt_win32com):
     def __init__(self, name, **kw):
-        kw.setdefault("libraries", "")
+        libs = kw.get("libraries", "")
         # The stand-alone exchange SDK has these libs
         # Additional utility functions are only available for 32-bit builds.
         if not platform.machine() in ("AMD64", "ARM64", "x86_64"):
-            kw["libraries"] += " version user32 advapi32 Ex2KSdk sadapi netapi32"
+            libs += " version user32 advapi32 Ex2KSdk sadapi netapi32"
         if not is_mingw:
-            kw["libraries"] += " legacy_stdio_definitions"
-        if is_mingw:
-            # Force-include sal_compat.h before every MAPI translation unit so
-            # SAL annotations (__in, __out, etc.) are defined as no-ops without
-            # modifying the third-party MAPIStubLibrary headers.
-            kw.setdefault("extra_compile_args", []).extend(
-                [
-                    "-include",
-                    "com/win32comext/mapi/src/sal_compat.h",
-                ]
-            )
-            kw["libraries"] += " sal_compat"
+            libs += " legacy_stdio_definitions"
+        kw["libraries"] = libs
+        # if is_mingw:
+        #     # Force-include sal_compat.h before every MAPI translation unit so
+        #     # SAL annotations (__in, __out, etc.) are defined as no-ops without
+        #     # modifying the third-party MAPIStubLibrary headers.
+        #     kw.setdefault("extra_compile_args", []).extend(
+        #         [
+        #             "-include",
+        #             "com/win32comext/mapi/src/sal_compat.h",
+        #         ]
+        #     )
         super().__init__(name, **kw)
 
     def get_pywin32_dir(self):
@@ -1525,11 +1525,11 @@ com_extensions = [
     ),
     WinExt_win32com(
         "mapi",
-        libraries="advapi32 sal_compat",
+        libraries="advapi32",
         include_dirs=["{mapi}/MAPIStubLibrary/include".format(**dirs)],
-        extra_compile_args=(
-            ["-include", "com/win32comext/mapi/src/sal_compat.h"] * is_mingw
-        ),
+        # extra_compile_args=(
+        #     ["-include", "com/win32comext/mapi/src/sal_compat.h"] if is_mingw else []
+        # ),
         sources=(
             """
                         {mapi}/mapi.i                 {mapi}/mapi.cpp
