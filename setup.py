@@ -1877,7 +1877,7 @@ def expand_modules(module_dir: str | os.PathLike[str]):
 
 
 # NOTE: somewhat counter-intuitively, a result list a-la:
-#  [('Lib/site-packages/pythonwin', ('pythonwin/License.txt',)),]
+# [('Lib/site-packages/pythonwin', ('pythonwin/License.txt',)),]
 # will 'do the right thing' in terms of installing License.txt into
 # 'Lib/site-packages/pythonwin/License.txt'.  We exploit this to
 # get 'com/win32com/whatever' installed to 'win32com/whatever'
@@ -1889,7 +1889,7 @@ def convert_data_files(files: Iterable[str]):
             files_use = tuple(
                 str(path)
                 for path in Path(file).parent.rglob(os.path.basename(file))
-                # Ignore bytecode
+                # Ignore pre-compiled bytecode
                 if path.suffix != ".pyc"
             )
             if not files_use:
