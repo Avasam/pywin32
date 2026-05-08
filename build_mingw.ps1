@@ -28,6 +28,7 @@ else {
 
 $WinPythonLib = "$Msys2PythonTmpDir/mingw64/lib"
 $WinPythonInclude = "$Msys2PythonTmpDir/mingw64/include/python${PythonVer}"
+# $WinProgramFilesSearchRoots = @($Env:HOME, '/mnt', '/media', '/run/media') | Where-Object { Test-Path $_ }
 
 $Env:CC = 'x86_64-w64-mingw32-gcc'
 $Env:CXX = 'x86_64-w64-mingw32-g++'
@@ -46,5 +47,8 @@ $Env:RC = 'x86_64-w64-mingw32-windres'
 $Env:WINDRES = 'x86_64-w64-mingw32-windres'
 $Env:WINDMC = 'x86_64-w64-mingw32-windmc'
 $Env:SWIG = 'SWIG/swig_wine.ps1' | Resolve-Path
+# $Env:MFC_INCLUDE_PATH = Get-ChildItem -Path $WinProgramFilesSearchRoots -Recurse -Directory -Filter 'Program Files (x86)' -ErrorAction SilentlyContinue |
+#     ForEach-Object { Get-Item "$($_.FullName)/Microsoft Visual Studio/*/BuildTools/VC/Tools/MSVC/*/atlmfc/include" -ErrorAction SilentlyContinue } |
+#     Select-Object -First 1 -ExpandProperty FullName
 
 uv run python -m build --wheel --no-isolation --config-setting=--build-option="build_ext --plat-name=win-amd64"

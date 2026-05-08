@@ -104,8 +104,6 @@ version_file_path = Path(gettempdir(), "pywin32.version.txt")
 scintilla_licence_path = Path(gettempdir(), "Scintilla-License.txt")
 mapi_stubs_licence_path = Path(gettempdir(), "MAPIStubLibrary-License.txt")
 
-MFC_SKIP_WHITELIST = {"win32ui", "win32uiole", "dde", "Pythonwin"}
-
 
 def remove_manifest_flags(ldflags: list[str]):
     ldflags[:] = [ldflag for ldflag in ldflags if not ldflag.startswith("/MANIFEST")]
@@ -443,11 +441,11 @@ class my_build_ext(build_ext):
         cc = getattr(self.compiler, "cc", "")
         if not cc:
             return []
-            output = subprocess.check_output(
-                [cc, "-xc", "-E", "-", "-v"],
-                input=b"",
-                stderr=subprocess.STDOUT,
-            ).decode(errors="replace")
+        output = subprocess.check_output(
+            [cc, "-xc", "-E", "-", "-v"],
+            input=b"",
+            stderr=subprocess.STDOUT,
+        ).decode(errors="replace")
         dirs = dropwhile(
             lambda line: line != "#include <...> search starts here:",
             output.splitlines(),
@@ -597,6 +595,22 @@ class my_build_ext(build_ext):
     # find the VC base path corresponding to distutils paths, and
     # potentially upgrade for extra include / lib paths (MFC)
     def _check_vc(self):
+        # Using same env variable as winemaker for ATL/MFC include path
+        # https://github.com/wine-mirror/wine/blob/master/tools/winemaker/winemaker
+        # HACK/NOTE: ends up with usual Windows.h headers casing issue
+        # mfc_include_path = Path(os.environ.get("MFC_INCLUDE_PATH", ""))
+        # if mfc_include_path.is_dir():
+        #     self.include_dirs.append(mfc_include_path)
+        #     self.compiler.include_dirs.append(mfc_include_path)
+        #     self.library_dirs.append(
+        #         mfc_include_path.parent / "lib" / self.plat_dir / "atls.lib",
+        #     )
+        #     self.compiler.library_dirs.append(
+        #         mfc_include_path.parent / "lib" / self.plat_dir / "atls.lib",
+        #     )
+        #     vcverdir = mfc_include_path.parent.parent
+        #     return vcverdir.parent.parent.parent, vcverdir
+
         vcbase = vcverdir = None
         atlmfc_found = False
         for _dir in self.compiler.library_dirs:
@@ -2283,7 +2297,12 @@ if "build_ext" in dist.command_obj:
         # Set of extension names that are acceptable to skip for a release build
         skip_whitelist = set()
         if is_mingw:
-            skip_whitelist = MFC_SKIP_WHITELIST
+            # On MinGW, allow excluded ext/exe due to missing ATL/MFC headers (typically PythonWin)
+            skip_whitelist |= {
+                ext.name
+                for ext in [*pythonwin_extensions, *W32_exe_files]
+                if "afxwin.h" in ext.optional_headers
+            }
         skipped_ex = []
         print(f"*** NOTE: The following extensions were NOT {what_string}:")
         for ext, why in excluded_extensions:
