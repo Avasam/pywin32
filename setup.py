@@ -35,6 +35,7 @@ import subprocess
 import sys
 from abc import abstractmethod
 from collections.abc import Iterable
+from itertools import dropwhile, takewhile
 from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build import build
@@ -440,27 +441,20 @@ class my_build_ext(build_ext):
     def _get_gcc_include_dirs(self) -> list[str]:
         """Query gcc's built-in include search paths (needed for cross-compilation on Linux)."""
         cc = getattr(self.compiler, "cc", "")
-        try:
+        if not cc:
+            return []
             output = subprocess.check_output(
                 [cc, "-xc", "-E", "-", "-v"],
                 input=b"",
                 stderr=subprocess.STDOUT,
             ).decode(errors="replace")
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            return []
-        dirs = []
-        in_includes = False
-        for line in output.splitlines():
-            if "#include <...> search starts here:" in line:
-                in_includes = True
-                continue
-            if "End of search list." in line:
-                break
-            if in_includes:
-                d = line.strip()
-                if d:
-                    dirs.append(os.path.normpath(d))
-        return dirs
+        dirs = dropwhile(
+            lambda line: line != "#include <...> search starts here:",
+            output.splitlines(),
+        )
+        next(dirs)
+        dirs = takewhile(lambda line: line != "End of search list.", dirs)
+        return [os.path.normpath(line.strip()) for line in dirs]
 
     def _why_cant_build_extension(self, ext: WinExt) -> str | None:
         """Return None, or a reason it can't be built."""
