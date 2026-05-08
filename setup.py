@@ -31,6 +31,7 @@ import os
 import platform
 import re
 import shutil
+import subprocess
 import sys
 from abc import abstractmethod
 from collections.abc import Iterable
@@ -436,47 +437,69 @@ class my_build_ext(build_ext):
         """List of excluded extensions and their reason"""
         self.swig_opts.append("-c++")
 
-    def _why_cant_build_extension(self, ext):
-        """Return None, or a reason it can't be built."""
-        # header-based auto-skip detection is broken for MinGGW (at least on Linux)
-        # So just explicitly skip extensions we know we can't build
-        if is_mingw:
-            # Comment out below to enable Pythonwin extensions
-            if ext.name in MFC_SKIP_WHITELIST:
-                return "Unsupported due to ATL/MFC usage."
-            return None
+    def _get_gcc_include_dirs(self) -> list[str]:
+        """Query gcc's built-in include search paths (needed for cross-compilation on Linux)."""
+        cc = getattr(self.compiler, "cc", "")
+        try:
+            output = subprocess.check_output(
+                [cc, "-xc", "-E", "-", "-v"],
+                input=b"",
+                stderr=subprocess.STDOUT,
+            ).decode(errors="replace")
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return []
+        dirs = []
+        in_includes = False
+        for line in output.splitlines():
+            if "#include <...> search starts here:" in line:
+                in_includes = True
+                continue
+            if "End of search list." in line:
+                break
+            if in_includes:
+                d = line.strip()
+                if d:
+                    dirs.append(os.path.normpath(d))
+        return dirs
 
-        include_dirs = self.compiler.include_dirs + os.environ.get("INCLUDE", "").split(
-            os.pathsep
+    def _why_cant_build_extension(self, ext: WinExt) -> str | None:
+        """Return None, or a reason it can't be built."""
+
+        include_dirs = (
+            self.compiler.include_dirs
+            + os.environ.get("INCLUDE", "").split(os.pathsep)  # MSVC INCLUDE Env
+            + self._get_gcc_include_dirs()
         )
 
-        look_dirs = include_dirs
         for h in ext.optional_headers:
-            for d in look_dirs:
+            for d in include_dirs:
                 if os.path.isfile(os.path.join(d, h)):
                     break
             else:
-                logging.debug("Header '%s' not found  in %s", h, look_dirs)
+                logging.debug("Header '%s' not found  in %s", h, include_dirs)
                 return f"The header '{h}' can not be located."
 
-        common_dirs = self.compiler.library_dirs[:]
-        common_dirs += os.environ.get("LIB", "").split(os.pathsep)
-        patched_libs = []
-        for lib in ext.libraries:
-            if lib.lower() in self.found_libraries:
-                found = self.found_libraries[lib.lower()]
-            else:
-                look_dirs = common_dirs + ext.library_dirs
-                found = self.compiler.find_library_file(look_dirs, lib, self.debug)
-                if not found:
-                    logging.debug("Lib '%s' not found in %s", lib, look_dirs)
-                    return "No library '%s'" % lib
-                self.found_libraries[lib.lower()] = found
-            patched_libs.append(os.path.splitext(os.path.basename(found))[0])
+        if not is_mingw:
+            look_dirs = (
+                self.compiler.library_dirs
+                + os.environ.get("LIB", "").split(os.pathsep)
+                + ext.library_dirs
+            )
+            patched_libs = []
+            for lib in ext.libraries:
+                if lib.lower() in self.found_libraries:
+                    found = self.found_libraries[lib.lower()]
+                else:
+                    found = self.compiler.find_library_file(look_dirs, lib, self.debug)
+                    if not found:
+                        logging.debug("Lib '%s' not found in %s", lib, look_dirs)
+                        return f"No library '{lib}'"
+                    self.found_libraries[lib.lower()] = found
+                patched_libs.append(os.path.splitext(os.path.basename(found))[0])
 
-        # We update the .libraries list with the resolved library name.
-        # This is really only so "_d" works.
-        ext.libraries = patched_libs
+            # We update the .libraries list with the resolved library name.
+            # This is really only so "_d" works.
+            ext.libraries = patched_libs
         return None  # no reason - it can be built!
 
     def _generate_missing_import_libs(self):
@@ -596,7 +619,7 @@ class my_build_ext(build_ext):
             # Error or warn? last hope would be a non-standard build environment
             print("-- Visual C base path not found !?")
 
-        # The afxres.h/atls.lib files aren't always included by default,
+        # The afxwin.h/atls.lib files aren't always included by default,
         # so find and add them
         if vcbase and not atlmfc_found:
             atls_lib = glob.glob(vcbase + rf"ATLMFC\lib\{self.plat_dir}\atls.lib")
@@ -1869,7 +1892,7 @@ pythonwin_extensions = [
             "pythonwin/win32win.h",
         ],
         implib_name="win32ui",
-        optional_headers=["afxres.h"],
+        optional_headers=["afxwin.h"],
     ),
     WinExt_pythonwin(
         "win32uiole",
@@ -1886,7 +1909,7 @@ pythonwin_extensions = [
             "pythonwin/win32oleDlgs.h",
             "pythonwin/win32uioledoc.h",
         ],
-        optional_headers=["afxres.h"],
+        optional_headers=["afxwin.h"],
     ),
     WinExt_pythonwin(
         "dde",
@@ -1899,7 +1922,7 @@ pythonwin_extensions = [
             "pythonwin/ddeserver.cpp",
         ],
         depends=["win32/src/stddde.h", "pythonwin/ddemodule.h"],
-        optional_headers=["afxres.h"],
+        optional_headers=["afxwin.h"],
     ),
 ]
 
@@ -1954,7 +1977,7 @@ W32_exe_files: list[WinExt] = [
             "pythonwin/Win32uiHostGlue.h",
             "pythonwin/pythonwin.h",
         ],
-        optional_headers=["afxres.h"],
+        optional_headers=["afxwin.h"],
     ),
 ]
 
