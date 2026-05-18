@@ -34,7 +34,7 @@ import shutil
 import subprocess
 import sys
 from abc import abstractmethod
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from itertools import dropwhile, takewhile
 from pathlib import Path
 from setuptools import Extension, setup
@@ -446,7 +446,7 @@ class my_build_ext(build_ext):
             input=b"",
             stderr=subprocess.STDOUT,
         ).decode(errors="replace")
-        dirs = dropwhile(
+        dirs: Iterator[str] = dropwhile(
             lambda line: line != "#include <...> search starts here:",
             output.splitlines(),
         )
