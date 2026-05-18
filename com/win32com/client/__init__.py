@@ -8,14 +8,26 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Iterable
 from itertools import chain
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import pythoncom
 import pywintypes
 
 from . import dynamic, gencache
 
-_PyIDispatchType = pythoncom.TypeIIDs[pythoncom.IID_IDispatch]
+if TYPE_CHECKING:
+    from _win32typing import PyIDispatch
+    from typing_extensions import TypeAlias
+
+    _PyIDispatchType: TypeAlias = PyIDispatch
+    _T = TypeVar("_T")
+    _GoodObjectTuple: TypeAlias = tuple[
+        "_T | DispatchBaseClass | CDispatch | _GoodObjectTuple[_T]", ...
+    ]
+else:
+    _PyIDispatchType = pythoncom.TypeIIDs[pythoncom.IID_IDispatch]
 
 
 def __WrapDispatch(
@@ -24,7 +36,7 @@ def __WrapDispatch(
     resultCLSID=None,
     typeinfo=None,
     clsctx=pythoncom.CLSCTX_SERVER,
-    WrapperClass=None,
+    WrapperClass: type[CDispatch] | None = None,
 ):
     """
     Helper function to return a makepy generated class for a CLSID if it exists,
@@ -64,7 +76,7 @@ def GetObject(Pathname=None, Class=None, clsctx=None):
     ob = GetObject(r"c:\blah\blah\foo.xls") (aka the COM moniker syntax)
     will return a ready to use Python wrapping of the required COM object.
 
-    Note: You must specifiy one or the other of these arguments. I know
+    Note: You must specify one or the other of these arguments. I know
     this isn't pretty, but it is what VB does. Blech. If you don't
     I'll throw ValueError at you. :)
 
@@ -521,6 +533,11 @@ def register_record_class(cls):
 # The base of all makepy generated classes
 ############################################
 class DispatchBaseClass:
+    # Should be set by subclasses
+    _oleobj_: _PyIDispatchType
+    _prop_map_get_: dict[str, Iterable[Any]]
+    _prop_map_put_: dict[str, tuple[tuple[Any, ...], tuple[Any, ...]]]
+
     def __init__(self, oobj=None):
         if oobj is None:
             oobj = pythoncom.new(self.CLSID)
@@ -599,21 +616,64 @@ class DispatchBaseClass:
             raise AttributeError(f"'{self!r}' object has no attribute '{attr}'")
         self._oleobj_.Invoke(*(args + (value,) + defArgs))
 
-    def _get_good_single_object_(self, obj, obUserName=None, resultCLSID=None):
+    @overload
+    def _get_good_single_object_(
+        self, obj: _PyIDispatchType, obUserName=None, resultCLSID=None
+    ) -> DispatchBaseClass | CDispatch: ...
+    @overload
+    def _get_good_single_object_(
+        self, obj: _T, obUserName: object = None, resultCLSID: object = None
+    ) -> _T: ...
+    def _get_good_single_object_(self, obj: object, obUserName=None, resultCLSID=None):
         return _get_good_single_object_(obj, obUserName, resultCLSID)
 
+    @overload
+    def _get_good_object_(
+        self, obj: None, obUserName: object = None, resultCLSID: object = None
+    ) -> None: ...
+    @overload
+    def _get_good_object_(
+        self, obj: _GoodObjectTuple[_T], obUserName=None, resultCLSID=None
+    ) -> _GoodObjectTuple[_T]: ...
+    @overload
+    def _get_good_object_(
+        self, obj: _PyIDispatchType, obUserName=None, resultCLSID=None
+    ) -> DispatchBaseClass | CDispatch: ...
+    @overload
+    def _get_good_object_(self, obj: _T, obUserName=None, resultCLSID=None) -> _T: ...
     def _get_good_object_(self, obj, obUserName=None, resultCLSID=None):
         return _get_good_object_(obj, obUserName, resultCLSID)
 
 
 # XXX - These should be consolidated with dynamic.py versions.
-def _get_good_single_object_(obj, obUserName=None, resultCLSID=None):
+@overload
+def _get_good_single_object_(
+    obj: _PyIDispatchType, obUserName=None, resultCLSID=None
+) -> DispatchBaseClass | CDispatch: ...
+@overload
+def _get_good_single_object_(
+    obj: _T, obUserName: object = None, resultCLSID: object = None
+) -> _T: ...
+def _get_good_single_object_(obj: object, obUserName=None, resultCLSID=None):
     if isinstance(obj, _PyIDispatchType):
         return Dispatch(obj, obUserName, resultCLSID)
     return obj
 
-
-def _get_good_object_(obj, obUserName=None, resultCLSID=None):
+@overload
+def _get_good_object_(
+    obj: None, obUserName: object = None, resultCLSID: object = None
+) -> None: ...
+@overload
+def _get_good_object_(
+    obj: _GoodObjectTuple[_T], obUserName=None, resultCLSID=None
+) -> _GoodObjectTuple[_T]: ...
+@overload
+def _get_good_object_(
+    obj: _PyIDispatchType, obUserName=None, resultCLSID=None
+) -> DispatchBaseClass | CDispatch: ...
+@overload
+def _get_good_object_(obj: _T, obUserName=None, resultCLSID=None) -> _T: ...
+def _get_good_object_(obj, obUserName=None, resultCLSID=None):  # pyright: ignore[reportInconsistentOverload]
     if obj is None:
         return None
     elif isinstance(obj, tuple):
