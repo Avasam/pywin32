@@ -2038,7 +2038,7 @@ def expand_modules(module_dir: str | os.PathLike[str]):
 
 
 # NOTE: somewhat counter-intuitively, a result list a-la:
-#  [('Lib/site-packages/pythonwin', ('pythonwin/License.txt',)),]
+# [('Lib/site-packages/pythonwin', ('pythonwin/License.txt',)),]
 # will 'do the right thing' in terms of installing License.txt into
 # 'Lib/site-packages/pythonwin/License.txt'.  We exploit this to
 # get 'com/win32com/whatever' installed to 'win32com/whatever'
@@ -2054,13 +2054,13 @@ def convert_data_files(files: Iterable[str]):
                 if path.suffix != ".pyc"
             )
             if not files_use:
-                raise RuntimeError("No files match '%s'" % file)
+                raise RuntimeError(f"No files match '{file}'")
         else:
             if not os.path.isfile(file):
-                raise RuntimeError("No file '%s'" % file)
+                raise RuntimeError(f"No file '{file}'")
             files_use = (file,)
         for fname in files_use:
-            path_use = os.path.dirname(fname).removeprefix("com\\").removeprefix("com/")
+            path_use = os.path.dirname(fname).removeprefix(f"com{os.sep}")
             ret.append((path_use, (fname,)))
     return ret
 
@@ -2147,6 +2147,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Programming Language :: Python :: Implementation :: CPython",
 ]
 
