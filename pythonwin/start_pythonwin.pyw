@@ -7,7 +7,8 @@ import pywin.framework.intpyapp  # noqa: F401 # InteractivePythonApp()
 import win32ui
 
 # Pretend this script doesn't exist, or pythonwin tries to edit it
-sys.argv[:] = sys.argv[1:] or [""]  # like PySys_SetArgv(Ex)
+# like setting PyConfig.argv: drop script name, default to [""]
+sys.argv[:] = sys.argv[1:] or [""]
 if sys.path[0] not in ("", ".", os.getcwd()):
     sys.path.insert(0, os.getcwd())
 # And bootstrap the app.

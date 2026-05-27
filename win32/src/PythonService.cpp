@@ -563,23 +563,38 @@ static void PyService_InitPython()
     // knows how to get the .EXE name when it needs.
     int pyargc;
     WCHAR **pyargv = CommandLineToArgvW(GetCommandLineW(), &pyargc);
-    if (pyargv)
-        Py_SetProgramName(pyargv[0]);
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+    PyStatus status;
+    if (pyargv) {
+        status = PyConfig_SetString(&config, &config.program_name, pyargv[0]);
+        if (PyStatus_Exception(status)) {
+            PyConfig_Clear(&config);
+            Py_ExitStatusException(status);
+        }
+        // Notes about argv: When debugging a service, the argv is currently
+        // the *full* args, including the "-debug servicename" args.  This
+        // isn't ideal, but has been this way for a few builds, and a good
+        // fix isn't clear - should 'servicename' be presented in argv, even
+        // though it never is when running as a real service?
+        status = PyConfig_SetArgv(&config, pyargc, pyargv);
+        if (PyStatus_Exception(status)) {
+            PyConfig_Clear(&config);
+            Py_ExitStatusException(status);
+        }
+    }
 
 #ifdef BUILD_FREEZE
     PyInitFrozenExtensions();
 #endif
-    Py_Initialize();
+    status = Py_InitializeFromConfig(&config);
+    PyConfig_Clear(&config);
+    if (PyStatus_Exception(status))
+        Py_ExitStatusException(status);
 #ifdef BUILD_FREEZE
     PyWinFreeze_ExeInit();
 #endif
-    // Notes about argv: When debugging a service, the argv is currently
-    // the *full* args, including the "-debug servicename" args.  This
-    // isn't ideal, but has been this way for a few builds, and a good
-    // fix isn't clear - should 'servicename' be presented in argv, even
-    // though it never is when running as a real service?
-    if (pyargv)
-        PySys_SetArgv(pyargc, pyargv);
     PyInit_servicemanager();
     LocalFree(pyargv);
 }
@@ -1398,11 +1413,22 @@ int _tmain(int argc, TCHAR **argv)
     FARPROC proc;
     int dummy;
     wchar_t **program = CommandLineToArgvW(GetCommandLineW(), &dummy);
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+    PyStatus status;
     if (program != NULL) {
-        Py_SetProgramName(program[0]);
-        // do not free `program` since Py_SetProgramName does not copy it.
+        status = PyConfig_SetString(&config, &config.program_name, program[0]);
+        LocalFree(program);
+        if (PyStatus_Exception(status)) {
+            PyConfig_Clear(&config);
+            Py_ExitStatusException(status);
+        }
     }
-    Py_Initialize();
+    status = Py_InitializeFromConfig(&config);
+    PyConfig_Clear(&config);
+    if (PyStatus_Exception(status))
+        Py_ExitStatusException(status);
     module = PyImport_ImportModule("servicemanager");
     if (!module)
         goto failed;

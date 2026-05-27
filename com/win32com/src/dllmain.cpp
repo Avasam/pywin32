@@ -270,7 +270,22 @@ HRESULT DoRegisterUnregister(LPCSTR fileName, int argc, char **argv)
     PyCom_DLLAddRef();
     {  // A scope for _celp
         CEnterLeavePython _celp;
-        PySys_SetArgv(argc, __wargv);
+        PyObject *sysArgv = PyList_New(argc);
+        if (sysArgv) {
+            for (int i = 0; i < argc; i++) {
+                PyObject *item = PyUnicode_FromWideChar(__wargv[i], -1);
+                if (!item) {
+                    Py_DECREF(sysArgv);
+                    sysArgv = NULL;
+                    break;
+                }
+                PyList_SET_ITEM(sysArgv, i, item);
+            }
+            if (sysArgv) {
+                PySys_SetObject("argv", sysArgv);
+                Py_DECREF(sysArgv);
+            }
+        }
 
         if (PyRun_SimpleFile(fp, (char *)fileName) != 0) {
             // Convert the Python error to a HRESULT.

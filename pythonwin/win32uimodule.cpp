@@ -2564,7 +2564,22 @@ extern "C" PYW_EXPORT BOOL Win32uiApplicationInit(Win32uiHostGlue *pGlue, const 
         int myargc;
         LPWSTR *myargv = CommandLineToArgvW(GetCommandLineW(), &myargc);
         if (myargv) {
-            PySys_SetArgv(myargc - 1, myargv + 1);
+            PyObject *sysArgv = PyList_New(myargc - 1);
+            if (sysArgv) {
+                for (int i = 0; i < myargc - 1; i++) {
+                    PyObject *item = PyUnicode_FromWideChar(myargv[i + 1], -1);
+                    if (!item) {
+                        Py_DECREF(sysArgv);
+                        sysArgv = NULL;
+                        break;
+                    }
+                    PyList_SET_ITEM(sysArgv, i, item);
+                }
+                if (sysArgv) {
+                    PySys_SetObject("argv", sysArgv);
+                    Py_DECREF(sysArgv);
+                }
+            }
             LocalFree(myargv);
         }
     }
