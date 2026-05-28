@@ -72,6 +72,7 @@ venv.bak/
 .vagrant/
 # Not currently using a lock file
 uv.lock
+.python-version
 
 # other IDEs, MacOS, etc
 .idea/
