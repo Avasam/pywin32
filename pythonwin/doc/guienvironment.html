@@ -21,14 +21,14 @@
    the context, to try and decide what to do.
 </P>
 <P>If the line is recognised as a "block" (ie, the first line starts with
-   "&gt;&gt;&gt; ", and the rest start with "… "), it checks to see if we
+   "&gt;&gt;&gt; ", and the rest start with "â€¦ "), it checks to see if we
    are at the end of the window. If not, the block is copied to the end of
    the buffer - nothing is executed - enter must be pressed again to force
    execution.
 </P>
 <P>If we are at the end of the buffer, it <I>always</I> attempts to execute
    the line. If Python indicates "unexpected end of file", then it assumes
-   the block should continue, and emits the "… " for the next line.
+   the block should continue, and emits the "â€¦ " for the next line.
 </P>
 <P>If the line is recognised as part of a Python exception, then some special
    processing is done. If the line contains a filename and line number, it
