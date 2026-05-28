@@ -24,7 +24,7 @@ def NumPressed(Num):
 # Dynamically create handlers for all the decimal buttons.
 # (ie, this will dynamically create "One_OnClick()"... etc handlers
 for i in range(len(numberButNames)):
-	exec "def %s_OnClick():\tNumPressed(%d)\n" % (numberButNames[i],i)
+	exec(f"def {umberButNames[i]}_OnClick():\tNumPressed({i})\n")
 
 def Decimal_OnClick():
 	global curReadOut, FlagNewNum

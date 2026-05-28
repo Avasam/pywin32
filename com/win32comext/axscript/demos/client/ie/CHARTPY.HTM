@@ -75,10 +75,10 @@ def DoChartType(WhatType):
 # Turns horizontal gridlines on or off depending on value of chkHorizontal checkbox
 def DoHorizontalGrid():
     print(ax.chkHorizontal.Checked)
-		if ax.chkHorizontal.Checked:
-			ax.Chart1.HGridStyle = 1
-		else:
-			ax.Chart1.HGridStyle = 0
+    if ax.chkHorizontal.Checked:
+        ax.Chart1.HGridStyle = 1
+    else:
+        ax.Chart1.HGridStyle = 0
 
 # Sets the background of the chart to Opaque or Transparent
 def DoBackground(intBackGround):

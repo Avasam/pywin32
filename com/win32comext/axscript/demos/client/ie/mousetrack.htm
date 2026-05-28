@@ -18,7 +18,6 @@ TYPE="text" NAME="TxtLinkDescription" SIZE=50></FONT></TD></TR></TABLE>
 A mouse tracking demo.  Move the mouse over the image above...
 
 <SCRIPT Language="Python">
-<!--
 # Remember the last location clicked
 # print("here we go", 1)
 mx = my = 0
@@ -38,7 +37,7 @@ class rect:
        ax.TxtLinkDescription.Value = coords + " - " + self.desc
    def onclick(self):
        # print("click", self.desc)
-       ax.TxtLinkDescription.Value = coords +" click! " + `self.url`
+       ax.TxtLinkDescription.Value = coords +" click! " + "self.url"
        if self.url: ax.location = self.url
 
 blows = "Blows away "
@@ -54,7 +53,7 @@ default = rect(0,0,0,0,"Click on an icon","")
 
 def Image_MouseMove(s, b, x, y):
     global mx, my, coords
-    coords =`(x,y)`
+    coords ="(x,y)"
     # print(coords)
     mx, my = x, y
     for r in rects:
@@ -71,7 +70,6 @@ def Image_OnClick():
         if r.inside(mx,my):
            r.onclick()
            break
--->
 </SCRIPT>
 
 <P>
