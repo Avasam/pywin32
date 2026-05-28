@@ -86,6 +86,7 @@ I use the following format:
 <code>
 try:
   #win32net calls
+  ...
 except win32net.error:
   print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
 </code>

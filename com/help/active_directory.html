@@ -90,20 +90,20 @@ It gives you the raw ldap view of active directory.
 Note that it is not available for the Home edition of Windows.</p>
 <code>
 def discover():
-    Here is a function that helps you determine the active directory ldap strings that you can actually use.
+    #Here is a function that helps you determine the active directory ldap strings that you can actually use.
     #get base LDAP string
     ldap_loc=win32com.client.GetObject('LDAP://rootDSE').Get("defaultNamingContext")
     #container where users are put it, may be like:
     ldap_main_loc='OU=people,'+ldap_loc
 
-    Finding out about exchange, it is a bit more complicated.
+    #Finding out about exchange, it is a bit more complicated.
     #typical exchange string
     ex_loc='CN=Microsoft Exchange,CN=Services,CN=Configuration'
 
     #look for your exchange sites
     ex_sites=[]
     for i in win32com.client.GetObject('LDAP://'+ex_loc+','+ldap_loc):
-    if i.cn!='Active Directory Connections': ex_sites.append(i.cn)
+        if i.cn!='Active Directory Connections': ex_sites.append(i.cn)
 
     #get an exchange server
     ex_admin_grps='CN=Administrative Groups,cn='+ex_site+','+ex_loc+','+ldap_loc
@@ -147,7 +147,7 @@ print("groups=",opends("fred").memberOf)
 
 <code>
 def opends(loc,server=''):
-    '''automatically buoild ldap string and authenticate
+    '''automatically build ldap string and authenticate'''
     ldap=win32com.client.Dispatch('ADsNameSpaces').getobject("","LDAP:")
     ldap_main_loc='OU=people,DC=ad,DC=company,DC=state,DC=oh,DC=us'
     ldap_auth='CN=admin_account,'+ldap_main_loc
@@ -245,11 +245,11 @@ the time. The following is a function that returns the time in the
 typical format the python time libraries use (seconds since 1970).
 
 Here's an example where you'd use it:
-
+<code>
 user=opends('fred')
 
 print("time in seconds",conv_time(user.pwdLastSet.lowpart,user.pwdLastSet.highpart))
-
+</code>
 user.pwdLastSet returns a com object, not a python data type.
 
 <code>
@@ -258,7 +258,7 @@ def conv_time(l,h):
     #intervals which have passed since January 1, 1601.
     #This 64-bit value is split into the
     #two 32 bits  stored in the structure.
-    d=116444736000000000L #diference between 1601 and 1970
+    d=116444736000000000 #diference between 1601 and 1970
     #we divide by 10million to convert to seconds
     return (((long(h)<< 32) + long(l))-d)/10000000
 </code>

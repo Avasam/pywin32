@@ -122,12 +122,12 @@ following
 
 <p>
 <code>
-    def proclist(self):
-        try:
-            junk, instances = win32pdh.EnumObjectItems(None,None,self.object, win32pdh.PERF_DETAIL_WIZARD)
-            return instances
-        except:
-            raise COMException("Problem getting process list")
+def proclist(self):
+    try:
+        junk, instances = win32pdh.EnumObjectItems(None,None,self.object, win32pdh.PERF_DETAIL_WIZARD)
+        return instances
+    except:
+        raise COMException("Problem getting process list")
 </code>
 <p>
 The variable instances contains the list of processes, and you'll find the item or counter than we want
@@ -255,18 +255,18 @@ out the basic meanings and sequences of the win32 calls without having to deal w
 
 <p>
 <code>
-        for instance, max_instances in proc_dict.items():
-            for inum in xrange(max_instances+1):
-                try:
-                    hq = win32pdh.OpenQuery() # initializes the query handle
-                    path = win32pdh.MakeCounterPath( (None,self.object,instance, None, inum, self.item) )
-                    counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
-                    win32pdh.CollectQueryData(hq) #collects data for the counter
-                    type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
-                    proc_ids.append(instance+'\t'+str(val))
-                    win32pdh.CloseQuery(hq)
-                except:
-                    raise COMException("Problem getting process id")
+for instance, max_instances in proc_dict.items():
+    for inum in xrange(max_instances+1):
+        try:
+            hq = win32pdh.OpenQuery() # initializes the query handle
+            path = win32pdh.MakeCounterPath( (None,self.object,instance, None, inum, self.item) )
+            counter_handle=win32pdh.AddCounter(hq, path) #convert counter path to counter handle
+            win32pdh.CollectQueryData(hq) #collects data for the counter
+            type, val = win32pdh.GetFormattedCounterValue(counter_handle, win32pdh.PDH_FMT_LONG)
+            proc_ids.append(instance+'\t'+str(val))
+            win32pdh.CloseQuery(hq)
+        except:
+            raise COMException("Problem getting process id")
 </code>
 
 <p>
@@ -354,12 +354,12 @@ The Python COM client which will call the C++ COM object and Python COM object d
 </p>
 <p>
 <code>
-     import win32com.client
-     a=win32com.client.Dispatch('NtPerf.process') # C++ com object
-     print(a.procids())
+import win32com.client
+a=win32com.client.Dispatch('NtPerf.process') # C++ com object
+print(a.procids())
 
-     b=win32com.client.Dispatch('PyPerf.process') # python com object
-     print(b.procids())
+b=win32com.client.Dispatch('PyPerf.process') # python com object
+print(b.procids())
 </code>
 </p>
 <p>

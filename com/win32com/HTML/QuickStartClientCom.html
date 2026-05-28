@@ -75,7 +75,7 @@ o.Cells(1,1).Value = "Hello"</CODE> </P>
 <P>&lt;win32com.gen_py.Microsoft Word 8.0 Object Library._Application&gt;</P>
 </CODE><P>Note that now Python knows the explicit type of the object.</P>
 <H3><A NAME="UsingComConstants">Using COM Constants</A></H3>
-<P>Makepy automatically installs all generated constants from a type library in an object called <I>win32com.clients.constants</I>.  You do not need to do anything special to make these constants work, other than create the object itself (ie, in the example above, the constants relating to <I>Word</I> would automatically be available after the <CODE>w=win32com.client.Dispatch("Word.Application</CODE>") statement.</P>
+<P>Makepy automatically installs all generated constants from a type library in an object called <I>win32com.clients.constants</I>.  You do not need to do anything special to make these constants work, other than create the object itself (ie, in the example above, the constants relating to <I>Word</I> would automatically be available after the <CODE>w=win32com.client.Dispatch("Word.Application")</CODE> statement.</P>
 </CODE><P>For example, immediately after executing the code above, you could execute the following:</P>
 <CODE><P>&gt;&gt;&gt; w.WindowState = win32com.client.constants.wdWindowStateMinimize</P>
 </CODE><P>and Word will Minimize.</P></BODY>
