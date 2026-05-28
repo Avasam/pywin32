@@ -29,7 +29,9 @@ def _elem_tag_start(raw: str, elem) -> int:
     return sum(len(l) for l in lines[: elem.sourceline - 1]) + elem.sourcepos
 
 
-def replace_elem_content(raw: str, tag_start: int, tag_name: str, new_content: str) -> str:
+def replace_elem_content(
+    raw: str, tag_start: int, tag_name: str, new_content: str
+) -> str:
     inner_start = raw.index(">", tag_start) + 1
     inner_end = raw.lower().index(f"</{tag_name}>", inner_start)
     return raw[:inner_start] + new_content + raw[inner_end:]
@@ -87,7 +89,9 @@ for path in paths:
 
     if pending:
         print(f"Formatting {path}")
-        for tag_start, tag_name, formatted in sorted(pending, key=lambda x: x[0], reverse=True):
+        for tag_start, tag_name, formatted in sorted(
+            pending, key=lambda x: x[0], reverse=True
+        ):
             raw = replace_elem_content(raw, tag_start, tag_name, formatted)
         path.write_text(raw, encoding="utf-8")
 
