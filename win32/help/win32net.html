@@ -85,10 +85,12 @@ And finally, python's exception handling makes it convenient to catch win32net e
 I use the following format:
 <code>
 try:
-  #win32net calls
-  ...
+    # win32net calls
+    ...
 except win32net.error:
-  print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code>
 The traceback and sys modules are used to extract the error information.
 
@@ -131,23 +133,30 @@ the win32 call again.
 Now for some code:
 <code>
 def getusers(server):
-  res=1  #initially set it to true
-  pref=win32netcon.MAX_PREFERRED_LENGTH
-  level=0 #setting it to 1 will provide more detailed info
-  total_list=[]
-  try:
-    while res: #loop until res2
-      (user_list,total,res2)=win32net.NetWkstaUserEnum(server,level,res,pref)
-      for i in user_list:
-          total_list.append(i['username'])
-      res=res2
-      return total_list
-  except win32net.error:
-    print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
+    res = 1  # initially set it to true
+    pref = win32netcon.MAX_PREFERRED_LENGTH
+    level = 0  # setting it to 1 will provide more detailed info
+    total_list = []
+    try:
+        while res:  # loop until res2
+            (user_list, total, res2) = win32net.NetWkstaUserEnum(
+                server, level, res, pref
+            )
+            for i in user_list:
+                total_list.append(i["username"])
+            res = res2
+            return total_list
+    except win32net.error:
+        print(
+            traceback.format_tb(sys.exc_info()[2]),
+            "\n",
+            sys.exc_type,
+            "\n",
+            sys.exc_value,
+        )
 
-print(getusers(r'\\betty'))
 
-
+print(getusers(r"\\betty"))
 </code>
 
 <H3><A NAME="accounts">Listing all user accounts</A></H3>
@@ -161,27 +170,39 @@ described later gets the full_name for the login.
 
 <code>
 def getall_users(server):
-   'This functions returns a list of id and full_names on an NT server'
-   j=1
-   res=1
-   users=[]
-   user_list=[]
-   try:
-       while res:
-          (users,total,res) = win32net.NetUserEnum(server,3,win32netcon.FILTER_NORMAL_ACCOUNT,res,win32netcon.MAX_PREFERRED_LENGTH)
-          for i in users:
-             add=0
-             login=str(i['name'])
-             info_dict=win32net.NetUserGetInfo(server, login, 3)
-             full_name=str(info_dict['full_name'])
-             j=j+1
-             user_list.append(login+'\t'+full_name)
-       return user_list
-   except win32net.error:
-        print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
+    "This functions returns a list of id and full_names on an NT server"
+    j = 1
+    res = 1
+    users = []
+    user_list = []
+    try:
+        while res:
+            (users, total, res) = win32net.NetUserEnum(
+                server,
+                3,
+                win32netcon.FILTER_NORMAL_ACCOUNT,
+                res,
+                win32netcon.MAX_PREFERRED_LENGTH,
+            )
+            for i in users:
+                add = 0
+                login = str(i["name"])
+                info_dict = win32net.NetUserGetInfo(server, login, 3)
+                full_name = str(info_dict["full_name"])
+                j = j + 1
+                user_list.append(login + "\t" + full_name)
+        return user_list
+    except win32net.error:
+        print(
+            traceback.format_tb(sys.exc_info()[2]),
+            "\n",
+            sys.exc_type,
+            "\n",
+            sys.exc_value,
+        )
 
-print(getall_users(r'\\dino'))
 
+print(getall_users(r"\\dino"))
 </code>
 
 <H3><A NAME="machines">Listing all machines in Domain</A></H3> If you
@@ -192,23 +213,37 @@ win32netcon.SV_TYPE_DOMAIN_BAKCTRL, will single out backup domain
 controllers. Here we use SV_TYPE_ALL to get everything.
 
 <code>
-def getall_boxes(domain='',server=''):
-    res=1
-    wrk_lst=[]
+def getall_boxes(domain="", server=""):
+    res = 1
+    wrk_lst = []
     try:
-        while res: #loop until res2
-          (wrk_list2,total,res2)=win32net.NetServerEnum('',100,win32netcon.SV_TYPE_ALL,server,res,win32netcon.MAX_PREFERRED_LENGTH)
-          wrk_lst.extend(wrk_list2)
-          res=res2
+        while res:  # loop until res2
+            (wrk_list2, total, res2) = win32net.NetServerEnum(
+                "",
+                100,
+                win32netcon.SV_TYPE_ALL,
+                server,
+                res,
+                win32netcon.MAX_PREFERRED_LENGTH,
+            )
+            wrk_lst.extend(wrk_list2)
+            res = res2
     except win32net.error:
-        print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
+        print(
+            traceback.format_tb(sys.exc_info()[2]),
+            "\n",
+            sys.exc_type,
+            "\n",
+            sys.exc_value,
+        )
 
-    final_lst=[]
+    final_lst = []
     for i in wrk_lst:
-      final_lst.append(str(i['name']))
+        final_lst.append(str(i["name"]))
     return final_lst
 
-print(getall_boxes('bedrock',r'\\rubble'))
+
+print(getall_boxes("bedrock", r"\\rubble"))
 </code>
 
 <H3><A NAME="share">Creating a share</A></H3>
@@ -264,26 +299,26 @@ add a new share.
 import win32net
 import win32netcon
 
-shinfo={}
+shinfo = {}
 
-shinfo['netname']='python test'
-shinfo['type']=win32netcon.STYPE_DISKTREE
-shinfo['remark']='bedrock_rubbel'
-shinfo['permissions']=0
-shinfo['max_uses']=-1
-shinfo['current_uses']=0
-shinfo['path']='c:\\rubbel_share'
-shinfo['passwd']=''
-server='betty_server'
-
+shinfo["netname"] = "python test"
+shinfo["type"] = win32netcon.STYPE_DISKTREE
+shinfo["remark"] = "bedrock_rubbel"
+shinfo["permissions"] = 0
+shinfo["max_uses"] = -1
+shinfo["current_uses"] = 0
+shinfo["path"] = "c:\\rubbel_share"
+shinfo["passwd"] = ""
+server = "betty_server"
 
 
 try:
-  win32net.NetShareAdd(server,2,shinfo)
-  return "success"
+    win32net.NetShareAdd(server, 2, shinfo)
+    return "success"
 except win32net.error:
-  print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
-
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code>
 </p>
 <HR>
@@ -327,7 +362,7 @@ using USER_INFO_1008 that has no corresponding NetUserGetInfo.
 
 The python call looks like this:
 
-<code>NetUserSetInfo( server , username ,level , data )</code>
+<code>NetUserSetInfo(server, username, level, data)</code>
 
 For it the most interesting parts are server, level, and data.  Server
 is only interesting because the server name has to be prepended with
@@ -362,22 +397,24 @@ import sys
 import win32net
 import win32netcon
 
-domain="bedrock"
-login="slate"
+domain = "bedrock"
+login = "slate"
 
 try:
-    #get the server for the domain -- it has to be a primary dc
-    server=str(win32net.NetGetDCName("",domain))
-    #info returns a dictionary of information
+    # get the server for the domain -- it has to be a primary dc
+    server = str(win32net.NetGetDCName("", domain))
+    # info returns a dictionary of information
 
     info = win32net.NetUserGetInfo(server, login, 3)
-    print(info['full_name'])
-    info['full_name']="Mr. Slate"
-    win32net.NetUserSetInfo(server,login,3,info)
+    print(info["full_name"])
+    info["full_name"] = "Mr. Slate"
+    win32net.NetUserSetInfo(server, login, 3, info)
     info = win32net.NetUserGetInfo(server, login, 3)
-    print(info['full_name'])
+    print(info["full_name"])
 except win32net.error:
-    print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code>
 
 <H3><A NAME="password"></A>Changing password expiration</H3>
@@ -409,26 +446,28 @@ import sys
 import win32net
 import win32netcon
 
-domain="bedrock"
-login="slate"
+domain = "bedrock"
+login = "slate"
 
 try:
+    # get the server for the domain -- it has to be a primary dc
+    server = str(win32net.NetGetDCName("", domain))
 
-    #get the server for the domain -- it has to be a primary dc
-    server=str(win32net.NetGetDCName("",domain))
-
-    #Commented out here is a typical flag setting
-    #flag=win32netcon.UF_NORMAL_ACCOUNT|win32netcon.UF_SCRIPT|win32netcon.UF_DONT_EXPIRE_PASSWD
-    #however, if you want to preserve any non-standard flags then do the following
-    d=win32net.NetUserGetInfo(server,login,3) #get the current flags, note, I didn't use 1008 here!
-    flag=d['flags']| win32netcon.UF_DONT_EXPIRE_PASSWD  #this adds the flag
+    # Commented out here is a typical flag setting
+    # flag=win32netcon.UF_NORMAL_ACCOUNT|win32netcon.UF_SCRIPT|win32netcon.UF_DONT_EXPIRE_PASSWD
+    # however, if you want to preserve any non-standard flags then do the following
+    d = win32net.NetUserGetInfo(
+        server, login, 3
+    )  # get the current flags, note, I didn't use 1008 here!
+    flag = d["flags"] | win32netcon.UF_DONT_EXPIRE_PASSWD  # this adds the flag
     # flag=d['flags']& ~win32netcon.UF_DONT_EXPIRE_PASSWD  #this removes the flag
 
-    flag_dict={'flags':flag}
-    win32net.NetUserSetInfo(server,login,1008,flag_dict)
+    flag_dict = {"flags": flag}
+    win32net.NetUserSetInfo(server, login, 1008, flag_dict)
 except win32net.error:
-    print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
-
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code>
 </p>
 <p>

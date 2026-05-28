@@ -31,17 +31,11 @@ class HelloWorld:
 <P>This is obviously a very simple server. In particular, custom error handling would be needed for a production class server. In addition, there are some contrived properties just for demonstration purposes.</P>
 <H3>Make Unicode concessions</H3>
 <P>At this stage, Python and Unicode don't really work well together. All strings which come from COM will actually be Unicode objects rather than string objects.</P>
-<P>To make this code work in a COM environment, the last line of the "Hello" method must become:</P><DIR>
-<DIR>
-<DIR>
-<DIR>
+<P>To make this code work in a COM environment, the last line of the "Hello" method must become:</P>
 
-<CODE><P>return "Hello" + " " * self.softspace + str(who)</P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-</CODE><P>Note the conversion of the "who" to "str(who)". This forces the Unicode object into a native Python string object.</P>
+<CODE>return "Hello" + " " * self.softspace + str(who)</CODE>
+<P>Note the conversion of the "who" to "str(who)". This forces the Unicode object into a native Python string object.
+</P>
 <P>For details on how to debug COM Servers to find this sort of error, please see <A HREF="#debugging">debugging the class</A></P>
 <H3>Annotate the class with win32com specific attributes</H3>
 <P>This is not a complete list of names, simply a list of properties used by this sample.</P>
@@ -127,21 +121,28 @@ class HelloWorld:
 
 <P>Note there are quite a few other keys available. Also note that these annotations are <I>not</I> required - they just make registration simple. Helper functions in the module <CODE>win32com.server.register</CODE> allow you to explicitly specify each of these attributes without attaching them to the class.</P>
 <P>The header of our class now becomes:</P>
-<P><CODE>class HelloWorld:
+<P><CODE>
+class HelloWorld:
     _reg_clsid_ = "{7CC9F362-486D-11D1-BB48-0000E838A65F}"
     _reg_desc_ = "Python Test COM Server"
     _reg_progid_ = "Python.TestServer"
-    _public_methods_ = ['Hello']
+    _public_methods_ = ["Hello"]
     # [same from here]
 </CODE></P>
 <H4>Registering the Class</H4>
-<P>The idiom that most Python COM Servers use is that they register themselves when run as a script (ie, when executed from the command line.) Thus the standard "<CODE>if __name__=='__main___':...</CODE>" technique works well.</P>
+<P>The idiom that most Python COM Servers use is that they register themselves when run as a script (ie, when executed
+    from the command line.) Thus the standard "<CODE>
+if __name__ == "__main___":
+    ...
+</CODE>" technique works well.</P>
 <P>win32com.server.register contains a number of helper functions. The easiest to use is "<CODE>UseCommandLine</CODE>".</P>
 <P>Registration becomes as simple as:</P>
-<CODE><P>if __name__=='__main__':<BR>
-&#9;# ni only for 1.4!<BR>
-&#9;import ni, win32com.server.register <BR>
-&#9;win32com.server.register.UseCommandLine(HelloWorld)</P>
+<CODE>
+if __name__ == "__main__":
+    # ni only for 1.4!
+    import ni, win32com.server.register
+
+    win32com.server.register.UseCommandLine(HelloWorld)
 </CODE><P>Running the script will register our test server.</P>
 <H2><A NAME="testing">Testing our Class</A></H2>
 <P>For the purposes of this demonstration, we will test the class using Visual Basic. This code should run under any version of Visual Basic, including VBA found in Microsoft Office. Any COM compliant package could be used alternatively. VB has been used just to prove there is no "smoke and mirrors. For information on how to test the server using Python, please see the <A HREF="QuickStartClientCom.html">Quick Start to Client side COM</A> documentation.</P>
@@ -149,15 +150,23 @@ class HelloWorld:
 <H2><A NAME="debugging">Debugging the COM Server</A></H2>
 <P>When things go wrong in COM Servers, there is often nowhere useful for the Python traceback to go, even if such a traceback is generated.</P>
 <P>Rather than discuss how it works, I will just present the procedure to debug your server:</P>
-<B><P>To register a debug version of your class</B>, run the script (as above) but pass in a "<CODE>--debug</CODE>" parameter. Eg, for the server above, use the command line "<CODE>testcomserver.py --debug</CODE>".</P>
+<B>
+    <P>To register a debug version of your class
+</B>, run the script (as above) but pass in a "<CODE>--debug</CODE>" parameter. Eg, for the server above, use the
+command line "<CODE>testcomserver.py - -debug</CODE>".</P>
 <B><P>To see the debug output generated</B> (and any print statements you may choose to add!) you can simply select the "Remote Debug Trace Collector" from the Pythonwin Tools menu, or run the script "win32traceutil.py" from Windows Explorer or a Command Prompt.</P>
 <H2><A NAME="Exception">Exception Handling </A></H2>
 <P>Servers need to be able to provide exception information to their client. In some cases, it may be a simple return code (such as E_NOTIMPLEMENTED), but often it can contain much richer information, describing the error on detail, and even a help file and topic where more information can be found. </P>
 <P>We use Python class based exceptions to provide this information. The COM framework will examine the exception, and look for certain known attributes. These attributes will be copied across to the COM exception, and passed back to the client. </P>
 <P>The following attributes are supported, and correspond to the equivalent entry in the COM Exception structure:<BR>
-<CODE>scode, code, description, source, helpfile and helpcontext</P>
-</CODE><P>To make working with exceptions easier, there is a helper module "win32com.server.exception.py", which defines a single class. An example of its usage would be: </P>
-<CODE><P>raise COMException(desc="Must be a string",scode=winerror.E_INVALIDARG,helpfile="myhelp.hlp",**...)</CODE> </P>
+<CODE>scode, code, description, source, helpfile and helpcontext</CODE>
+<P>To make working with exceptions easier, there is a helper module "win32com.server.exception.py", which defines a
+    single class. An example of its usage would be: </P>
+<CODE>
+raise COMException(
+    desc="Must be a string", scode=winerror.E_INVALIDARG, helpfile="myhelp.hlp", **...
+)
+</CODE> </P>
 <P>(Note the <CODE>COMException</CODE> class supports (and translates) "desc" as a shortcut for "description", but the framework requires "description")</P>
 </CODE><H2><A NAME="Policies">Server Policies</A></H2>
 <P>This is information about how it all hangs together. The casual COM author need not know this. </P>

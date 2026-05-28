@@ -3,69 +3,90 @@
 <BODY><FONT FACE=ARIAL SIZE=3> <!-- global default -->
 <SCRIPT LANGUAGE="Python">
 # globals
-Accum = 0.0	  # Previous number (operand) awaiting operation
-FlagNewNum = 1    # Flag to indicate a new number (operand) is being entered
-NullOp = lambda x,y: y
-PendingOp = NullOp# Pending operation waiting for completion of second operand
-numberButNames = ['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine']
+Accum = 0.0  # Previous number (operand) awaiting operation
+FlagNewNum = 1  # Flag to indicate a new number (operand) is being entered
+NullOp = lambda x, y: y
+PendingOp = NullOp  # Pending operation waiting for completion of second operand
+numberButNames = [
+    "Zero",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+]
+
 
 def NumPressed(Num):
-	print("NumPressed", Num)
-	global FlagNewNum
-	if FlagNewNum:
-		ax.document.Keypad.ReadOut.Value = Num
-		FlagNewNum = None
-	else:
-		if ax.document.Keypad.ReadOut.Value == "0":
-			ax.document.Keypad.ReadOut.Value = str(Num)
-		else:
-			ax.document.Keypad.ReadOut.Value= ax.document.Keypad.ReadOut.Value + str(Num)
+    print("NumPressed", Num)
+    global FlagNewNum
+    if FlagNewNum:
+        ax.document.Keypad.ReadOut.Value = Num
+        FlagNewNum = None
+    else:
+        if ax.document.Keypad.ReadOut.Value == "0":
+            ax.document.Keypad.ReadOut.Value = str(Num)
+        else:
+            ax.document.Keypad.ReadOut.Value = ax.document.Keypad.ReadOut.Value + str(
+                Num
+            )
+
 
 # Dynamically create handlers for all the decimal buttons.
 # (ie, this will dynamically create "One_OnClick()"... etc handlers
 for i in range(len(numberButNames)):
-	exec(f"def {umberButNames[i]}_OnClick():\tNumPressed({i})\n")
+    exec(f"def {umberButNames[i]}_OnClick():\tNumPressed({i})\n")
+
 
 def Decimal_OnClick():
-	global curReadOut, FlagNewNum
-	curReadOut = ax.document.Keypad.ReadOut.Value
-	if FlagNewNum:
-		curReadOut = "0."
-		FlagNewNum = None
-	else:
-		if not ("." in curReadOut):
-			curReadOut = curReadOut + "."
-	ax.document.Keypad.ReadOut.Value = curReadOut
+    global curReadOut, FlagNewNum
+    curReadOut = ax.document.Keypad.ReadOut.Value
+    if FlagNewNum:
+        curReadOut = "0."
+        FlagNewNum = None
+    else:
+        if not ("." in curReadOut):
+            curReadOut = curReadOut + "."
+    ax.document.Keypad.ReadOut.Value = curReadOut
+
 
 import sys, string
 
+
 def Operation(Op, fn):
-	global FlagNewNum, PendingOp, Accum
-	ReadOut = ax.document.Keypad.ReadOut.Value
-	print("Operation", Op, ReadOut, PendingOp, Accum)
-	if FlagNewNum:
-		# User is hitting op keys repeatedly, so don't do anything
-		PendingOp = NullOp
-	else:
-		FlagNewNum = 1
-		Accum = PendingOp( Accum, float(ReadOut) )
-	ax.document.Keypad.ReadOut.Value = str(Accum)
-	PendingOp = fn
+    global FlagNewNum, PendingOp, Accum
+    ReadOut = ax.document.Keypad.ReadOut.Value
+    print("Operation", Op, ReadOut, PendingOp, Accum)
+    if FlagNewNum:
+        # User is hitting op keys repeatedly, so don't do anything
+        PendingOp = NullOp
+    else:
+        FlagNewNum = 1
+        Accum = PendingOp(Accum, float(ReadOut))
+    ax.document.Keypad.ReadOut.Value = str(Accum)
+    PendingOp = fn
+
 
 def ClearEntry_OnClick():
-	# Remove current number and reset state
-	global FlagNewNum
-	ax.document.Keypad.ReadOut.Value = "0"
-	FlagNewNum = 1
+    # Remove current number and reset state
+    global FlagNewNum
+    ax.document.Keypad.ReadOut.Value = "0"
+    FlagNewNum = 1
+
 
 def Clear_OnClick():
-	global Accum, PendingOp
-	Accum = 0
-	PendingOp = NullOp
-	ClearEntry_OnClick()
+    global Accum, PendingOp
+    Accum = 0
+    PendingOp = NullOp
+    ClearEntry_OnClick()
+
 
 def Neg_OnClick():
-	ax.document.Keypad.ReadOut.Value = str(-float(ax.document.Keypad.ReadOut.Value))
+    ax.document.Keypad.ReadOut.Value = str(-float(ax.document.Keypad.ReadOut.Value))
 </SCRIPT>
 
 
