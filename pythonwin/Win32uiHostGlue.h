@@ -5,7 +5,7 @@
 // be in synch!  Use a version number to check this.
 #define WIN32UIHOSTGLUE_VERSION 3
 
-#include "pywintypes.h"
+#include "PyWinTypes.h"
 
 class Win32uiHostGlue : public CObject {
    public:
@@ -22,7 +22,7 @@ class Win32uiHostGlue : public CObject {
     virtual void SetStatusText(const TCHAR * /*cmd*/, int /*bForce*/) { return; }
     // Helper class, to register _any_ HMODULE as a module name.
     // This allows modules built into .EXE's, or in differently
-    // named DLL's etc.  This requires admin priveliges on some machines, so
+    // named DLL's etc.  This requires admin privileges on some machines, so
     // a program should not refuse to start if this fails, but calling it
     // each time means the app is guaranteed to work when moved.
     // REMOVED - See below!!!
@@ -119,8 +119,8 @@ inline BOOL Win32uiHostGlue::DynamicApplicationInit(const TCHAR *cmd, const TCHA
     HMODULE hModCore = NULL;
     HMODULE hModWin32ui = NULL;
     // There are 2 cases we care about:
-    // * pythonwin.exe next to win32ui, in lib\site-packages\pythonwin
-    // * pythonwin.exe next to python.exe, in sys.home - this is for
+    // * Pythonwin.exe next to win32ui, in lib\site-packages\pythonwin
+    // * Pythonwin.exe next to python.exe, in sys.home - this is for
     //   older style installs and for custom layouts.
     // * a kind-of sub-case - handle the PCBuild directory
     TCHAR *py_dll_candidates[] = {
