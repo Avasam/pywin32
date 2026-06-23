@@ -2,12 +2,21 @@
 #include "sal.h"
 
 // Must include before MAPIX.h, which includes mapidefs.h and mapicode.h.
-// Because of casing that will import from MinGW shared headers instead,
+// Because of casing that will import from mingw shared headers instead,
 // Which actually has some differences in param types, causing build failures
 #include <MAPIDefS.h>
 #include <MAPICode.h>
 
-#include "MAPIX.h"
+// PythonCOM.h includes <initguid.h> which sets INITGUID before PyMAPIUtil.h is
+// processed. MAPIGuid.h only declares an IID when (!INITGUID || USES_IID_<name>),
+// and its MAPIGUID_H guard fires under INITGUID, blocking later re-inclusion via
+// mapiguids.cpp. Define all USES_IID_* here so every IID is declared on first pass.
+#include "mapiiids.h"
+#include <MAPIGuid.h>
+#include <MAPIAux.h>
+#include <MAPITags.h>
+
+#include <MAPIX.h>
 
 // We should not be using this!
 #define OleSetOleError PyCom_BuildPyException

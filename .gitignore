@@ -46,6 +46,7 @@ com/win32comext/mapi/src/*.cpp
 !com/win32comext/mapi/src/mapiStubLibrary.cpp
 !com/win32comext/mapi/src/PyIMAPIAdviseSink.cpp
 !com/win32comext/mapi/src/exchangeguids.cpp
+!com/win32comext/mapi/src/mapiStubLibrary.cpp
 com/win32comext/mapi/src/Py*.h
 !com/win32comext/mapi/src/PyIMAPIAdviseSink.h
 !com/win32comext/mapi/src/PyMAPIUtil.h
@@ -57,6 +58,9 @@ win32/src/PythonServiceMessages.h
 win32/src/win32service_messages.h
 win32/src/win32evtlog_messages.h
 isapi/src/pyISAPI_messages.h
+
+# Scintilla build output
+pythonwin/Scintilla/win32/*.o
 
 # Eclipse + PyDev
 .project
