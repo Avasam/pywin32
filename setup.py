@@ -334,8 +334,6 @@ class WinExt_win32com_mapi(WinExt_win32com):
         # Additional utility functions are only available for 32-bit builds.
         if not platform.machine() in ("AMD64", "ARM64", "x86_64"):
             libs += " version user32 advapi32 Ex2KSdk sadapi netapi32"
-        if not is_mingw:
-            libs += " legacy_stdio_definitions"
         kw["libraries"] = libs
         super().__init__(name, **kw)
 
