@@ -46,7 +46,6 @@ com/win32comext/mapi/src/*.cpp
 !com/win32comext/mapi/src/mapiStubLibrary.cpp
 !com/win32comext/mapi/src/PyIMAPIAdviseSink.cpp
 !com/win32comext/mapi/src/exchangeguids.cpp
-!com/win32comext/mapi/src/mapiStubLibrary.cpp
 com/win32comext/mapi/src/Py*.h
 !com/win32comext/mapi/src/PyIMAPIAdviseSink.h
 !com/win32comext/mapi/src/PyMAPIUtil.h
