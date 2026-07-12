@@ -5,16 +5,10 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 selectors = [
-    ('script[language="Python"]', True),
-    ("pre>code", False),
+    ('script[language="Python"]'),
+    ('code[lang="python"]'),
+    ("pre>code:not([lang])"),
 ]
-
-acceptable_ruff_format_errors = {
-    "Expected a newline after line continuation character",
-    "Expected a statement",
-    "Simple statements must be separated by newlines or semicolons",
-    "Expected an expression",
-}
 
 paths = [
     *Path(".").rglob("*.html"),
@@ -50,7 +44,7 @@ for path in paths:
     soup = BeautifulSoup(raw, "html.parser")
     pending: list[tuple[int, str, str]] = []  # (tag_start, tag_name, formatted)
 
-    for selector, strict in selectors:
+    for selector in selectors:
         for elem in soup.select(selector):
             text = elem.get_text()
             if ">>>" in text:
@@ -67,22 +61,19 @@ for path in paths:
             if proc.returncode != 0:
                 stderr = proc.stderr.strip()
                 error_message = stderr.split(": ", 2)[-1]
-                if strict or error_message not in acceptable_ruff_format_errors:
-                    color = "\033[31m"
-                    returncode = max(returncode, proc.returncode)
-                else:
-                    color = "\033[33m"
-                    stderr = stderr.replace("error: ", "warning: ", 1)
+                returncode = max(returncode, proc.returncode)
                 print(
-                    f"{color}{path}:{elem.sourceline}:{elem.sourcepos}: {stderr}\033[0m",
+                    f"\033[31m{path}:{elem.sourceline}:{elem.sourcepos}: {stderr}\033[0m",
                     file=sys.stderr,
                 )
                 continue
 
             formatted = proc.stdout.strip()
             if "\n" in formatted:
-                # Multi-line: add surrounding newlines so tags are on their own line
-                formatted = f"\n{proc.stdout.strip()}\n"
+                # Single-line: Keep tags on the same line
+                # Multi-line: add trailing newline so tags end on their own line
+                # Do not add preceding newline as it'll get rendered in <pre>
+                formatted = f"{proc.stdout.strip()}\n"
 
             if formatted != text:
                 pending.append((_elem_tag_start(raw, elem), elem.name, formatted))

@@ -88,8 +88,7 @@ A tool that can be of a great help is the ADSI Edit MMC snap-in, aka <b>ADSIEdit
 >Remote Server Administration Tools for Windows 10</a> for installation instructions.
 It gives you the raw ldap view of active directory.
 Note that it is not available for the Home edition of Windows.</p>
-<pre><code>
-def discover():
+<pre><code>def discover():
     # Here is a function that helps you determine the active directory ldap strings that you can actually use.
     # get base LDAP string
     ldap_loc = win32com.client.GetObject("LDAP://rootDSE").Get("defaultNamingContext")
@@ -151,8 +150,7 @@ or to get the groups fred is a member of
 <br>
 print("groups=",opends("fred").memberOf)
 
-<pre><code>
-def opends(loc, server=""):
+<pre><code>def opends(loc, server=""):
     """automatically buoild ldap string and authenticate"""
     ldap = win32com.client.Dispatch("ADsNameSpaces").getobject("", "LDAP:")
     ldap_main_loc = "OU=people,DC=ad,DC=company,DC=state,DC=oh,DC=us"
@@ -187,8 +185,7 @@ library.
 <p>
 You would use ad_dict like a normal python dictionary.
 <br>
-<pre><code>
-for i in ad_dict("fred").items():
+<pre><code>for i in ad_dict("fred").items():
     print(i)
 </code></pre>
 <br>
@@ -196,8 +193,7 @@ A lot of things convert to automatic python data types. For others, you'll get s
 COMObject. You need to do specific processing, like the one done for
 pwdLastSet below, to extract data from them.
 
-<pre><code>
-def ad_dict(ldapobj, attr_dict={}, recurse=0, auth=1, filter=()):
+<pre><code>def ad_dict(ldapobj, attr_dict={}, recurse=0, auth=1, filter=()):
     if ldapobj.find(",") == -1:
         ldapobj = "cn=" + ldapobj + "," + Ad.ldap_main_loc
     if auth:  # setup authenticated connections
@@ -267,22 +263,20 @@ the time. The following is a function that returns the time in the
 typical format the python time libraries use (seconds since 1970).
 
 Here's an example where you'd use it:
-<code>
-user = opends("fred")
+<code>user = opends("fred")
 
 print("time in seconds", conv_time(user.pwdLastSet.lowpart, user.pwdLastSet.highpart))
 </code>
 user.pwdLastSet returns a com object, not a python data type.
 
-<pre><code>
-def conv_time(l,h):
-    #converts 64-bit integer specifying the number of 100-nanosecond
-    #intervals which have passed since January 1, 1601.
-    #This 64-bit value is split into the
-    #two 32 bits  stored in the structure.
-    d=116444736000000000L #diference between 1601 and 1970
-    #we divide by 10million to convert to seconds
-    return (((long(h)<< 32) + long(l))-d)/10000000
+<pre><code>def conv_time(l, h):
+    # converts 64-bit integer specifying the number of 100-nanosecond
+    # intervals which have passed since January 1, 1601.
+    # This 64-bit value is split into the
+    # two 32 bits  stored in the structure.
+    d = 116444736000000000  # diference between 1601 and 1970
+    # we divide by 10million to convert to seconds
+    return (((long(h) << 32) + long(l)) - d) / 10000000
 </code></pre>
 
 <hr>

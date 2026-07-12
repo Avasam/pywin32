@@ -118,8 +118,7 @@ The ex_path in the above example specifies the resource you are trying to access
 <hr>
 <h2><A NAME="User">User Account Management</A></h2>
 <h3><a name="add">Adding a user to exchange</A></h3>
-<pre><code>
-# Adding a new account to exchange is simple except for one thing.
+<pre><code># Adding a new account to exchange is simple except for one thing.
 # You need to associate an NT account with an exchange account.
 # To do so at this point requires some c++ to produce some hex SID
 # and trustee information that adsi can use.
@@ -148,8 +147,7 @@ newobj.SetInfo
 
 <h3><a name="get">Getting/Modify user info</a></h3>
 
-<pre><code>
-ex_path = "LDAP://server/cn=fredflint,cn=Recipients,ou=rubble,o=bedrock"
+<pre><code>ex_path = "LDAP://server/cn=fredflint,cn=Recipients,ou=rubble,o=bedrock"
 myDSObject = ldap.OpenDSObject(ex_path, logon_ex, password, 0)
 myDSObject.Getinfo()
 # To access a user's data try:
@@ -166,8 +164,7 @@ Comments
 
 <h3><a name="delete">Deleting a user from exchange</a></h3>
 
-<pre><code>
-# Here we connect to Recipients and then
+<pre><code># Here we connect to Recipients and then
 # delete a user
 # This is a more complete example.
 # data is a dictionary that contains info
@@ -205,8 +202,7 @@ except:
 
 <h3><a name="dadd">Adding to a distribution list</a></h3>
 
-<pre><code>
-# I used putex instead of put because it has more options
+<pre><code># I used putex instead of put because it has more options
 # The '3' value means append. The SDK has specific info on it
 ex_list_path = (
     "LDAP://" + server + "/cn=" + list + ",cn=Recipients,ou=" + ou + ",o=" + o
@@ -221,8 +217,7 @@ dsobj.SetInfo()
 
 <h3><a name="dlist"></A>Recursively listing all unique members of a distribution list</h3>
 
-<pre><code>
-# This function looks for all Organizational persons to add to a dictionary
+<pre><code># This function looks for all Organizational persons to add to a dictionary
 # If it gets a groupOfNames, it needs to parse that and call the function again
 # to get the members of the groupOfNames
 def getmembers(path=""):

@@ -292,8 +292,7 @@ svg.gh-md-to-html-formula {fill: black;}
 <li>GUID of the COM Record in this Type Library</li>
 </ul>
 <p>An instance of the COM Record is created with <code>pythoncom.GetRecordFromGuids</code>, e.g.:</p>
-<pre><code>
-import pythoncom
+<pre><code>import pythoncom
 
 PyCOMTestLib_GUID = "{6bcdcb60-5605-11d0-ae5f-cadd4c000000}"
 MAJVER = 1
@@ -313,8 +312,7 @@ record1 = pythoncom.GetRecordFromGuids(
 <p>Instances of <code>&lt;class 'com_record'&gt;</code> can be used as method parameters and are returned by COM methods that return a COM Record. However, it is not possible to differentiate the COM Record Types, i.e. COM Records of different GUID at runtime.</p>
 <div class="markdown-heading"><h2 class="heading-element">Early-bound objects</h2><a aria-label="Permalink: Early-bound objects" class="anchor" href="#user-content-early-bound-objects" id="user-content-early-bound-objects" name="user-content-early-bound-objects"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
 <p>The availability of makepy-support does in its basic form offer the convenience function <code>win32com.client.Record</code> to create COM Record instances using the COM Record name from the Type Library and an interface object of the same Type Library:</p>
-<pre><code>
-import win32com.client
+<pre><code>import win32com.client
 
 com_test = win32com.client.Dispatch("PyCOMTest.PyCOMTest")
 
@@ -336,8 +334,7 @@ record1 = win32com.client.Record("TestStruct1", com_test)
 <li>GUID  : The GUID of the COM Record as a string</li>
 </ul>
 <p>with GUID strings in {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} notation, e.g.:</p>
-<pre><code>
-import pythoncom
+<pre><code>import pythoncom
 
 
 class TestStruct1(pythoncom.com_record):
@@ -348,8 +345,7 @@ class TestStruct1(pythoncom.com_record):
     GUID = "{7a4ce6a7-7959-4e85-a3c0-b41442ff0f67}"
 </code></pre>
 <p>Before this subclass can be used to create <em>TestStruct1</em> instances, it has to be registered with <code>win32com.client.register_record_class</code>, e.g.:</p>
-<pre><code>
-from win32com.client import register_record_class
+<pre><code>from win32com.client import register_record_class
 
 register_record_class(TestStruct1)
 </code></pre>

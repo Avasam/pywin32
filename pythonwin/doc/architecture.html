@@ -47,7 +47,7 @@
 <PRE><CODE><P>&gt;&gt;&gt; d._obj_
 object 'PyCDialog' - assoc is 002F3278, vf=True, ch=0, mh=2, kh=0
 &gt;&gt;&gt;
-</CODE></PRE>This output shows the C++ CDialog object is at address <CODE> 0x002F3278</CODE>, that there is a virtual function handler (i.e., the class instance "d"), that 2 messages have hooks, and no command or keyboard handlers are installed. </P>
+</CODE></PRE>This output shows the C++ CDialog object is at address <CODE>0x002F3278</CODE>, that there is a virtual function handler (i.e., the class instance "d"), that 2 messages have hooks, and no command or keyboard handlers are installed. </P>
 <P>Even though the DoModal() method is implemented in the underlying win32ui type, the class object can be used just like the win32ui object. Thus: </P>
 <PRE><CODE>&gt;&gt;&gt; d.DoModal()
 1

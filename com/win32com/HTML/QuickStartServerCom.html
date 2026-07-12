@@ -17,8 +17,7 @@
 <P>In this document we discuss the <A HREF="#core">core functionality</A>, <A HREF="#Registering">registering the server</A>, <A HREF="#testing">testing the class</A>, <A HREF="#debugging">debugging the class</A>, <A HREF="#Exception">exception handling</A> and <A HREF="#Policies">server policies</A> (phew!)</P>
 <H2><A NAME="core">Implement the core functionality</A></H2>
 <H3><A NAME="Using">Implement a stand-alone Python class with your functionality</A></H3>
-<PRE><CODE>
-class HelloWorld:
+<PRE><CODE>class HelloWorld:
     def __init__(self):
         self.softspace = 1
         self.noCalls = 0
@@ -61,8 +60,7 @@ class HelloWorld:
 </TABLE>
 
 <P>We change the class header to become:</P>
-<PRE><CODE>
-class HelloWorld:
+<PRE><CODE>class HelloWorld:
     _public_methods_ = ["Hello"]
     _public_attrs_ = ["softspace", "noCalls"]
     _readonly_attrs_ = ["noCalls"]
@@ -119,8 +117,7 @@ class HelloWorld:
 
 <P>Note there are quite a few other keys available. Also note that these annotations are <I>not</I> required - they just make registration simple. Helper functions in the module <CODE>win32com.server.register</CODE> allow you to explicitly specify each of these attributes without attaching them to the class.</P>
 <P>The header of our class now becomes:</P>
-<PRE><CODE>
-class HelloWorld:
+<PRE><CODE>class HelloWorld:
     _reg_clsid_ = "{7CC9F362-486D-11D1-BB48-0000E838A65F}"
     _reg_desc_ = "Python Test COM Server"
     _reg_progid_ = "Python.TestServer"
@@ -131,8 +128,7 @@ class HelloWorld:
 <P>The idiom that most Python COM Servers use is that they register themselves when run as a script (ie, when executed from the command line.) Thus the standard "<CODE>if __name__=='__main___':</CODE>" technique works well.</P>
 <P>win32com.server.register contains a number of helper functions. The easiest to use is "<CODE>UseCommandLine</CODE>".</P>
 <P>Registration becomes as simple as:</P>
-<PRE><CODE>
-if __name__ == "__main__":
+<PRE><CODE>if __name__ == "__main__":
     # ni only for 1.4!
     import ni, win32com.server.register
 
@@ -156,8 +152,7 @@ command line "<CODE>testcomserver.py - -debug</CODE>".</P>
 <P>The following attributes are supported, and correspond to the equivalent entry in the COM Exception structure:<BR>
 <CODE>scode, code, description, source, helpfile and helpcontext</CODE></P>
 <P>To make working with exceptions easier, there is a helper module "win32com.server.exception.py", which defines a single class. An example of its usage would be: </P>
-<PRE><CODE>
-raise COMException(
+<PRE><CODE>raise COMException(
     desc="Must be a string", scode=winerror.E_INVALIDARG, helpfile="myhelp.hlp", **...
 )
 </CODE></PRE>

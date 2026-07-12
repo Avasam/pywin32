@@ -29,7 +29,7 @@
   classes, and at certain key points in your CWinApp derived class, call the appropriate methods. You may choose to
   provide your own glue class derived from Win32uiHostGlue in certain cases. </P>
 <P>Below is an example class, which overrides the "SetStatusText" method, so that status information displays in the applications status bar (this is only necessary if your application has a "non standard" status bar - normally you could omit this.). </P>
-<PRE><CODE>GameApp NEAR theApp; // My existing CWinApp derived class.
+<PRE><CODE LANG="cpp">GameApp NEAR theApp; // My existing CWinApp derived class.
 // HostGlue class.
 
 class GameHostGlue : public Win32uiHostGlue
@@ -45,7 +45,7 @@ GameHostGlue NEAR glue; </CODE></PRE>
 <H3>Delegating to win32uiHostGlue</H3>
 <P>You need to either implement, or modify, certain key methods of your Application object. Probably the most important is the call to initialise win32ui. You need to modify your CWinApp::InitInstance method (it is almost certain you already have one). The following code needs to be executed in this method: </P>
 <H4>InitInstance</H4>
-<PRE><CODE>BOOL GameApp::InitInstance()
+<PRE><CODE LANG="cpp">BOOL GameApp::InitInstance()
 {
 ...
   if (!glue.DynamicApplicationInit("import initscore", csScripts)) {
@@ -63,7 +63,7 @@ GameHostGlue NEAR glue; </CODE></PRE>
 
 <H4>And the Rest</H4>
 <P>Below is the rest of the code you need to implement. You may need to create these methods, as the AppWizard generated MFC application does not have some. </P>
-<PRE><CODE>BOOL
+<PRE><CODE LANG="cpp">BOOL
 GameApp::OnCmdMsg (UINT nID, int nCode,
 void* pExtra, AFX_CMDHANDLERINFO*pHandlerInfo)
 {
@@ -93,8 +93,7 @@ BOOL GameApp::OnIdle( LONG lCount )
 <H3><LI>initscore.py</LI></H3>
 <LI>Below is the code for initscore.py. Obviously your code will vary, depending on your requirements. </LI></UL>
 
-<PRE><CODE>
-import sys
+<PRE><CODE>import sys
 import win32ui
 # First step - redirect python output to the debugging device, until we
 # can create a window to capture it.

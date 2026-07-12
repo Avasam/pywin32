@@ -83,8 +83,7 @@ r'\\rubble'.
 <p>
 And finally, python's exception handling makes it convenient to catch win32net errors.
 I use the following format:
-<pre><code>
-try:
+<pre><code>try:
     # win32net calls
     ...
 except win32net.error:
@@ -106,7 +105,7 @@ The traceback and sys modules are used to extract the error information.
 need to use NetWkstaUserEnum api call.
 
 In c++ the call looks like this: |
-<pre><code>
+<pre><code lang="cpp">
 NET_API_STATUS NetWkstaUserEnum(
   LPWSTR servername,
   DWORD level,
@@ -131,8 +130,7 @@ returned which trivial to parse and if resumeHandle is true you make
 the win32 call again.
 
 Now for some code:
-<pre><code>
-def getusers(server):
+<pre><code>def getusers(server):
     res = 1  # initially set it to true
     pref = win32netcon.MAX_PREFERRED_LENGTH
     level = 0  # setting it to 1 will provide more detailed info
@@ -165,8 +163,7 @@ can look for. In this case, we use the constant in win32netcon to look
 for 'normal' accounts. Another win32net function, NetUserGetInfo
 described later gets the full_name for the login.
 
-<pre><code>
-def getall_users(server):
+<pre><code>def getall_users(server):
     "This functions returns a list of id and full_names on an NT server"
     j = 1
     res = 1
@@ -206,8 +203,7 @@ for different classes of machines.  For example,
 win32netcon.SV_TYPE_DOMAIN_BAKCTRL, will single out backup domain
 controllers. Here we use SV_TYPE_ALL to get everything.
 
-<pre><code>
-def getall_boxes(domain="", server=""):
+<pre><code>def getall_boxes(domain="", server=""):
     res = 1
     wrk_lst = []
     try:
@@ -254,7 +250,7 @@ structures; let's assume we want to use the PySHARE_INFO_2 structure.
 So do you create this PySHARE_INFO_2 Object? It is really quite simple:
 
 In c++, for example, the SHARE_INFO_2 structure looks like:
-<pre><code>
+<pre><code lang="cpp">
 typedef struct _SHARE_INFO_2 {
 LPWSTR shi2_netname;
 DWORD shi2_type;
@@ -289,8 +285,7 @@ Example
 
 Given this knowledge, we could then write the following Python code to
 add a new share.
-<pre><code>
-import win32net
+<pre><code>import win32net
 import win32netcon
 
 shinfo = {}
@@ -328,7 +323,7 @@ use NetUserGetInfo and NetUserSetInfo, respectively.
 
 Example
 In c++ the setinfo call looks like this:
-<pre><code>
+<pre><code lang="cpp">
 
 NET_API_STATUS NetUserSetInfo(
 
@@ -386,8 +381,7 @@ exception handling is a very powerful asset. The try block explicitly
 catches and win32net errors from your system calls. And, we can
 extract what happened with sys.exc_type and sys.exc_value.
 
-<pre><code>
-import sys
+<pre><code>import sys
 import win32net
 import win32netcon
 
@@ -435,8 +429,7 @@ Here is some code that turns on the
 
 UF_DONT_EXPIRE_PASSWD bit for a user.
 
-<pre><code>
-import sys
+<pre><code>import sys
 import win32net
 import win32netcon
 

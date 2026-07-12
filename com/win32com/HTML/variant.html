@@ -60,7 +60,7 @@ This variable can then be used whereever a COM VARIANT is expected.
 For this example we will use the COM object used for win32com testing,
 <code>PyCOMTest.PyCOMTest</code>.  This object defines a method which is
 defined in IDL as:
-<pre><code>
+<pre><code lang="cpp">
 HRESULT DoubleInOutString([in,out] BSTR *str);
 </code></pre>
 
@@ -122,7 +122,7 @@ be useful.
 
 Imagine a poorly specified object with IDL like:
 
-<pre><code>
+<pre><code lang="cpp">
 HRESULT DoSomething([in] VARIANT value);
 </code></pre>
 

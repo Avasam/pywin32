@@ -52,7 +52,7 @@
 <H4>QueryInterface and Types </H4>
 <P>When the only support required by Python is IDispatch, everything is simple - every object returned from QueryInterface is a PyIDispatch object. But this does not extend to other types, such as ITypeLib, IConnectionPoint etc., which are required for full COM support. </P>
 <P>For example, consider the following C++ pseudo-code: </P>
-<PRE><CODE>IConnectionPoint *conPt;
+<PRE><CODE LANG="cpp">IConnectionPoint *conPt;
 someIDispatch-&gt;QueryInterface(IID_IConnectionPoint, (void **)&amp;conPt);
 // Note the IID_ and type of the * could be anything!
 </CODE></PRE>
