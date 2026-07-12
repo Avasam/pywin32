@@ -49,6 +49,7 @@ for path in paths:
         text = elem.get_text()
         if ">>>" in text:
             # Can't format REPL outside docstrings
+            # https://github.com/astral-sh/ruff/issues/9189#issuecomment-4952230176
             continue
 
         proc = subprocess.run(
