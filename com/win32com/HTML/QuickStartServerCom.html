@@ -32,7 +32,7 @@ class HelloWorld:
 <H3>Make Unicode concessions</H3>
 <P>At this stage, Python and Unicode don't really work well together. All strings which come from COM will actually be Unicode objects rather than string objects.</P>
 <P>To make this code work in a COM environment, the last line of the "Hello" method must become:</P>
-<PRE><CODE>        return "Hello" + " " * self.softspace + str(who)</CODE></PRE>
+<PRE><CODE>return "Hello" + " " * self.softspace + str(who)</CODE></PRE>
 <P>Note the conversion of the "who" to "str(who)". This forces the Unicode object into a native Python string object.</P>
 <P>For details on how to debug COM Servers to find this sort of error, please see <A HREF="#debugging">debugging the class</A></P>
 <H3>Annotate the class with win32com specific attributes</H3>
@@ -61,12 +61,13 @@ class HelloWorld:
 </TABLE>
 
 <P>We change the class header to become:</P>
-<PRE><CODE>class HelloWorld:
-    _public_methods_ = ['Hello']
-    _public_attrs_ = ['softspace', 'noCalls']
-    _readonly_attrs_ = ['noCalls']
-    def __init__(self):
-    [Same from here...]
+<PRE><CODE>
+class HelloWorld:
+    _public_methods_ = ["Hello"]
+    _public_attrs_ = ["softspace", "noCalls"]
+    _readonly_attrs_ = ["noCalls"]
+
+    def __init__(self): ...  # [Same from here]
 </CODE></PRE>
 <H3><A NAME="Registering">Registering and assigning a CLSID for the object</A></H3>
 <P>COM requires that all objects use a unique CLSID and be registered under a "user friendly" name. This documents the process.</P>
@@ -118,12 +119,13 @@ class HelloWorld:
 
 <P>Note there are quite a few other keys available. Also note that these annotations are <I>not</I> required - they just make registration simple. Helper functions in the module <CODE>win32com.server.register</CODE> allow you to explicitly specify each of these attributes without attaching them to the class.</P>
 <P>The header of our class now becomes:</P>
-<PRE><CODE>class HelloWorld:
+<PRE><CODE>
+class HelloWorld:
     _reg_clsid_ = "{7CC9F362-486D-11D1-BB48-0000E838A65F}"
     _reg_desc_ = "Python Test COM Server"
     _reg_progid_ = "Python.TestServer"
-    _public_methods_ = ['Hello']
-    [same from here]
+    _public_methods_ = ["Hello"]
+    # [same from here]
 </CODE></PRE>
 <H4>Registering the Class</H4>
 <P>The idiom that most Python COM Servers use is that they register themselves when run as a script (ie, when executed from the command line.) Thus the standard "<CODE>if __name__=='__main___':</CODE>" technique works well.</P>
@@ -154,7 +156,11 @@ command line "<CODE>testcomserver.py - -debug</CODE>".</P>
 <P>The following attributes are supported, and correspond to the equivalent entry in the COM Exception structure:<BR>
 <CODE>scode, code, description, source, helpfile and helpcontext</CODE></P>
 <P>To make working with exceptions easier, there is a helper module "win32com.server.exception.py", which defines a single class. An example of its usage would be: </P>
-<PRE><CODE>raise COMException(desc="Must be a string",scode=winerror.E_INVALIDARG,helpfile="myhelp.hlp",...)</CODE></PRE>
+<PRE><CODE>
+raise COMException(
+    desc="Must be a string", scode=winerror.E_INVALIDARG, helpfile="myhelp.hlp", **...
+)
+</CODE></PRE>
 <P>(Note the<CODE>COMException</CODE> class supports (and translates) "desc" as a shortcut for "description", but the framework requires "description")</P>
 <H2><A NAME="Policies">Server Policies</A></H2>
 <P>This is information about how it all hangs together. The casual COM author need not know this. </P>

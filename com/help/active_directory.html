@@ -152,11 +152,11 @@ or to get the groups fred is a member of
 print("groups=",opends("fred").memberOf)
 
 <pre><code>
-def opends(loc,server=''):
-    '''automatically buoild ldap string and authenticate
-    ldap=win32com.client.Dispatch('ADsNameSpaces').getobject("","LDAP:")
-    ldap_main_loc='OU=people,DC=ad,DC=company,DC=state,DC=oh,DC=us'
-    ldap_auth='CN=admin_account,'+ldap_main_loc
+def opends(loc, server=""):
+    """automatically buoild ldap string and authenticate"""
+    ldap = win32com.client.Dispatch("ADsNameSpaces").getobject("", "LDAP:")
+    ldap_main_loc = "OU=people,DC=ad,DC=company,DC=state,DC=oh,DC=us"
+    ldap_auth = "CN=admin_account," + ldap_main_loc
 
     # if there is no ","  then they are not providing a full url
     # so append the standard url for it
@@ -169,7 +169,7 @@ def opends(loc,server=''):
     if loc.find("LDAP://") == -1:
         loc = "LDAP://" + loc
 
-    return ldap.OpenDSObject(loc,Ad.ldap_auth,Ad.pw,1)
+    return ldap.OpenDSObject(loc, Ad.ldap_auth, Ad.pw, 1)
 </code></pre>
 
 <h3><a name="what">What does the object have?</a></h3>
