@@ -40,7 +40,7 @@ for path in paths:
     except Exception as error:
         returncode = max(returncode, 1)
         # Likely a UnicodeDecodeError, but catch and print all
-        print(f"\033[31m{path}: {error}\033[0m")
+        print(f"\033[31m{path}: {error}\033[0m", file=sys.stderr)
 
     soup = BeautifulSoup(raw, "html.parser")
     pending: list[tuple[int, str, str]] = []  # (tag_start, tag_name, formatted)
