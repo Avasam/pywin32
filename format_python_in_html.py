@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 selectors = [
     ('script[language="Python"]', True),
-    ("code", False),
+    ("pre>code", False),
 ]
 
 acceptable_ruff_format_errors = {

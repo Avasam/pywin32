@@ -128,9 +128,9 @@ def discover():
 
     ex_stores = []
 
-    for i in win32com.client.GetObject('LDAP://'+ex_first_store):
-        ex_stores.append('cn='+i.cn+','+ex_first_store)
-    print("\tExchange stores:","',".join(ex_stores))
+    for i in win32com.client.GetObject("LDAP://" + ex_first_store):
+        ex_stores.append("cn=" + i.cn + "," + ex_first_store)
+    print("\tExchange stores:", "',".join(ex_stores))
 </code></pre>
 
 <h3><a name="opends">Making the object</a></h3>
@@ -188,8 +188,8 @@ library.
 You would use ad_dict like a normal python dictionary.
 <br>
 <pre><code>
-for i in ad_dict('fred').items():
-	print(i)
+for i in ad_dict("fred").items():
+    print(i)
 </code></pre>
 <br>
 A lot of things convert to automatic python data types. For others, you'll get stuff like
@@ -197,11 +197,13 @@ COMObject. You need to do specific processing, like the one done for
 pwdLastSet below, to extract data from them.
 
 <pre><code>
-def ad_dict(ldapobj,attr_dict={},recurse=0,auth=1,filter=()):
-    if ldapobj.find(',')==-1: ldapobj='cn='+ldapobj+','+Ad.ldap_main_loc
-    if auth: #setup authenticated connections
-        if debug: print("auth")
-        adobj=opends(ldapobj)
+def ad_dict(ldapobj, attr_dict={}, recurse=0, auth=1, filter=()):
+    if ldapobj.find(",") == -1:
+        ldapobj = "cn=" + ldapobj + "," + Ad.ldap_main_loc
+    if auth:  # setup authenticated connections
+        if debug:
+            print("auth")
+        adobj = opends(ldapobj)
         # if debug: print("authenticated to",ldapobj)
     else:
         adobj = win32com.client.GetObject("LDAP://" + ldapobj)

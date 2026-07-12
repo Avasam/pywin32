@@ -93,10 +93,12 @@ BOOL GameApp::OnIdle( LONG lCount )
 <H3><LI>initscore.py</LI></H3>
 <LI>Below is the code for initscore.py. Obviously your code will vary, depending on your requirements. </LI></UL>
 
-<PRE><CODE>import sys
+<PRE><CODE>
+import sys
 import win32ui
 # First step - redirect python output to the debugging device, until we
 # can create a window to capture it.
+
 
 # Note that this is only useful while debugging, and simply sends any
 # Python output (ie, exceptions while developing the startup code) is
@@ -104,10 +106,13 @@ import win32ui
 # the win32trace module has appeared, giving another alternative to
 # debugging this code.
 class DebugOutput:
-  softspace=1
-  def write(self,message):
-    win32ui.OutputDebug(message)
-sys.stderr=sys.stdout=DebugOutput()
+    softspace = 1
+
+    def write(self, message):
+        win32ui.OutputDebug(message)
+
+
+sys.stderr = sys.stdout = DebugOutput()
 
 # One of your first priorities should be to set sys.stdout to somewhere useful,
 # depending on what useful means to your application. This code simply creates
@@ -117,19 +122,22 @@ sys.stderr=sys.stdout=DebugOutput()
 import win32con
 from pywin.framework import intpyapp, app
 
+
 class ScoreApp(intpyapp.InteractivePythonApp):
-  def InitInstance(self):
-    # Call the base class (if you want)
-    intpyapp.InteractivePythonApp.InitInstance(self)
-    # Do domething useful, specific to your app.
-    # Here, we minimise the interactive window.
-    # (after painting the main frame)
-    win32ui.PumpWaitingMessages()
-    interact.edit.currentView.GetParent().ShowWindow(win32con.SW_MINIMIZE)
+    def InitInstance(self):
+        # Call the base class (if you want)
+        intpyapp.InteractivePythonApp.InitInstance(self)
+        # Do domething useful, specific to your app.
+        # Here, we minimise the interactive window.
+        # (after painting the main frame)
+        win32ui.PumpWaitingMessages()
+        interact.edit.currentView.GetParent().ShowWindow(win32con.SW_MINIMIZE)
+
 
 #  def OnExitInstance(self):
 #    return 0
 
-app = ScoreApp()</CODE></PRE>
+app = ScoreApp()
+</CODE></PRE>
 <P>And we are done </P></BODY>
 </HTML>

@@ -27,14 +27,16 @@
 </DIR>
 
 <P>The following functions operate almost identically to those described in the <CODE>pdb</CODE> documentation </P>
-<PRE><CODE>set_trace()
-brk() # alternative name</CODE></PRE><DIR>
+<PRE><CODE>
+set_trace()
+brk()  # alternative name
+</CODE></PRE><DIR>
 <DIR>
 
 <P>Like a hard-coded break-point, this function creates a debugger if necessary, and stops at the following statement. Note - putting this statement as the last line of a function may cause you to stop at an unexpected place! </P></DIR>
 </DIR>
 
-<PRE><CODE>post_mortem(traceback, exception_type = None, exception_value = None)</CODE></PRE><DIR>
+<PRE><CODE>post_mortem(traceback, exception_type=None, exception_value=None)</CODE></PRE><DIR>
 <DIR>
 
 <P>Perform post-mortem debugging of the passed traceback. This is useful for analysing the conditions that lead up to an exception. </P></DIR>

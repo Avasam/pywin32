@@ -22,17 +22,21 @@
 
 <H2>Quick Start</H2>
 <H3><A NAME="Using">To use a COM object from Python</A></H3>
-<PRE><CODE>import win32com.client
+<PRE><CODE>
+import win32com.client
+
 o = win32com.client.Dispatch("Object.Name")
 o.Method()
 o.property = "New Value"
 print(o.property)
 </CODE></PRE>
 <P>Example</P>
-<PRE><CODE>o = win32com.client.Dispatch("Excel.Application")
+<PRE><CODE>
+o = win32com.client.Dispatch("Excel.Application")
 o.Visible = 1
 o.Workbooks.Add()
-o.Cells(1,1).Value = "Hello"</CODE></PRE>
+o.Cells(1, 1).Value = "Hello"
+</CODE></PRE>
 <P>And we will see the word "Hello" appear in the top cell. </P>
 <H3><A NAME="WhatObjects">How do I know which methods and properties are available?</A></H3>
 <P>Good question. This is hard! You need to use the documentation with the products, or possibly a COM browser. Note however that COM browsers typically rely on these objects registering themselves in certain ways, and many objects to not do this. You are just expected to know.</P>

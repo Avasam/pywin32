@@ -17,7 +17,8 @@
 <P>In this document we discuss the <A HREF="#core">core functionality</A>, <A HREF="#Registering">registering the server</A>, <A HREF="#testing">testing the class</A>, <A HREF="#debugging">debugging the class</A>, <A HREF="#Exception">exception handling</A> and <A HREF="#Policies">server policies</A> (phew!)</P>
 <H2><A NAME="core">Implement the core functionality</A></H2>
 <H3><A NAME="Using">Implement a stand-alone Python class with your functionality</A></H3>
-<PRE><CODE>class HelloWorld:
+<PRE><CODE>
+class HelloWorld:
     def __init__(self):
         self.softspace = 1
         self.noCalls = 0
@@ -128,9 +129,11 @@
 <P>The idiom that most Python COM Servers use is that they register themselves when run as a script (ie, when executed from the command line.) Thus the standard "<CODE>if __name__=='__main___':</CODE>" technique works well.</P>
 <P>win32com.server.register contains a number of helper functions. The easiest to use is "<CODE>UseCommandLine</CODE>".</P>
 <P>Registration becomes as simple as:</P>
-<PRE><CODE>if __name__=='__main__':
+<PRE><CODE>
+if __name__ == "__main__":
     # ni only for 1.4!
-    import ni, win32com.server.register 
+    import ni, win32com.server.register
+
     win32com.server.register.UseCommandLine(HelloWorld)
 </CODE></PRE>
 <P>Running the script will register our test server.</P>

@@ -88,7 +88,9 @@ try:
     # win32net calls
     ...
 except win32net.error:
-  print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code></pre>
 The traceback and sys modules are used to extract the error information.
 
@@ -152,8 +154,6 @@ def getusers(server):
             "\n",
             sys.exc_value,
         )
-
-
 </code></pre>
 
 <H3><A NAME="accounts">Listing all user accounts</A></H3>
@@ -197,8 +197,6 @@ def getall_users(server):
             "\n",
             sys.exc_value,
         )
-
-
 </code></pre>
 
 <H3><A NAME="machines">Listing all machines in Domain</A></H3> If you
@@ -209,9 +207,9 @@ win32netcon.SV_TYPE_DOMAIN_BAKCTRL, will single out backup domain
 controllers. Here we use SV_TYPE_ALL to get everything.
 
 <pre><code>
-def getall_boxes(domain='',server=''):
-    res=1
-    wrk_lst=[]
+def getall_boxes(domain="", server=""):
+    res = 1
+    wrk_lst = []
     try:
         while res:  # loop until res2
             (wrk_list2, total, res2) = win32net.NetServerEnum(
@@ -238,7 +236,8 @@ def getall_boxes(domain='',server=''):
         final_lst.append(str(i["name"]))
     return final_lst
 
-print(getall_boxes('bedrock',r'\\rubble'))
+
+print(getall_boxes("bedrock", r"\\rubble"))
 </code></pre>
 
 <H3><A NAME="share">Creating a share</A></H3>
@@ -311,8 +310,9 @@ try:
     win32net.NetShareAdd(server, 2, shinfo)
     return "success"
 except win32net.error:
-  print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
-
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code></pre>
 </p>
 <HR>
@@ -356,7 +356,7 @@ using USER_INFO_1008 that has no corresponding NetUserGetInfo.
 
 The python call looks like this:
 
-<pre><code>NetUserSetInfo( server , username ,level , data )</code></pre>
+<pre><code>NetUserSetInfo(server, username, level, data)</code></pre>
 
 For it the most interesting parts are server, level, and data.  Server
 is only interesting because the server name has to be prepended with
@@ -406,7 +406,9 @@ try:
     info = win32net.NetUserGetInfo(server, login, 3)
     print(info["full_name"])
 except win32net.error:
-    print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code></pre>
 
 <H3><A NAME="password"></A>Changing password expiration</H3>
@@ -457,8 +459,9 @@ try:
     flag_dict = {"flags": flag}
     win32net.NetUserSetInfo(server, login, 1008, flag_dict)
 except win32net.error:
-    print(traceback.format_tb(sys.exc_info()[2]),'\n',sys.exc_type,'\n',sys.exc_value)
-
+    print(
+        traceback.format_tb(sys.exc_info()[2]), "\n", sys.exc_type, "\n", sys.exc_value
+    )
 </code></pre>
 </p>
 <p>
