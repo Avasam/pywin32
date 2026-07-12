@@ -118,7 +118,7 @@ The ex_path in the above example specifies the resource you are trying to access
 <hr>
 <h2><A NAME="User">User Account Management</A></h2>
 <h3><a name="add">Adding a user to exchange</A></h3>
-<code>
+<pre><code>
 # Adding a new account to exchange is simple except for one thing.
 # You need to associate an NT account with an exchange account.
 # To do so at this point requires some c++ to produce some hex SID
@@ -144,13 +144,13 @@ newobj.put("NT-Security-Descriptor", assoc_nt)
 newobj.put("NT-Security-Descriptor", nt_security)
 
 newobj.SetInfo
-</code>
+</code></pre>
 
 <h3><a name="get">Getting/Modify user info</a></h3>
 
-<code>
-ex_path = "LDAP://server/cn=fredflint,cn=Recipients,ou=rubble,o=bedrock"
-myDSObject = ldap.OpenDSObject(ex_path, logon_ex, password, 0)
+<pre><code>
+ex_path="LDAP://server/cn=fredflint,cn=Recipients,ou=rubble,o=bedrock"
+myDSObject = ldap.OpenDSObject(ex_path,logon_ex,password,0)
 myDSObject.Getinfo()
 # To access a user's data try:
 attribute = myDSObject.Get("Extension-Attribute-1")
@@ -158,7 +158,7 @@ print(attribute)
 # To modify a user try:
 myDSObject.Put("Extension-Attribute-1", "barney was here")
 myDSObject.Setinfo()
-</code>
+</code></pre>
 Comments
 
 <strong>Note</strong> -- To make any changes permanent setinfo is required.
@@ -166,15 +166,15 @@ Comments
 
 <h3><a name="delete">Deleting a user from exchange</a></h3>
 
-<code>
-# Here we connect to Recipients and then
-# delete a user
-# This is a more complete example.
-# data is a dictionary that contains info
-# that may be dynamic like the domain,
-# admin login, or exchange server
-# notice I am using a try/except clause here
-# to catch any exceptions
+<pre><code>
+#Here we connect to Recipients and then
+#delete a user
+#This is a more complete example.
+#data is a dictionary that contains info
+#that may be dynamic like the domain,
+#admin login, or exchange server
+#notice I am using a try/except clause here
+#to catch any exceptions
 try:
     # ADSI here
     # Create the Global Providers object
@@ -196,19 +196,16 @@ try:
     dsobj.Delete("OrganizationalPerson", "cn=" + login)
     dsobj.Setinfo()
 except:
-    print("Error deleting " + login, sys.exc_type, sys.exc_value)
-</code>
+  print("Error deleting "+login, sys.exc_type , sys.exc_value)
+</code></pre>
 </p>
 <hr>
 <h2><a name="Distribution List">Distribution List</a></h2>
-<p>
-<pre>
 <hr>
-
 
 <h3><a name="dadd">Adding to a distribution list</a></h3>
 
-<code>
+<pre><code>
 # I used putex instead of put because it has more options
 # The '3' value means append. The SDK has specific info on it
 ex_list_path = (
@@ -220,47 +217,46 @@ list_member = "cn=" + user + ",cn=Recipients,ou=" + ou + ",o=" + o
 append_list = [list_member]
 dsobj.putEx(3, "Member", append_list)
 dsobj.SetInfo()
-</code>
-
+</code></pre>
 
 <h3><a name="dlist"></A>Recursively listing all unique members of a distribution list</h3>
 
-<code>
-# This function looks for all Organizational persons to add to a dictionary
-# If it gets a groupOfNames, it needs to parse that and call the function again
-# to get the members of the groupOfNames
-def getmembers(path=""):
-    user_dict = {}
-    logon_ex = "cn=fred, dc=bedrock"
-    password = "dino"
-    server = "flintstone"
-    ldap = win32com.client.Dispatch("ADsNameSpaces").getobject("", "LDAP:")
-    dsobj = ldap.OpenDSObject(path, logon_ex, password, 0)
-    dsobj.Getinfo()
-    if dsobj.Class == "organizationalPerson":
-        user_dict[dsobj.cn.capitalize()] = dsobj.uid
-    elif dsobj.Class == "groupOfNames":
-        for i in dsobj.Members():
-            if i.Class == "organizationalPerson":
-                user_dict[i.cn.capitalize()] = i.uid
-            elif type(i.member) == types.TupleType:
-                for j in i.member:
-                    newpath = "LDAP://" + server + "/" + j
-                    getmembers(newpath)
-            elif type(i.member) == types.StringType:
-                newpath = "LDAP://" + server + "/" + i.member
-                getmembers(newpath)
-    elif dsobj.Class == "Remote-Address":
-        User_dict[dsobj.cn.capitalize()] = dsobj.uid
-    elif dsobj.Class == "Public-Folder":
-        pass
-    else:
-        print("skipped", dsobj.Class, dsobj.uid)
-    return user_dict
-</code>
-</p>
-<p>
+<pre><code>
+#This function looks for all Organizational persons to add to a dictionary
+#If it gets a groupOfNames, it needs to parse that and call the function again
+#to get the members of the groupOfNames
+def getmembers(path=''):
+  user_dict={}
+  logon_ex='cn=fred, dc=bedrock'
+  password='dino'
+  server='flintstone'
+  ldap = win32com.client.Dispatch('ADsNameSpaces').getobject("","LDAP:")
+  dsobj = ldap.OpenDSObject(path,logon_ex,password,0)
+  dsobj.Getinfo()
+  if dsobj.Class=='organizationalPerson':
+      user_dict[dsobj.cn.capitalize()]=dsobj.uid
+  elif dsobj.Class=='groupOfNames':
+      for i in dsobj.Members():
+              if i.Class=='organizationalPerson':
+                  user_dict[i.cn.capitalize()]=i.uid
+              elif type(i.member)==types.TupleType:
+                  for j in i.member:
+                      newpath='LDAP://'+server+'/'+j
+                      getmembers(newpath)
+              elif type(i.member)==types.StringType:
+                  newpath='LDAP://'+server+'/'+i.member
+                  getmembers(newpath)
+  elif dsobj.Class=='Remote-Address':
+      User_dict[dsobj.cn.capitalize()]=dsobj.uid
+  elif  dsobj.Class=='Public-Folder':
+      pass
+  else:
+      print("skipped",dsobj.Class,dsobj.uid)
+  return user_dict
 
+</code></pre>
+
+<p>
 <hr>
 <h2><a name="Conclusion">In Conclusion</a></h2>
 Microsoft's ADSI allows one to manage exchange w/out having to resort to the lower-level APIs.
