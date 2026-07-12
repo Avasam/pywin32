@@ -4,18 +4,19 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-selectors = [
-    ('script[language="Python"]'),
-    ('code[lang="python"]'),
-    ("pre>code:not([lang])"),
-]
+if sys.version_info >= (3, 12):
+    paths = [
+        *Path(".").rglob("*.html"),
+        *Path(".").rglob("*.htm", case_sensitive=False),
+    ]
+else:
+    paths = [
+        *Path(".").rglob("*.html"),
+        *Path(".").rglob("*.htm"),
+        *Path(".").rglob("*.HTM"),
+    ]
 
-paths = [
-    *Path(".").rglob("*.html"),
-    *Path(".").rglob("*.htm"),
-    # Can't use case_sensitive=False until Python 3.12
-    *Path(".").rglob("*.HTM"),
-]
+SELECTOR = 'script[language="Python"], code[lang="python"], pre>code:not([lang])'
 
 
 def _elem_tag_start(raw: str, elem) -> int:
@@ -44,39 +45,38 @@ for path in paths:
     soup = BeautifulSoup(raw, "html.parser")
     pending: list[tuple[int, str, str]] = []  # (tag_start, tag_name, formatted)
 
-    for selector in selectors:
-        for elem in soup.select(selector):
-            text = elem.get_text()
-            if ">>>" in text:
-                # Can't format REPL outside docstrings
-                continue
+    for elem in soup.select(SELECTOR):
+        text = elem.get_text()
+        if ">>>" in text:
+            # Can't format REPL outside docstrings
+            continue
 
-            proc = subprocess.run(
-                ["ruff", "format", "-"],
-                input=text,
-                text=True,
-                capture_output=True,
+        proc = subprocess.run(
+            ["ruff", "format", "-"],
+            input=text,
+            text=True,
+            capture_output=True,
+        )
+
+        if proc.returncode != 0:
+            stderr = proc.stderr.strip()
+            error_message = stderr.split(": ", 2)[-1]
+            returncode = max(returncode, proc.returncode)
+            print(
+                f"\033[31m{path}:{elem.sourceline}:{elem.sourcepos}: {stderr}\033[0m",
+                file=sys.stderr,
             )
+            continue
 
-            if proc.returncode != 0:
-                stderr = proc.stderr.strip()
-                error_message = stderr.split(": ", 2)[-1]
-                returncode = max(returncode, proc.returncode)
-                print(
-                    f"\033[31m{path}:{elem.sourceline}:{elem.sourcepos}: {stderr}\033[0m",
-                    file=sys.stderr,
-                )
-                continue
+        formatted = proc.stdout.strip()
+        if "\n" in formatted:
+            # Single-line: Keep tags on the same line
+            # Multi-line: add trailing newline so tags end on their own line
+            # Do not add preceding newline as it'll get rendered in <pre>
+            formatted = f"{proc.stdout.strip()}\n"
 
-            formatted = proc.stdout.strip()
-            if "\n" in formatted:
-                # Single-line: Keep tags on the same line
-                # Multi-line: add trailing newline so tags end on their own line
-                # Do not add preceding newline as it'll get rendered in <pre>
-                formatted = f"{proc.stdout.strip()}\n"
-
-            if formatted != text:
-                pending.append((_elem_tag_start(raw, elem), elem.name, formatted))
+        if formatted != text:
+            pending.append((_elem_tag_start(raw, elem), elem.name, formatted))
 
     if pending:
         print(f"Formatting {path}")
