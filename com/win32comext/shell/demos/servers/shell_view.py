@@ -436,7 +436,7 @@ class FileSystemView:
     def _CreateMainWindow(self, prev, settings, browser, rect):
         # Creates a parent window that hosts the view window.  This window
         # gets the control notifications etc sent from the child.
-        style = win32con.WS_CHILD | win32con.WS_VISIBLE  #
+        style = win32con.WS_CHILD | win32con.WS_VISIBLE
         wclass_name = "ShellViewDemo_DefView"
         # Register the Window class.
         wc = win32gui.WNDCLASS()

@@ -1814,7 +1814,6 @@ W32_exe_files: list[WinExt] = [
 swig_interface_parents = {
     # source file base,     "base class" for generated COM support
     "mapi": None,  # not a class, but module
-    "PyIMailUser": "IMAPIContainer",
     "PyIABContainer": "IMAPIContainer",
     "PyIAddrBook": "IMAPIProp",
     "PyIAttach": "IMAPIProp",

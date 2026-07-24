@@ -1121,7 +1121,7 @@ class Cursor:
             return None
 
         try:  # [begin 2.1 ekelund]
-            rsTuple = self.rs.NextRecordset()  #
+            rsTuple = self.rs.NextRecordset()
         except pywintypes.com_error as exc:  # return appropriate error
             self._raiseCursorError(api.NotSupportedError, exc.args)  # [end 2.1 ekelund]
         recordset = rsTuple[0]

@@ -10,7 +10,7 @@
 
 import bdb
 import os
-import pdb
+import pdb  # ruff: ignore[T100]
 import string
 import sys
 import traceback

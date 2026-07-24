@@ -251,7 +251,7 @@ class FindReplaceDialog(dialog.Dialog):
         if code != 0:  # BN_CLICKED
             # 3d controls (python.exe + start_pythonwin.pyw) send
             # other notification codes
-            return 1  #
+            return 1
         if not self.editFindText.GetWindowText():
             win32api.MessageBeep()
             return 1

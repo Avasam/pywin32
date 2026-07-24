@@ -162,7 +162,6 @@ class StackFrameDebugProperty:
         RaiseNotImpl("StackFrameDebugProperty::GetExtendedInfo")
 
     def SetValueAsString(self, value, radix):
-        #
         RaiseNotImpl("DebugProperty::SetValueAsString")
 
     def EnumMembers(self, dwFieldSpec, nRadix, iid):

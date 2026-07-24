@@ -34,7 +34,6 @@ from win32com.shell.shellcon import DBIMF_VARIABLEHEIGHT
 # ensure we know the ms internet controls typelib so we have access to IWebBrowser2 later on
 gencache.EnsureModule("{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}", 0, 1, 1)
 
-#
 IDeskBand_methods = ["GetBandInfo"]
 IDockingWindow_methods = ["ShowDW", "CloseDW", "ResizeBorderDW"]
 IOleWindow_methods = ["GetWindow", "ContextSensitiveHelp"]

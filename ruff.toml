@@ -13,7 +13,7 @@ line-ending = "cr-lf"
 
 [lint]
 future-annotations = true
-select = [
+extend-select = [
   "B028", # no-explicit-stacklevel
   "C4", # flake8-comprehensions
   "F401", # unused-import
@@ -57,6 +57,35 @@ extend-ignore = [
   "UP032", # Use f-string instead of format call
   # TODO: https://github.com/astral-sh/ruff/issues/12475#issuecomment-5074327259
   "N999", # invalid-module-name
+
+  # TODO: These are now default in Ruff
+  "B0",
+  "BLE001",
+  "DTZ",
+  "E722",
+  "EXE",
+  "F5",
+  "F6",
+  "F821",
+  "F841",
+  "F9",
+  "FURB122",
+  "LOG0",
+  "PERF4",
+  "PIE790",
+  "PIE808",
+  "PLR",
+  "PLW0",
+  "RET501",
+  "RUF012",
+  "RUF051",
+  "RUF059",
+  "RUF100",
+  "S102",
+  "S110",
+  "SIM",
+  "TRY0",
+  "TRY203",
 ]
 
 [lint.per-file-ignores]
@@ -70,6 +99,12 @@ extend-ignore = [
   "UP035",
   "UP036",
   "YTT301",
+  # TODO: These are now default in Ruff
+  "FURB105",
+  "FURB157",
+  "RUF012",
+  "RUF059",
+  "TRY203",
 ]
 
 [lint.flake8-tidy-imports]

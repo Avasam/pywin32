@@ -43,7 +43,6 @@ from win32com.axcontrol import axcontrol
 win32com.client.gencache.EnsureModule("{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}", 0, 1, 1)
 
 
-#
 IObjectWithSite_methods = ["SetSite", "GetSite"]
 IOleCommandTarget_methods = ["Exec", "QueryStatus"]
 
