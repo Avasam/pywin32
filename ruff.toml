@@ -1,4 +1,4 @@
-target-version = "py315" # Target the oldest supported version
+target-version = "py39" # Target the oldest supported version
 extend-include = [
   "*.pyw", # Will be included by default in Ruff eventually
   "*.pys", # PythonScript (Windows Script Host)
