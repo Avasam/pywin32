@@ -10,6 +10,7 @@ from __future__ import annotations
 import datetime
 import decimal
 import numbers
+import operator
 import sys
 import time
 from collections.abc import Callable, Iterable, Mapping
@@ -563,7 +564,9 @@ class SQLrow:  # a single database row
             yield self._getValue(n)
 
     def __repr__(self):  # create a human readable representation
-        taglist = sorted(list(self.rows.columnNames.items()), key=lambda x: x[1])
+        taglist = sorted(
+            list(self.rows.columnNames.items()), key=operator.itemgetter(1)
+        )
         s = "<SQLrow={"
         for name, i in taglist:
             s += f"{name}:{self._getValue(i)!r}, "
