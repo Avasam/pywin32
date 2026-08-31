@@ -294,13 +294,15 @@ svg.gh-md-to-html-formula {fill: black;}
 <p>An instance of the COM Record is created with <code>pythoncom.GetRecordFromGuids</code>, e.g.:</p>
 <pre><code>import pythoncom
 
-PyCOMTestLib_GUID = '{6bcdcb60-5605-11d0-ae5f-cadd4c000000}'
+PyCOMTestLib_GUID = "{6bcdcb60-5605-11d0-ae5f-cadd4c000000}"
 MAJVER = 1
 MINVER = 1
 LCID = 0
-TestStruct1_GUID = '{7a4ce6a7-7959-4e85-a3c0-b41442ff0f67}'
+TestStruct1_GUID = "{7a4ce6a7-7959-4e85-a3c0-b41442ff0f67}"
 
-record1 = pythoncom.GetRecordFromGuids(PyCOMTestLib_GUID, MAJVER, MINVER, LCID, TestStruct1_GUID)
+record1 = pythoncom.GetRecordFromGuids(
+    PyCOMTestLib_GUID, MAJVER, MINVER, LCID, TestStruct1_GUID
+)
 </code></pre>
 <p>The Python type of the returned COM Record instance is:</p>
 <pre><code>&gt;&gt;&gt; type(record1)
@@ -314,7 +316,7 @@ record1 = pythoncom.GetRecordFromGuids(PyCOMTestLib_GUID, MAJVER, MINVER, LCID, 
 
 com_test = win32com.client.Dispatch("PyCOMTest.PyCOMTest")
 
-record1 = win32com.client.Record('TestStruct1' ,com_test)
+record1 = win32com.client.Record("TestStruct1", com_test)
 </code></pre>
 <p>Still the Python type of the returned COM Record instance is:</p>
 <pre><code>&gt;&gt;&gt; type(record1)
@@ -334,12 +336,13 @@ record1 = win32com.client.Record('TestStruct1' ,com_test)
 <p>with GUID strings in {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} notation, e.g.:</p>
 <pre><code>import pythoncom
 
+
 class TestStruct1(pythoncom.com_record):
-  TLBID = '{6bcdcb60-5605-11d0-ae5f-cadd4c000000}'
-  MJVER = 1
-  MNVER = 1
-  LCID = 0
-  GUID = '{7a4ce6a7-7959-4e85-a3c0-b41442ff0f67}'
+    TLBID = "{6bcdcb60-5605-11d0-ae5f-cadd4c000000}"
+    MJVER = 1
+    MNVER = 1
+    LCID = 0
+    GUID = "{7a4ce6a7-7959-4e85-a3c0-b41442ff0f67}"
 </code></pre>
 <p>Before this subclass can be used to create <em>TestStruct1</em> instances, it has to be registered with <code>win32com.client.register_record_class</code>, e.g.:</p>
 <pre><code>from win32com.client import register_record_class

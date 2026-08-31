@@ -34,17 +34,16 @@
 <INPUT TYPE="Button" NAME="btnNormal" VALUE="Normal">
 <INPUT TYPE="Button" NAME="btnSlower" VALUE="Slower">
 
-<SCRIPT Language="Python">
+<SCRIPT Language="Python">def btnFaster_Onclick():
+    ax.Marquee1.ScrollDelay = 0
 
-def btnFaster_Onclick():
-	ax.Marquee1.ScrollDelay = 0
 
 def btnNormal_Onclick():
-	ax.Marquee1.ScrollDelay = 50
+    ax.Marquee1.ScrollDelay = 50
+
 
 def btnSlower_Onclick():
-	ax.Marquee1.ScrollDelay = 300
-
+    ax.Marquee1.ScrollDelay = 300
 </SCRIPT>
 
 
