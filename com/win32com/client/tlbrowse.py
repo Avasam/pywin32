@@ -7,7 +7,7 @@ from pywin.mfc import dialog
 
 
 class TLBrowserException(Exception):
-    "TypeLib browser internal error"
+    """TypeLib browser internal error"""
 
 
 error = TLBrowserException  # Re-exported alias
@@ -36,7 +36,7 @@ TypeBrowseDialog_Parent = dialog.Dialog
 
 
 class TypeBrowseDialog(TypeBrowseDialog_Parent):
-    "Browse a type library"
+    """Browse a type library"""
 
     IDC_TYPELIST = 1000
     IDC_MEMBERLIST = 1001
@@ -223,7 +223,7 @@ class TypeBrowseDialog(TypeBrowseDialog_Parent):
             return 1
 
     def GetTemplate(self):
-        "Return the template used to create this dialog"
+        """Return the template used to create this dialog"""
 
         w = 272  # Dialog width
         h = 192  # Dialog height

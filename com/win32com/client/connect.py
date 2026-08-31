@@ -6,7 +6,7 @@ import win32com.server.util
 
 
 class SimpleConnection:
-    "A simple, single connection object"
+    """A simple, single connection object"""
 
     def __init__(self, coInstance=None, eventInstance=None, eventCLSID=None, debug=0):
         self.cp = None

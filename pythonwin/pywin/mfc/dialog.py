@@ -12,7 +12,7 @@ from . import window
 
 
 def dllFromDll(dllid):
-    "given a 'dll' (maybe a dll, filename, etc), return a DLL object"
+    """given a 'dll' (maybe a dll, filename, etc), return a DLL object"""
     if dllid is None:
         return None
     elif isinstance(dllid, str):
@@ -26,7 +26,7 @@ def dllFromDll(dllid):
 
 
 class Dialog(window.Wnd):
-    "Base class for a dialog"
+    """Base class for a dialog"""
 
     def __init__(self, id, dllid=None):
         """id is the resource ID, or a template
@@ -97,7 +97,7 @@ class Dialog(window.Wnd):
 
 
 class PrintDialog(Dialog):
-    "Base class for a print dialog"
+    """Base class for a print dialog"""
 
     def __init__(
         self,
@@ -185,7 +185,7 @@ class PrintDialog(Dialog):
 
 
 class PropertyPage(Dialog):
-    "Base class for a Property Page"
+    """Base class for a Property Page"""
 
     def __init__(self, id, dllid=None, caption=0):
         """id is the resource ID
@@ -207,7 +207,7 @@ class PropertyPage(Dialog):
 
 class PropertySheet(window.Wnd):
     def __init__(self, caption, dll=None, pageList=None):  # parent=None, style,etc):
-        "Initialize a property sheet.  pageList is a list of ID's"
+        """Initialize a property sheet.  pageList is a list of ID's"""
         # must take a reference to the DLL until InitDialog.
         self.dll = dllFromDll(dll)
         self.sheet = win32ui.CreatePropertySheet(caption)
@@ -243,7 +243,7 @@ class PropertySheet(window.Wnd):
             win32ui.SetResource(oldRes)
 
     def DoAddSinglePage(self, page):
-        "Page may be page, or int ID. Assumes DLL setup"
+        """Page may be page, or int ID. Assumes DLL setup"""
         if isinstance(page, int):
             self.sheet.AddPage(win32ui.CreatePropertyPage(page))
         else:

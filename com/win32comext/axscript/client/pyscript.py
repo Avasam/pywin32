@@ -55,7 +55,7 @@ class AXScriptCodeBlock(framework.AXScriptCodeBlock):
 # This means that if 2 sub-objects of the same name are used
 # then only one is ever reachable using the ax shortcut.
 class AXScriptAttribute:
-    "An attribute in a scripts namespace."
+    """An attribute in a scripts namespace."""
 
     def __init__(self, engine):
         self.__dict__["_scriptEngine_"] = engine
@@ -99,7 +99,7 @@ class AXScriptAttribute:
 
 
 class NamedScriptAttribute:
-    "An explicitly named object in an objects namespace"
+    """An explicitly named object in an objects namespace"""
 
     # Each named object holds a reference to one of these.
     # Whenever a sub-item appears in a namespace, it is really one of these

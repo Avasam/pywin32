@@ -948,7 +948,7 @@ class Debugger(debugger_parent):
         return 1
 
     def GUIAboutToBreak(self):
-        "Called as the GUI debugger is about to get context, and take control of the running program."
+        """Called as the GUI debugger is about to get context, and take control of the running program."""
         self.GUICheckInit()
         self.RespondDebuggerState(DBGSTATE_BREAK)
         self.GUIAboutToInteract()
@@ -962,7 +962,7 @@ class Debugger(debugger_parent):
             win32ui.GetMainFrame().PostMessage(win32con.WM_CLOSE)
 
     def GUIAboutToInteract(self):
-        "Called as the GUI is about to perform any interaction with the user"
+        """Called as the GUI is about to perform any interaction with the user"""
         frame = win32ui.GetMainFrame()
         # Remember the enabled state of our main frame
         # may be disabled primarily if a modal dialog is displayed.
@@ -1069,7 +1069,7 @@ class Debugger(debugger_parent):
             self.ShowLineState(fileName, lineNo, LINESTATE_CURRENT)
 
     def _UnshowCurrentLine(self):
-        "Unshow the current line, and forget it"
+        """Unshow the current line, and forget it"""
         if self.shownLineCurrent is not None:
             fname, lineno = self.shownLineCurrent
             self.ResetLineState(fname, lineno, LINESTATE_CURRENT)

@@ -50,7 +50,7 @@ def io_callback(ecb, url, cbIO, errcode):
 
 # The ISAPI extension - handles all requests in the site.
 class Extension(threaded_extension.ThreadPoolExtension):
-    "Python sample Extension"
+    """Python sample Extension"""
 
     def Dispatch(self, ecb):
         # Note that our ThreadPoolExtension base class will catch exceptions

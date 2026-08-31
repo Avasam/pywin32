@@ -30,7 +30,7 @@ def FinalizeHelp():
 
 
 def OpenHelpFile(fileName, helpCmd=None, helpArg=None):
-    "Open a help file, given a full path"
+    """Open a help file, given a full path"""
     # default help arg.
     win32ui.DoWaitCursor(1)
     try:

@@ -11,22 +11,22 @@ from pywin.framework import winout
 
 
 class ThreadWriter:
-    "Assign an instance to sys.stdout for per-thread printing objects - Courtesy Guido!"
+    """Assign an instance to sys.stdout for per-thread printing objects - Courtesy Guido!"""
 
     def __init__(self):
-        "Constructor -- initialize the table of writers"
+        """Constructor -- initialize the table of writers"""
         self.writers = {}
         self.origStdOut = None
 
     def register(self, writer):
-        "Register the writer for the current thread"
+        """Register the writer for the current thread"""
         self.writers[_thread.get_ident()] = writer
         if self.origStdOut is None:
             self.origStdOut = sys.stdout
             sys.stdout = self
 
     def unregister(self):
-        "Remove the writer for the current thread, if any"
+        """Remove the writer for the current thread, if any"""
         try:
             del self.writers[_thread.get_ident()]
         except KeyError:
@@ -36,11 +36,11 @@ class ThreadWriter:
             self.origStdOut = None
 
     def getwriter(self):
-        "Return the current thread's writer, default sys.stdout"
+        """Return the current thread's writer, default sys.stdout"""
         self.writers.get(_thread.get_ident(), self.origStdOut)
 
     def write(self, str):
-        "Write to the current thread's writer, default sys.stdout"
+        """Write to the current thread's writer, default sys.stdout"""
         self.getwriter().write(str)
 
 

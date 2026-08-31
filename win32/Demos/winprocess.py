@@ -26,7 +26,7 @@ import win32security
 
 
 def logonUser(loginString):
-    """
+    r"""
     Login as specified user and return handle.
     loginString:  'Domain\nUser\nPassword'; for local
         login use . or empty string as domain
@@ -59,7 +59,7 @@ class Process:
         xySize=None,
         desktop=None,
     ):
-        """
+        r"""
         Create a Windows process.
         cmd:     command to run
         login:   run as user 'Domain\nUser\nPassword'

@@ -58,7 +58,7 @@ virtualdir = "/python"
 # The ISAPI extension - handles requests in our virtual dir, and sends the
 # response to the client.
 class Extension(threaded_extension.ThreadPoolExtension):
-    "Python sample Extension"
+    """Python sample Extension"""
 
     def Dispatch(self, ecb):
         # Note that our ThreadPoolExtension base class will catch exceptions
@@ -83,7 +83,7 @@ class Extension(threaded_extension.ThreadPoolExtension):
 
 # The ISAPI filter.
 class Filter(SimpleFilter):
-    "Sample Python Redirector"
+    """Sample Python Redirector"""
 
     filter_flags = isapicon.SF_NOTIFY_PREPROC_HEADERS | isapicon.SF_NOTIFY_ORDER_DEFAULT
 

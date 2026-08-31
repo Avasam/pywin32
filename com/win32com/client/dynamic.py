@@ -177,7 +177,7 @@ def DumbDispatch(
     createClass=None,
     clsctx=pythoncom.CLSCTX_SERVER,
 ):
-    "Dispatch with no type info"
+    """Dispatch with no type info"""
     IDispatch, userName = _GetGoodDispatchAndUserName(IDispatch, userName, clsctx)
     if createClass is None:
         createClass = CDispatch
@@ -198,7 +198,7 @@ class CDispatch:
         self.__dict__["_lazydata_"] = lazydata
 
     def __call__(self, *args):
-        "Provide 'default dispatch' COM functionality - allow instance to be called"
+        """Provide 'default dispatch' COM functionality - allow instance to be called"""
         if self._olerepr_.defaultDispatchName:
             invkind, dispid = self._find_dispatch_type_(
                 self._olerepr_.defaultDispatchName
@@ -243,7 +243,7 @@ class CDispatch:
 
     def _dir_ole_(self):
         items_dict = {}
-        for iTI in range(0, self._oleobj_.GetTypeInfoCount()):
+        for iTI in range(self._oleobj_.GetTypeInfoCount()):
             typeInfo = self._oleobj_.GetTypeInfo(iTI)
             self._UpdateWithITypeInfo_(items_dict, typeInfo)
         return list(items_dict)
@@ -259,7 +259,7 @@ class CDispatch:
 
             if typeAttr.iid not in inspectedIIDs:
                 inspectedIIDs[typeAttr.iid] = None
-                for iFun in range(0, typeAttr.cFuncs):
+                for iFun in range(typeAttr.cFuncs):
                     funDesc = typeInfo.GetFuncDesc(iFun)
                     funName = typeInfo.GetNames(funDesc.memid)[0]
                     if funName not in items_dict:
@@ -267,7 +267,7 @@ class CDispatch:
 
                 # Inspect the type info of all implemented types
                 # E.g. IShellDispatch5 implements IShellDispatch4 which implements IShellDispatch3 ...
-                for iImplType in range(0, typeAttr.cImplTypes):
+                for iImplType in range(typeAttr.cImplTypes):
                     iRefType = typeInfo.GetRefTypeOfImplType(iImplType)
                     refTypeInfo = typeInfo.GetRefTypeInfo(iRefType)
                     typeInfos.append(refTypeInfo)
@@ -400,7 +400,7 @@ class CDispatch:
             return self._get_good_single_object_(ob)
 
     def _make_method_(self, name):
-        "Make a method object - Assumes in olerepr funcmap"
+        """Make a method object - Assumes in olerepr funcmap"""
         methodName = build.MakePublicAttributeName(name)  # translate keywords etc.
         methodCodeList = self._olerepr_.MakeFuncMethod(
             self._olerepr_.mapFuncs[name], methodName, 0
@@ -453,7 +453,7 @@ class CDispatch:
             raise AttributeError(name)
 
     def _print_details_(self):
-        "Debug routine - dumps what it knows about an object."
+        """Debug routine - dumps what it knows about an object."""
         print("AxDispatch container", self._username_)
         try:
             print("Methods:")

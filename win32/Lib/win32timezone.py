@@ -454,7 +454,7 @@ class TimeZoneDefinition(DYNAMIC_TIME_ZONE_INFORMATION):
 
     @classmethod
     def current(cls):
-        "Windows Platform SDK GetTimeZoneInformation"
+        """Windows Platform SDK GetTimeZoneInformation"""
         code, tzi = win32api.GetTimeZoneInformation(True)
         return code, cls(*tzi)
 
@@ -730,7 +730,7 @@ class TimeZoneInfo(datetime.tzinfo):
     @overload
     def utcoffset(self, dt: datetime.datetime) -> datetime.timedelta: ...
     def utcoffset(self, dt: datetime.datetime | None) -> datetime.timedelta | None:
-        "Calculates the utcoffset according to the datetime.tzinfo spec"
+        """Calculates the utcoffset according to the datetime.tzinfo spec"""
         if dt is None:
             return None
         winInfo = self.getWinInfo(dt.year)
@@ -784,11 +784,11 @@ class TimeZoneInfo(datetime.tzinfo):
         return in_dst
 
     def GetDSTStartTime(self, year: int) -> datetime.datetime:
-        "Given a year, determines the time when daylight savings time starts"
+        """Given a year, determines the time when daylight savings time starts"""
         return self.getWinInfo(year).locate_daylight_start(year)
 
     def GetDSTEndTime(self, year: int) -> datetime.datetime:
-        "Given a year, determines the time when daylight savings ends."
+        """Given a year, determines the time when daylight savings ends."""
         return self.getWinInfo(year).locate_standard_start(year)
 
     def __eq__(self, other: object) -> bool:
@@ -850,7 +850,7 @@ class TimeZoneInfo(datetime.tzinfo):
     # helper methods for accessing the timezone info from the registry
     @staticmethod
     def _get_time_zone_key(subkey=None):
-        "Return the registry key that stores time zone details"
+        """Return the registry key that stores time zone details"""
         key = _RegKeyDict.open(winreg.HKEY_LOCAL_MACHINE, TimeZoneInfo.tzRegKey)
         if subkey:
             key = key.subkey(subkey)
@@ -858,7 +858,7 @@ class TimeZoneInfo(datetime.tzinfo):
 
     @staticmethod
     def _get_time_zone_key_names():
-        "Returns the names of the (registry keys of the) time zones"
+        """Returns the names of the (registry keys of the) time zones"""
         return TimeZoneInfo._get_time_zone_key().subkeys()
 
     @staticmethod
@@ -943,7 +943,7 @@ class _RegKeyDict(dict[str, str]):
     def _enumerate_reg(
         key: _T, func: Callable[[_T, int], _VT]
     ) -> Generator[_VT, None, None]:
-        "Enumerates an open registry key as an iterable generator"
+        """Enumerates an open registry key as an iterable generator"""
         try:
             for index in count():
                 yield func(key, index)

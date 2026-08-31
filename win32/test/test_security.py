@@ -80,7 +80,7 @@ class SecurityTests(unittest.TestCase):
         sacl.AddAuditAccessAce(
             win32security.ACL_REVISION, win32con.GENERIC_ALL, pwr_sid, 1, 1
         )
-        for x in range(0, 200000):
+        for x in range(200000):
             if admin_sid is not None:
                 sd1.SetSecurityDescriptorOwner(admin_sid, 0)
             sd2.SetSecurityDescriptorGroup(pwr_sid, 0)

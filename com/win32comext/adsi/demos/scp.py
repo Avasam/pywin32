@@ -1,4 +1,4 @@
-"""A re-implementation of the MS DirectoryService samples related to services.
+r"""A re-implementation of the MS DirectoryService samples related to services.
 
 * Adds and removes an ActiveDirectory "Service Connection Point",
   including managing the security on the object.

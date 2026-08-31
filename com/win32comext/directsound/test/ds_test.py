@@ -75,12 +75,12 @@ def wav_header_pack(wfx, datasize):
 
 class WAVEFORMATTest(unittest.TestCase):
     def test_1_Type(self):
-        "WAVEFORMATEX type"
+        """WAVEFORMATEX type"""
         w = pywintypes.WAVEFORMATEX()
         self.assertTrue(isinstance(w, pywintypes.WAVEFORMATEXType))
 
     def test_2_Attr(self):
-        "WAVEFORMATEX attribute access"
+        """WAVEFORMATEX attribute access"""
         # A wav header for a soundfile from a CD should look like this...
         w = pywintypes.WAVEFORMATEX()
         w.wFormatTag = pywintypes.WAVE_FORMAT_PCM
@@ -100,12 +100,12 @@ class WAVEFORMATTest(unittest.TestCase):
 
 class DSCAPSTest(unittest.TestCase):
     def test_1_Type(self):
-        "DSCAPS type"
+        """DSCAPS type"""
         c = ds.DSCAPS()
         self.assertTrue(isinstance(c, ds.DSCAPSType))
 
     def test_2_Attr(self):
-        "DSCAPS attribute access"
+        """DSCAPS attribute access"""
         c = ds.DSCAPS()
         c.dwFlags = 1
         c.dwMinSecondarySampleRate = 2
@@ -154,12 +154,12 @@ class DSCAPSTest(unittest.TestCase):
 
 class DSBCAPSTest(unittest.TestCase):
     def test_1_Type(self):
-        "DSBCAPS type"
+        """DSBCAPS type"""
         c = ds.DSBCAPS()
         self.assertTrue(isinstance(c, ds.DSBCAPSType))
 
     def test_2_Attr(self):
-        "DSBCAPS attribute access"
+        """DSBCAPS attribute access"""
         c = ds.DSBCAPS()
         c.dwFlags = 1
         c.dwBufferBytes = 2
@@ -174,12 +174,12 @@ class DSBCAPSTest(unittest.TestCase):
 
 class DSCCAPSTest(unittest.TestCase):
     def test_1_Type(self):
-        "DSCCAPS type"
+        """DSCCAPS type"""
         c = ds.DSCCAPS()
         self.assertTrue(isinstance(c, ds.DSCCAPSType))
 
     def test_2_Attr(self):
-        "DSCCAPS attribute access"
+        """DSCCAPS attribute access"""
         c = ds.DSCCAPS()
         c.dwFlags = 1
         c.dwFormats = 2
@@ -192,12 +192,12 @@ class DSCCAPSTest(unittest.TestCase):
 
 class DSCBCAPSTest(unittest.TestCase):
     def test_1_Type(self):
-        "DSCBCAPS type"
+        """DSCBCAPS type"""
         c = ds.DSCBCAPS()
         self.assertTrue(isinstance(c, ds.DSCBCAPSType))
 
     def test_2_Attr(self):
-        "DSCBCAPS attribute access"
+        """DSCBCAPS attribute access"""
         c = ds.DSCBCAPS()
         c.dwFlags = 1
         c.dwBufferBytes = 2
@@ -208,12 +208,12 @@ class DSCBCAPSTest(unittest.TestCase):
 
 class DSBUFFERDESCTest(unittest.TestCase):
     def test_1_Type(self):
-        "DSBUFFERDESC type"
+        """DSBUFFERDESC type"""
         c = ds.DSBUFFERDESC()
         self.assertTrue(isinstance(c, ds.DSBUFFERDESCType))
 
     def test_2_Attr(self):
-        "DSBUFFERDESC attribute access"
+        """DSBUFFERDESC attribute access"""
         c = ds.DSBUFFERDESC()
         c.dwFlags = 1
         c.dwBufferBytes = 2
@@ -238,19 +238,19 @@ class DSBUFFERDESCTest(unittest.TestCase):
         c.lpwfxFormat = 17
 
     def test_3_invalid_format(self):
-        "DSBUFFERDESC invalid lpwfxFormat assignment"
+        """DSBUFFERDESC invalid lpwfxFormat assignment"""
         c = ds.DSBUFFERDESC()
         self.assertRaises(ValueError, self.invalid_format, c)
 
 
 class DSCBUFFERDESCTest(unittest.TestCase):
     def test_1_Type(self):
-        "DSCBUFFERDESC type"
+        """DSCBUFFERDESC type"""
         c = ds.DSCBUFFERDESC()
         self.assertTrue(isinstance(c, ds.DSCBUFFERDESCType))
 
     def test_2_Attr(self):
-        "DSCBUFFERDESC attribute access"
+        """DSCBUFFERDESC attribute access"""
         c = ds.DSCBUFFERDESC()
         c.dwFlags = 1
         c.dwBufferBytes = 2
@@ -275,7 +275,7 @@ class DSCBUFFERDESCTest(unittest.TestCase):
         c.lpwfxFormat = 17
 
     def test_3_invalid_format(self):
-        "DSCBUFFERDESC invalid lpwfxFormat assignment"
+        """DSCBUFFERDESC invalid lpwfxFormat assignment"""
         c = ds.DSCBUFFERDESC()
         self.assertRaises(ValueError, self.invalid_format, c)
 

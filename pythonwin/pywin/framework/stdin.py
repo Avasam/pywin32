@@ -50,7 +50,7 @@ class Stdin:
         return self.__extract_from_buffer(result_size)
 
     def readline(self, size=-1):
-        """Read one entire line from the file. A trailing newline
+        r"""Read one entire line from the file. A trailing newline
         character is kept in the string2.6 (but may be absent when a file ends
         with an incomplete line). If the size argument is present and
         non-negative, it is a maximum byte count (including the trailing
