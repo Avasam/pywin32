@@ -19,7 +19,12 @@ Access.
 
 from __future__ import annotations
 
-mapCLSIDToClass: dict[str, type] = {}
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from win32com.client import DispatchBaseClass
+
+mapCLSIDToClass: dict[str, type[DispatchBaseClass]] = {}
 
 
 def RegisterCLSID(clsid, pythonClass):
