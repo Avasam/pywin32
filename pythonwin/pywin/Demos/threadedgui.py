@@ -134,7 +134,7 @@ class TestThread(WinThread):
 
 class ThreadedFontFrame(window.MDIChildWnd):
     def __init__(self):
-        pass  # Don't call base class doc/view version...
+        # Don't call base class doc/view version...
         self.thread = None
 
     def Create(self, title, rect=None, parent=None):

@@ -61,7 +61,7 @@ class WorkerThread(threading.Thread):
 # may leverage the CompletionPort to queue their own requests, and implement a
 # fully asynch extension.
 class ThreadPoolExtension(isapi.simple.SimpleExtension):
-    "Base class for an ISAPI extension based around a thread-pool"
+    """Base class for an ISAPI extension based around a thread-pool"""
 
     max_workers = 20
     worker_shutdown_wait = 15000  # 15 seconds for workers to quit...

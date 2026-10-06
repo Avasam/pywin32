@@ -19,7 +19,7 @@ def verbose(msg):
 
 
 def CreateUser():
-    "Creates a new test user, then deletes the user"
+    """Creates a new test user, then deletes the user"""
     testName = "PyNetTestUser"
     try:
         win32net.NetUserDel(server, testName)
@@ -47,7 +47,7 @@ def CreateUser():
 
 
 def UserEnum():
-    "Enumerates all the local users"
+    """Enumerates all the local users"""
     resume = 0
     nuser = 0
     while 1:
@@ -67,7 +67,7 @@ def UserEnum():
 
 
 def GroupEnum():
-    "Enumerates all the domain groups"
+    """Enumerates all the domain groups"""
     nmembers = 0
     resume = 0
     while 1:
@@ -92,7 +92,7 @@ def GroupEnum():
 
 
 def LocalGroupEnum():
-    "Enumerates all the local groups"
+    """Enumerates all the local groups"""
     resume = 0
     nmembers = 0
     while 1:
@@ -120,7 +120,7 @@ def LocalGroupEnum():
 
 
 def ServerEnum():
-    "Enumerates all servers on the network"
+    """Enumerates all servers on the network"""
     resume = 0
     while 1:
         data, total, resume = win32net.NetServerEnum(
@@ -147,7 +147,7 @@ def ServerEnum():
 
 
 def LocalGroup(uname=None):
-    "Creates a local group, adds some members, deletes them, then removes the group"
+    """Creates a local group, adds some members, deletes them, then removes the group"""
     level = 3
     if uname is None:
         uname = win32api.GetUserName()
@@ -179,7 +179,7 @@ def LocalGroup(uname=None):
 
 
 def GetInfo(userName=None):
-    "Dumps level 3 information about the current user"
+    """Dumps level 3 information about the current user"""
     if userName is None:
         userName = win32api.GetUserName()
     print("Dumping level 3 information about user")
@@ -189,7 +189,7 @@ def GetInfo(userName=None):
 
 
 def SetInfo(userName=None):
-    "Attempts to change the current users comment, then set it back"
+    """Attempts to change the current users comment, then set it back"""
     if userName is None:
         userName = win32api.GetUserName()
     oldData = win32net.NetUserGetInfo(server, userName, 3)
@@ -205,7 +205,7 @@ def SetInfo(userName=None):
 
 
 def SetComputerInfo():
-    "Doesn't actually change anything, just make sure we could ;-)"
+    """Doesn't actually change anything, just make sure we could ;-)"""
     info = win32net.NetWkstaGetInfo(None, 502)
     # *sob* - but we can't!  Why not!!!
     # win32net.NetWkstaSetInfo(None, 502, info)

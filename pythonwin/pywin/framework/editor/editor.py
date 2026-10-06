@@ -154,7 +154,7 @@ class EditorDocument(ParentEditorDocument):
             view.SetAllLineColors(color)
 
     def SetLineColor(self, lineNo, color):
-        "Color a line of all views"
+        """Color a line of all views"""
         for view in self.GetAllViews():
             view.SetLineColor(lineNo, color)
 
@@ -200,7 +200,7 @@ class EditorView(ParentEditorView):
         self._obj_.Cut()
 
     def _PrepareUserStateChange(self):
-        "Return selection, lineindex, etc info, so it can be restored"
+        """Return selection, lineindex, etc info, so it can be restored"""
         self.SetRedraw(0)
         return self.GetModify(), self.GetSel(), self.GetFirstVisibleLine()
 
@@ -229,7 +229,7 @@ class EditorView(ParentEditorView):
                 self._EndUserStateChange(info)
 
     def SetLineColor(self, lineNo, color):
-        "lineNo is the 1 based line number to set.  If color is None, default color is used."
+        """lineNo is the 1 based line number to set.  If color is None, default color is used."""
         if isRichText:
             info = self._PrepareUserStateChange()
             try:
@@ -294,7 +294,7 @@ class EditorView(ParentEditorView):
         self._obj_.ReplaceSel(ins)
 
     def BlockDent(self, isIndent, startLine, endLine):
-        "Indent/Undent all lines specified"
+        """Indent/Undent all lines specified"""
         if not self.GetDocument().CheckMakeDocumentWritable():
             return 0
         tabSize = self.tabSize  # hard-code for now!
@@ -312,7 +312,7 @@ class EditorView(ParentEditorView):
                         if line[0] == "\t":
                             noToDel = 1
                         elif line[0] == " ":
-                            for noToDel in range(0, tabSize):
+                            for noToDel in range(tabSize):
                                 if line[noToDel] != " ":
                                     break
                             else:

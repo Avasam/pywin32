@@ -38,7 +38,7 @@ def io_callback(ecb, fp, cbIO, errcode):
 
 # The ISAPI extension - handles all requests in the site.
 class Extension(threaded_extension.ThreadPoolExtension):
-    "Python sample proxy server - asynch version."
+    """Python sample proxy server - asynch version."""
 
     def Dispatch(self, ecb):
         print('IIS dispatching "{}"'.format(ecb.GetServerVariable("URL")))

@@ -501,7 +501,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
                 # The object might be a pure COM dynamic dispatch with typelib support - let's see if we can get its props.
                 if hasattr(ob, "_oleobj_"):
                     try:
-                        for iTI in range(0, ob._oleobj_.GetTypeInfoCount()):
+                        for iTI in range(ob._oleobj_.GetTypeInfoCount()):
                             typeInfo = ob._oleobj_.GetTypeInfo(iTI)
                             self._UpdateWithITypeInfo(items_dict, typeInfo)
                     except:
@@ -572,7 +572,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
 
             if typeAttr.iid not in inspectedIIDs:
                 inspectedIIDs[typeAttr.iid] = None
-                for iFun in range(0, typeAttr.cFuncs):
+                for iFun in range(typeAttr.cFuncs):
                     funDesc = typeInfo.GetFuncDesc(iFun)
                     funName = typeInfo.GetNames(funDesc.memid)[0]
                     if funName not in items_dict:
@@ -580,7 +580,7 @@ class CScintillaView(docview.CtrlView, control.CScintillaColorEditInterface):
 
                 # Inspect the type info of all implemented types
                 # E.g. IShellDispatch5 implements IShellDispatch4 which implements IShellDispatch3 ...
-                for iImplType in range(0, typeAttr.cImplTypes):
+                for iImplType in range(typeAttr.cImplTypes):
                     iRefType = typeInfo.GetRefTypeOfImplType(iImplType)
                     refTypeInfo = typeInfo.GetRefTypeInfo(iRefType)
                     typeInfos.append(refTypeInfo)

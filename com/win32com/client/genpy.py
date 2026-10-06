@@ -1219,7 +1219,7 @@ class Generator:
         print(file=stream)
 
     def generate_child(self, child, dir):
-        "Generate a single child.  May force a few children to be built as we generate deps"
+        """Generate a single child.  May force a few children to be built as we generate deps"""
         self.generate_type = GEN_DEMAND_CHILD
 
         la = self.typelib.GetLibAttr()

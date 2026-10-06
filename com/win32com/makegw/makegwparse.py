@@ -84,11 +84,11 @@ class ArgFormatter:
         return self._IndirectPrefix(indirectFrom, indirectionTo) + self.arg.name
 
     def GetBuildValueArg(self):
-        "Get the argument to be passes to Py_BuildValue"
+        """Get the argument to be passes to Py_BuildValue"""
         return self.arg.name
 
     def GetParseTupleArg(self):
-        "Get the argument to be passed to PyArg_ParseTuple"
+        """Get the argument to be passed to PyArg_ParseTuple"""
         if self.gatewayMode:
             # use whatever they were declared with
             return self.GetIndirectedArgName(None, 1)
@@ -127,7 +127,7 @@ class ArgFormatter:
         )
 
     def GetInterfaceArgCleanup(self):
-        "Return cleanup code for C++ args passed to the interface method."
+        """Return cleanup code for C++ args passed to the interface method."""
         if DEBUG:
             return "/* GetInterfaceArgCleanup output goes here: %s */\n" % self.arg.name
         else:
@@ -159,7 +159,7 @@ class ArgFormatter:
             return self.declaredIndirection
 
     def DeclareParseArgTupleInputConverter(self):
-        "Declare the variable used as the PyArg_ParseTuple param for a gateway"
+        """Declare the variable used as the PyArg_ParseTuple param for a gateway"""
         # Only declare it??
         # if self.arg.indirectionLevel==0:
         # 	return "\t%s %s;\n" % (self.arg.type, self.arg.name)
@@ -173,21 +173,21 @@ class ArgFormatter:
             return ""
 
     def GetParsePostCode(self):
-        "Get a string of C++ code to be executed after (ie, to finalise) the PyArg_ParseTuple conversion"
+        """Get a string of C++ code to be executed after (ie, to finalise) the PyArg_ParseTuple conversion"""
         if DEBUG:
             return "/* GetParsePostCode code goes here: %s */\n" % self.arg.name
         else:
             return ""
 
     def GetBuildForInterfacePreCode(self):
-        "Get a string of C++ code to be executed before (ie, to initialise) the Py_BuildValue conversion for Interfaces"
+        """Get a string of C++ code to be executed before (ie, to initialise) the Py_BuildValue conversion for Interfaces"""
         if DEBUG:
             return "/* GetBuildForInterfacePreCode goes here: %s */\n" % self.arg.name
         else:
             return ""
 
     def GetBuildForGatewayPreCode(self):
-        "Get a string of C++ code to be executed before (ie, to initialise) the Py_BuildValue conversion for Gateways"
+        """Get a string of C++ code to be executed before (ie, to initialise) the Py_BuildValue conversion for Gateways"""
         s = self.GetBuildForInterfacePreCode()  # Usually the same
         if DEBUG:
             if s[:4] == "/* G":
@@ -195,13 +195,13 @@ class ArgFormatter:
         return s
 
     def GetBuildForInterfacePostCode(self):
-        "Get a string of C++ code to be executed after (ie, to finalise) the Py_BuildValue conversion for Interfaces"
+        """Get a string of C++ code to be executed after (ie, to finalise) the Py_BuildValue conversion for Interfaces"""
         if DEBUG:
             return "/* GetBuildForInterfacePostCode goes here: %s */\n" % self.arg.name
         return ""
 
     def GetBuildForGatewayPostCode(self):
-        "Get a string of C++ code to be executed after (ie, to finalise) the Py_BuildValue conversion for Gateways"
+        """Get a string of C++ code to be executed after (ie, to finalise) the Py_BuildValue conversion for Gateways"""
         s = self.GetBuildForInterfacePostCode()  # Usually the same
         if DEBUG:
             if s[:4] == "/* G":
@@ -216,11 +216,11 @@ class ArgFormatter:
         )
 
     def _GetPythonTypeDesc(self):
-        "Returns a string with the description of the type. Used for doco purposes"
+        """Returns a string with the description of the type. Used for doco purposes"""
         return None
 
     def NeedUSES_CONVERSION(self):
-        "Determines if this arg forces a USES_CONVERSION macro"
+        """Determines if this arg forces a USES_CONVERSION macro"""
         return 0
 
 

@@ -13,7 +13,7 @@ class RegEditPropertyPage(dialog.PropertyPage):
     IDC_LISTVIEW = 1000
 
     def GetTemplate(self):
-        "Return the template used to create this dialog"
+        """Return the template used to create this dialog"""
 
         w = 152  # Dialog width
         h = 122  # Dialog height
