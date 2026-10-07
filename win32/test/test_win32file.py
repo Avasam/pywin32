@@ -737,6 +737,15 @@ class TestEncrypt(unittest.TestCase):
             try:
                 win32file.EncryptFile(fname)
             except win32file.error as details:
+                if (
+                    details.winerror == winerror.ERROR_NOT_SUPPORTED
+                    and "CI" not in os.environ
+                ):
+                    # EFS is not available on every edition - Windows Home
+                    # (EditionID "Core") returns ERROR_NOT_SUPPORTED here.
+                    raise unittest.SkipTest(
+                        "EFS is not supported on this edition of Windows"
+                    )
                 if details.winerror != winerror.ERROR_ACCESS_DENIED:
                     raise
                 print("It appears this is not NTFS - can't encrypt/decrypt")
@@ -800,7 +809,7 @@ class TestConnect(unittest.TestCase):
             win32file.ConnectEx(s2, self.addr, ol, b"some expected request")
         except win32file.error as exc:
             win32event.SetEvent(giveup_event)
-            raise  # some error error we don't expect.
+            raise  # some error we don't expect.
         # We occasionally see ERROR_CONNECTION_REFUSED in automation
         try:
             win32file.GetOverlappedResult(s2.fileno(), ol, 1)
@@ -835,7 +844,7 @@ class TestConnect(unittest.TestCase):
             win32file.ConnectEx(s2, self.addr, ol)
         except win32file.error as exc:
             win32event.SetEvent(giveup_event)
-            raise  # some error error we don't expect.
+            raise  # some error we don't expect.
         # We occasionally see ERROR_CONNECTION_REFUSED in automation
         try:
             win32file.GetOverlappedResult(s2.fileno(), ol, 1)
