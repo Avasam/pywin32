@@ -92,7 +92,12 @@
 
 #ifdef __MINGW32__
 #include <olectl.h>
-
+#include <oleidl.h>
+#include <oaidl.h>
+#include <objidl.h>
+// #include <MAPIGuid.h>
+#include <shlguid.h>
+#include <initguid.h>
 #endif  // __MINGW32__
 
 #include <PyWinTypes.h>  // Standard Win32 Types
