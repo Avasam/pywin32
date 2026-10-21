@@ -1148,7 +1148,7 @@ static PyObject *PyLoadCursor(PyObject *self, PyObject *args)
         return NULL;
     // @pyseeapi LoadCursor
     PyW32_BEGIN_ALLOW_THREADS;
-    HCURSOR ret = ::LoadCursor(hInstance, MAKEINTRESOURCE(id));
+    HCURSOR ret = ::LoadCursor(hInstance, id);
     PyW32_END_ALLOW_THREADS;
     PyWinObject_FreeResourceId(id);
     if (ret == NULL)
