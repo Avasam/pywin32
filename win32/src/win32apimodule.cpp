@@ -484,7 +484,7 @@ static PyObject *PyFindExecutable(PyObject *self, PyObject *args)
             if (rc == (HINSTANCE)31)
                 PyErr_SetString(PyWinExc_ApiError, "FindExecutable: There is no association for the file");
             else
-                PyWin_SetAPIError("FindExecutable", (int)rc);
+                PyWin_SetAPIError("FindExecutable", (int)(INT_PTR)rc);
         }
         else
             ret = Py_BuildValue("(NN)", PyWinLong_FromHANDLE(rc), PyWinObject_FromTCHAR(res));
@@ -4375,7 +4375,7 @@ static PyObject *PyShellExecute(PyObject *self, PyObject *args)
         PyW32_END_ALLOW_THREADS;
         // @pyseeapi ShellExecute
         if (rc <= (HINSTANCE)32)
-            PyWin_SetAPIError("ShellExecute", (int)rc);
+            PyWin_SetAPIError("ShellExecute", (int)(INT_PTR)rc);
         else
             ret = PyWinLong_FromVoidPtr(rc);
     }

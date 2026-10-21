@@ -380,7 +380,7 @@ static PyObject *odbcClose(PyObject *self, PyObject *args)
 }
 
 /* @object connection|An object representing an ODBC connection */
-static struct PyMethodDef connectionMethods[] = {
+struct PyMethodDef connectionMethods[] = {
     {"setautocommit", odbcSetAutoCommit, 1}, /* @pymeth setautocommit|Sets the autocommit mode. */
     {"commit", odbcCommit, 1},               /* @pymeth commit|Commits a transaction. */
     {"rollback", odbcRollback, 1},           /* @pymeth rollback|Rollsback a transaction. */
@@ -388,8 +388,7 @@ static struct PyMethodDef connectionMethods[] = {
     {"close", odbcClose, 1},                 /* @pymeth close|Closes the connection. */
     {0, 0}};
 
-static PyMemberDef connectionMembers[] = {{"error", T_OBJECT, offsetof(connectionObject, connectionError), READONLY},
-                                          {NULL}};
+PyMemberDef connectionMembers[] = {{"error", T_OBJECT, offsetof(connectionObject, connectionError), READONLY}, {NULL}};
 
 static void connectionDealloc(PyObject *self)
 {
@@ -1431,19 +1430,18 @@ static PyObject *odbcCurSetOutputSize(PyObject *self, PyObject *args)
 }
 
 /* @object cursor|An object representing an ODBC cursor. */
-static PyMethodDef cursorMethods[] = {
-    {"close", odbcCurClose, 1},                 /* @pymeth close|Closes the cursor */
-    {"execute", odbcCurExec, 1},                /* @pymeth execute|Execute some SQL */
-    {"fetchone", odbcCurFetchOne, 1},           /* @pymeth fetchone|Fetch one row of data */
-    {"fetchmany", odbcCurFetchMany, 1},         /* @pymeth fetchmany|Fetch many rows of data */
-    {"fetchall", odbcCurFetchAll, 1},           /* @pymeth fetchall|Fetch all the rows of data */
-    {"setinputsizes", odbcCurSetInputSizes, 1}, /* @pymeth setinputsizes| */
-    {"setoutputsize", odbcCurSetOutputSize, 1}, /* @pymeth setoutputsize| */
-    {0, 0}};
+PyMethodDef cursorMethods[] = {{"close", odbcCurClose, 1},         /* @pymeth close|Closes the cursor */
+                               {"execute", odbcCurExec, 1},        /* @pymeth execute|Execute some SQL */
+                               {"fetchone", odbcCurFetchOne, 1},   /* @pymeth fetchone|Fetch one row of data */
+                               {"fetchmany", odbcCurFetchMany, 1}, /* @pymeth fetchmany|Fetch many rows of data */
+                               {"fetchall", odbcCurFetchAll, 1},   /* @pymeth fetchall|Fetch all the rows of data */
+                               {"setinputsizes", odbcCurSetInputSizes, 1}, /* @pymeth setinputsizes| */
+                               {"setoutputsize", odbcCurSetOutputSize, 1}, /* @pymeth setoutputsize| */
+                               {0, 0}};
 
-static PyMemberDef cursorMembers[] = {{"description", T_OBJECT, offsetof(cursorObject, description), READONLY},
-                                      {"error", T_OBJECT, offsetof(cursorObject, cursorError), READONLY},
-                                      {NULL}};
+PyMemberDef cursorMembers[] = {{"description", T_OBJECT, offsetof(cursorObject, description), READONLY},
+                               {"error", T_OBJECT, offsetof(cursorObject, cursorError), READONLY},
+                               {NULL}};
 
 static void parseInfo(connectionObject *conn, const TCHAR *c)
 {
