@@ -771,7 +771,7 @@ PyObject *PyOpenIMsgSession(PyObject *self, PyObject *args)
 	PY_INTERFACE_POSTCALL;
 	if (FAILED(hr))
 		return OleSetOleError(hr);
-	return PyLong_FromLong((long)pSession);
+	return PyWinLong_FromVoidPtr(pSession);
 }
 %}
 // @pyswig |CloseIMsgSession|
@@ -779,8 +779,11 @@ PyObject *PyOpenIMsgSession(PyObject *self, PyObject *args)
 %{
 PyObject *PyCloseIMsgSession(PyObject *self, PyObject *args)
 {
-	long session = 0;
-	if (!PyArg_ParseTuple(args, "l:CloseIMsgSession", &session))
+	PyObject *obSession;
+	if (!PyArg_ParseTuple(args, "O:CloseIMsgSession", &obSession))
+		return NULL;
+	void *session;
+	if (!PyWinLong_AsVoidPtr(obSession, &session))
 		return NULL;
 	PY_INTERFACE_PRECALL;
 	::CloseIMsgSession( (LPMSGSESS)session );
@@ -803,15 +806,19 @@ PyObject *PyOpenIMsgOnIStg(PyObject *self, PyObject *args)
 	long flags = 0;
 	HRESULT hr = E_FAIL;
 	PyObject *rc = NULL;
-	long lSession;
+	PyObject *obSession;
+	void *session;
 
-	if (!PyArg_ParseTuple(args, "lOO|Oll:OpenIMsgOnIStg",
-		&lSession, // @pyparm object|session||
+	if (!PyArg_ParseTuple(args, "OOO|Oll:OpenIMsgOnIStg",
+		&obSession, // @pyparm object|session||
 		&obMapiSupport, // @pyparm <o PyIMAPISupport>|support||May be None
 		&obStorage, // @pyparm <o PyIStorage>|storage||A <o PyIStorage> object that is open and has read-only or read/write access. Because IMessage does not support write-only access, OpenIMsgOnIStg does not accept a storage object opened in write-only mode.
 		&obCallRelease, // @pyparm object|callback|None|Only None is supported.
 		&dwCallRelFlags, // @pyparm int|callbackData|0|
 		&flags)) // @pyparm int|flags|0|
+		return NULL;
+
+	if (!PyWinLong_AsVoidPtr(obSession, &session))
 		return NULL;
 
 	if (obMapiSupport != Py_None || obCallRelease != Py_None) {
@@ -828,7 +835,7 @@ PyObject *PyOpenIMsgOnIStg(PyObject *self, PyObject *args)
 	{
 	PY_INTERFACE_PRECALL;
 	LPMALLOC pMalloc = MAPIGetDefaultMalloc();
-	hr = ::OpenIMsgOnIStg((LPMSGSESS)lSession,
+	hr = ::OpenIMsgOnIStg((LPMSGSESS)session,
 					  MAPIAllocateBuffer,
 					  MAPIAllocateMore,
 					  MAPIFreeBuffer,
