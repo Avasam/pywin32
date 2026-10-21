@@ -317,7 +317,7 @@ PyObject *PyHFC::SendResponseHeader(PyObject *self, PyObject *args)
         // The Java code passes "\r\n" as first DWORD, and header in second,
         // but docs clearly have second as unused.  Either way, I can't see the
         // specific header!
-        bRes = phfc->m_pfc->ServerSupportFunction(SF_REQ_SEND_RESPONSE_HEADER, status, (DWORD)header, 0);
+        bRes = phfc->m_pfc->ServerSupportFunction(SF_REQ_SEND_RESPONSE_HEADER, status, (ULONG_PTR)header, 0);
     Py_END_ALLOW_THREADS
     if (!bRes)
         return SetPyHFCError("SendResponseHeader");
