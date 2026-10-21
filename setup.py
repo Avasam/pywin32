@@ -226,8 +226,6 @@ class WinExt(Extension):
         else:
             # Set our C++ standard
             self.extra_compile_args.append("-std=c++17")
-            # More lenient about non-standard C++ code as this project was based on MSVC
-            self.extra_compile_args.append("-fpermissive")
             # Enables MS-specific syntax and MS-specific idioms: namely anonymous structs/unions which C++ lacks
             self.extra_compile_args.append("-fms-extensions")
 
