@@ -404,7 +404,7 @@ class InteractivePythonApp(app.CApp):
     # General handlers
     #
     def OnViewBrowse(self, id, code):
-        "Called when ViewBrowse message is received"
+        """Called when ViewBrowse message is received"""
         from pywin.tools import browser
 
         obName = dialog.GetSimpleInput("Object", "__builtins__", "Browse Python Object")
@@ -421,13 +421,13 @@ class InteractivePythonApp(app.CApp):
             win32ui.MessageBox("This object can not be browsed")
 
     def OnFileImport(self, id, code):
-        "Called when a FileImport message is received. Import the current or specified file"
+        """Called when a FileImport message is received. Import the current or specified file"""
         from . import scriptutils
 
         scriptutils.ImportFile()
 
     def OnFileCheck(self, id, code):
-        "Called when a FileCheck message is received. Check the current file."
+        """Called when a FileCheck message is received. Check the current file."""
         from . import scriptutils
 
         scriptutils.CheckFile()
@@ -438,7 +438,7 @@ class InteractivePythonApp(app.CApp):
         cmdui.Enable(scriptutils.GetActiveFileName(0) is not None)
 
     def OnFileRun(self, id, code):
-        "Called when a FileRun message is received."
+        """Called when a FileRun message is received."""
         from . import scriptutils
 
         showDlg = win32api.GetKeyState(win32con.VK_SHIFT) >= 0

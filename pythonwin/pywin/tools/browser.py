@@ -401,7 +401,7 @@ class dynamic_browser(dialog.Dialog):
 
 
 def Browse(ob=__main__):
-    "Browse the argument, or the main dictionary"
+    """Browse the argument, or the main dictionary"""
     root = MakeHLI(ob, "root")
     if not root.IsExpandable():
         raise TypeError(

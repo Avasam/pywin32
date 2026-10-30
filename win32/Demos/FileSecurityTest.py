@@ -48,7 +48,7 @@ dacl = sd.GetSecurityDescriptorDacl()
 if dacl is None:
     print("No Discretionary ACL")
 else:
-    for ace_no in range(0, dacl.GetAceCount()):
+    for ace_no in range(dacl.GetAceCount()):
         ace = dacl.GetAce(ace_no)
         print("ACE", ace_no)
 

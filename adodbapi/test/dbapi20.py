@@ -131,7 +131,6 @@ class DatabaseAPI20Test(unittest.TestCase):
         """self.drivers should override this method to perform required setup
         if any is necessary, such as creating the database.
         """
-        pass
 
     def tearDown(self):
         """self.drivers should override this method to perform required cleanup
@@ -644,7 +643,7 @@ class DatabaseAPI20Test(unittest.TestCase):
             rows.sort()
 
             # Make sure we get the right data back out
-            for i in range(0, 6):
+            for i in range(6):
                 self.assertEqual(
                     rows[i],
                     self.samples[i],
@@ -701,7 +700,7 @@ class DatabaseAPI20Test(unittest.TestCase):
             )
             rows = [r[0] for r in rows]
             rows.sort()
-            for i in range(0, len(self.samples)):
+            for i in range(len(self.samples)):
                 self.assertEqual(
                     rows[i], self.samples[i], "cursor.fetchall retrieved incorrect rows"
                 )
@@ -754,7 +753,7 @@ class DatabaseAPI20Test(unittest.TestCase):
             rows.append(rows4[0])
             rows.extend([rows56[0][0], rows56[1][0]])
             rows.sort()
-            for i in range(0, len(self.samples)):
+            for i in range(len(self.samples)):
                 self.assertEqual(
                     rows[i], self.samples[i], "incorrect data retrieved or inserted"
                 )
@@ -777,7 +776,7 @@ class DatabaseAPI20Test(unittest.TestCase):
         # cur.execute(sql)
 
     def help_nextset_tearDown(self, cur):
-        "If cleaning up is needed after nextSetTest"
+        """If cleaning up is needed after nextSetTest"""
         raise NotImplementedError("Helper not implemented")
         # cur.execute("drop procedure deleteme")
 

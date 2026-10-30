@@ -241,23 +241,18 @@ class ExcelRTDServer:
     # Overridable class events...
     def OnConnectData(self, TopicID):
         """Called when a new topic has been created, at excel's request."""
-        pass
 
     def OnDisconnectData(self, TopicID):
         """Called when a topic is about to be deleted, at excel's request."""
-        pass
 
     def OnRefreshData(self):
         """Called when excel has requested all current topic data."""
-        pass
 
     def OnServerStart(self):
         """Called when excel has instanciated us."""
-        pass
 
     def OnServerTerminate(self):
         """Called when excel is about to destroy us."""
-        pass
 
 
 class RTDTopic:

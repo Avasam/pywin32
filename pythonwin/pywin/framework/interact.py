@@ -388,7 +388,7 @@ class InteractiveCore:
         return line
 
     def AppendToPrompt(self, bufLines, oldPrompt=None):
-        "Take a command and stick it at the end of the buffer (with python prompts inserted if required)."
+        """Take a command and stick it at the end of the buffer (with python prompts inserted if required)."""
         self.flush()
         lastLineNo = self.GetLineCount() - 1
         line = self.DoGetLine(lastLineNo)

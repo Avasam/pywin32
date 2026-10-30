@@ -20,7 +20,7 @@ ParentScintillaDocument = docview.Document
 
 
 class CScintillaDocument(ParentScintillaDocument):
-    "A SyntEdit document."
+    """A SyntEdit document."""
 
     def __init__(self, *args):
         self.bom = None  # the BOM, if any, read from the file.

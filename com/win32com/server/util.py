@@ -129,7 +129,7 @@ def NewEnum(
 
 
 class Collection:
-    "A collection of VARIANT values."
+    """A collection of VARIANT values."""
 
     _public_methods_ = ["Item", "Count", "Add", "Remove", "Insert"]
 

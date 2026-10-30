@@ -12,7 +12,7 @@ local_name = win32api.GetComputerName()
 
 
 def DumpRoot():
-    "Dumps the root DSE"
+    """Dumps the root DSE"""
     path = "LDAP://%srootDSE" % server
     rootdse = ADsGetObject(path)
 
@@ -55,7 +55,7 @@ def _DumpTheseAttributes(child, attrs):
 
 
 def DumpSchema():
-    "Dumps the default DSE schema"
+    """Dumps the default DSE schema"""
     # Bind to rootDSE to get the schemaNamingContext property.
     path = "LDAP://%srootDSE" % server
     rootdse = ADsGetObject(path)
@@ -112,7 +112,7 @@ def _DumpObject(ob, level=0):
 
 
 def DumpAllObjects():
-    "Recursively dump the entire directory!"
+    """Recursively dump the entire directory!"""
     path = "LDAP://%srootDSE" % server
     rootdse = ADsGetObject(path)
     name = rootdse.Get("defaultNamingContext")
@@ -139,7 +139,7 @@ for name, val in pythoncom.__dict__.items():
 
 
 def DumpSchema2():
-    "Dumps the schema using an alternative technique"
+    """Dumps the schema using an alternative technique"""
     path = f"LDAP://{server}schema"
     schema = ADsGetObject(path, IID_IADsContainer)
     nclass = nprop = nsyntax = 0
@@ -183,14 +183,14 @@ def DumpSchema2():
 
 
 def DumpGC():
-    "Dumps the GC: object (whatever that is!)"
+    """Dumps the GC: object (whatever that is!)"""
     ob = ADsGetObject("GC:", IID_IADsContainer)
     for sub_ob in ob:
         print(f"GC ob: {sub_ob.Name} ({sub_ob.ADsPath})")
 
 
 def DumpLocalUsers():
-    "Dumps the local machine users"
+    """Dumps the local machine users"""
     path = f"WinNT://{local_name},computer"
     ob = ADsGetObject(path, IID_IADsContainer)
     ob.put_Filter(["User", "Group"])
@@ -199,7 +199,7 @@ def DumpLocalUsers():
 
 
 def DumpLocalGroups():
-    "Dumps the local machine groups"
+    """Dumps the local machine groups"""
     path = f"WinNT://{local_name},computer"
     ob = ADsGetObject(path, IID_IADsContainer)
 

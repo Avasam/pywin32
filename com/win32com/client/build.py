@@ -70,7 +70,7 @@ NoTranslateMap = set(NoTranslateTypes)
 
 
 class MapEntry:
-    "Simple holder for named attibutes - items in a map."
+    """Simple holder for named attibutes - items in a map."""
 
     def __init__(
         self,
@@ -322,7 +322,7 @@ class DispatchItem(OleItem):
             self._propMapPutCheck_(key, item)
 
     def CountInOutOptArgs(self, argTuple):
-        "Return tuple counting in/outs/OPTS.  Sum of result may not be len(argTuple), as some args may be in/out."
+        """Return tuple counting in/outs/OPTS.  Sum of result may not be len(argTuple), as some args may be in/out."""
         ins = out = opts = 0
         for argCheck in argTuple:
             inOut = argCheck[1]
@@ -614,7 +614,7 @@ def _ResolveType(typerepr, itypeinfo):
 
 
 def _BuildArgList(fdesc, names):
-    "Builds list of args to the underlying Invoke method."
+    """Builds list of args to the underlying Invoke method."""
     # Word has TypeInfo for Insert() method, but says "no args"
     numArgs = max(fdesc[6], len(fdesc[2]))
     names = list(names)
@@ -729,7 +729,7 @@ def BuildCallList(
     defOutArg,
     is_comment=False,
 ):
-    "Builds a Python declaration for a method."
+    """Builds a Python declaration for a method."""
     # Names[0] is the func name - param names are from 1.
     numArgs = len(fdesc[2])
     numOptArgs = fdesc[6]
