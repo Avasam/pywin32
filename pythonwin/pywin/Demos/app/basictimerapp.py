@@ -128,11 +128,10 @@ class TimerManager:
                     exec(self.dlg.doWork)
                     print("The last operation completed successfully.")
                 except:
-                    t, v, tb = sys.exc_info()
-                    str = f"Failed: {t}: {v!r}"
+                    exc = sys.exception()
+                    str = f"Failed: {type(exc)}: {exc!r}"
                     print(str)
                     self.oldErr.write(str)
-                    tb = None  # Prevent cycle
             finally:
                 self.ReleaseOutput()
                 self.dlg.butOK.EnableWindow()

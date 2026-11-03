@@ -246,13 +246,13 @@ import operator
 import re
 import struct
 import winreg
-from collections.abc import Generator, Iterable, Mapping
+from collections.abc import Callable, Generator, Iterable, Mapping
 from itertools import count
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
     ClassVar,
+    Self,
     TypeVar,
     overload,
 )
@@ -263,7 +263,6 @@ if TYPE_CHECKING:
     from _operator import _SupportsComparison
 
     from _typeshed import SupportsKeysAndGetItem
-    from typing_extensions import Self
 
 __author__ = "Jason R. Coombs <jaraco@jaraco.com>"
 
@@ -670,7 +669,7 @@ class TimeZoneInfo(datetime.tzinfo):
     def __str__(self) -> str:
         return self.displayName
 
-    @overload  # type: ignore[override] # Split definition into overrides
+    @overload
     def tzname(self, dt: datetime.datetime) -> str: ...
     @overload
     def tzname(self, dt: None) -> None: ...
@@ -725,7 +724,7 @@ class TimeZoneInfo(datetime.tzinfo):
         winInfo = self.getWinInfo(dt.year)
         return winInfo.bias + winInfo.daylight_bias
 
-    @overload  # type: ignore[override] # False-positive, our overload covers all base types
+    @overload
     def utcoffset(self, dt: None) -> None: ...
     @overload
     def utcoffset(self, dt: datetime.datetime) -> datetime.timedelta: ...
@@ -736,7 +735,7 @@ class TimeZoneInfo(datetime.tzinfo):
         winInfo = self.getWinInfo(dt.year)
         return -winInfo.bias + self.dst(dt)
 
-    @overload  # type: ignore[override] # False-positive, our overload covers all base types
+    @overload
     def dst(self, dt: None) -> None: ...
     @overload
     def dst(self, dt: datetime.datetime) -> datetime.timedelta: ...
@@ -876,7 +875,9 @@ class TimeZoneInfo(datetime.tzinfo):
         values = map(get_index_value, key_names)
 
         return (
-            (value, key_name) for value, key_name in zip(values, key_names) if value
+            (value, key_name)
+            for value, key_name in zip(values, key_names, strict=True)
+            if value
         )
 
     @staticmethod

@@ -305,13 +305,7 @@ class T(unittest.TestCase):
         self.assertGreater(
             o.cnt_onpaint,
             0,
-            (
-                "".join(
-                    traceback.format_exception(type(o.exc), o.exc, o.exc.__traceback__)
-                )
-                if hasattr(o, "exc")
-                else None
-            ),
+            ("".join(traceback.format_exception(o.exc)) if hasattr(o, "exc") else None),
         )
         pix = dc.GetPixel(1, 1)
         bmp = win32ui.CreateBitmap()

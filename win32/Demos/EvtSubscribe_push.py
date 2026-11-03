@@ -1,5 +1,4 @@
-## Demonstrates a "push" subscription with a callback function
-from __future__ import annotations
+"""Demonstrates a "push" subscription with a callback function"""
 
 from time import sleep
 

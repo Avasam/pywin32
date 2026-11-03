@@ -4,10 +4,7 @@ This module contains utility functions to register Python objects as
 valid COM Servers.  The RegisterServer function provides all information
 necessary to allow the COM framework to respond to a request for a COM object,
 construct the necessary Python object, and dispatch COM events.
-
 """
-
-from __future__ import annotations
 
 import os
 import sys

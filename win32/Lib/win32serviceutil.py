@@ -6,6 +6,7 @@
 # when things go wrong - eg, not enough permissions to hit the
 # registry etc.
 
+import contextlib
 import importlib.machinery
 import os
 import sys
@@ -185,13 +186,8 @@ def InstallPerfmonForService(serviceName, iniName, dllName=None):
         import perfmon
 
         path, fname = os.path.split(iniName)
-        oldPath = os.getcwd()
-        if path:
-            os.chdir(path)
-        try:
+        with contextlib.chdir(path or os.curdir):
             perfmon.LoadPerfCounterTextStrings("python.exe " + fname)
-        finally:
-            os.chdir(oldPath)
     except win32api.error as details:
         print("The service was installed OK, but the performance monitor")
         print("data could not be loaded.", details)

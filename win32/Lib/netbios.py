@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import struct
 from collections.abc import Iterable
 
@@ -218,7 +216,7 @@ class NCBStruct:
     def _unpack(self):
         items = struct.unpack(self._format, self._buffer_)
         assert len(items) == len(self._items), "unexpected number of items to unpack!"
-        for (format, name), val in zip(self._items, items):
+        for (format, name), val in zip(self._items, items, strict=True):
             self.__dict__[name] = val
 
     def __setattr__(self, attr, val):

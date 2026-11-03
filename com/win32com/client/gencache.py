@@ -21,8 +21,6 @@ Hacks, to do, etc
   Maybe an OLE2 compound file, or a bsddb file?
 """
 
-from __future__ import annotations
-
 import contextlib
 import glob
 import os
@@ -760,11 +758,8 @@ def Rebuild(verbose=1):
         try:
             AddModuleToCache(iid, lcid, major, minor, verbose, 0)
         except:
-            print(
-                "Could not add module {} - {}: {}".format(
-                    info, sys.exc_info()[0], sys.exc_info()[1]
-                )
-            )
+            exc = sys.exception()
+            print("Could not add module {} - {}: {}".format(info, type(exc), exc))
     if verbose and len(infos):  # Don't bother reporting this when directory is empty!
         print("Done.")
     _SaveDicts()

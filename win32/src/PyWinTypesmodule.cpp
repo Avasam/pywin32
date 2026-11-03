@@ -471,9 +471,8 @@ BOOL PyWinObject_AsDWORDArray(PyObject *obdwords, DWORD **pdwords, DWORD *item_c
     else
         for (tuple_index = 0; tuple_index < *item_cnt; tuple_index++) {
             tuple_item = PyTuple_GET_ITEM(dwords_tuple, tuple_index);
-            // Doesn't check for overflow, but will accept a python long
-            //  greater than INT_MAX (even on Python 2.3).  Also accepts
-            //  negatives and converts to the correct hex representation
+            // Doesn't check for overflow, but will accept a python long greater than INT_MAX.
+            // Also accepts negatives and converts to the correct hex representation
             (*pdwords)[tuple_index] = PyLong_AsUnsignedLongMask(tuple_item);
             if (((*pdwords)[tuple_index] == -1) && PyErr_Occurred()) {
                 ret = FALSE;
@@ -491,67 +490,27 @@ BOOL PyWinObject_AsDWORDArray(PyObject *obdwords, DWORD **pdwords, DWORD *item_c
 }
 
 /*
-PyLong_AsVoidPtr is unsuitable for use in many places due to the following issues:
-
-1. It fails to convert some types.  On 32-bit, it calls PyLong_AsLong
-    which doesn't check if the type has number methods defined (tp_as_number).
-    This causes it to fail for PyHANDLE's.
-    However, it doesn't even fail consistently since on 64-bit it uses
-    PyLong_AsLongLong which does check tp_as_number.
-    (except starting in 3.10, it no longer does!)
-
-2. When it fails to convert an object (even one for which it should succeed!)
-    it uses PyErr_BadInternalCall which returns a vague and misleading error.
-
-3. The documentation says it's only guaranteed to work for objects created using
-    PyLong_FromVoidPtr.  However, there's no way to call this from the
-    interpreter which means that places which can also accept a plain number
-    as well as an address have no way to ensure that both will be converted
-    consistently.  Additionally, PyLong_FromVoidPtr just returns a python int or
-    long so there is actually no way to verify that an object was created using
-    that function and can be converted back to a usable address.
-
-From the response to this bug report:
-https://github.com/python/cpython/issues/44430
-apparently if you want any reasonable or consistent behaviour from this function
-you're expected to perform the type checking yourself first.
-And if you have to do all that, why use the damn function at all ?
-Accordingly, here is our own version.
+PyLong_AsVoidPtr only accepts int objects. Anything else, even objects implementing
+__index__ or __int__ (such as PyHANDLE), is rejected with a vague
+"an integer is required" TypeError that doesn't name the offending type.
+So we convert to an int ourselves first, and raise our own error on failure.
+For an int, PyLong_AsVoidPtr accepts the full range of both signed and unsigned
+pointer-sized values.
 */
 BOOL PyWinLong_AsVoidPtr(PyObject *ob, void **pptr)
 {
     assert(!PyErr_Occurred());  // lingering exception?
-                                // PyLong_AsLong (and PyLong_AsLongLong on x64) handle objects
-                                // with tp_number slots, and longs that fit in 32bits - but *not*
-                                // longs that fit in 32bits if they are treated as unsigned - eg,
-                                // eg, the result of:
-                                // struct.unpack("P", struct.pack("P", -1)) -> (4294967295L,)
-                                // So, we do the PyLong_AsLong thing first, then fall back to the
-                                // *_AsUnsignedLong[Long] versions.
-#ifdef _WIN64
-#define SIGNED_CONVERTER PyLong_AsLongLong
-#define UNSIGNED_CONVERTER PyLong_AsUnsignedLongLong
-#else
-#define SIGNED_CONVERTER PyLong_AsLong
-#define UNSIGNED_CONVERTER PyLong_AsUnsignedLong
-#endif
-    // Since Python 3.10, calling __int__ is no longer done, so we convert to an int explicitly.
     PyObject *longob = PyNumber_Long(ob);
-    if (!longob && PyErr_Occurred()) {
+    if (!longob) {
         PyErr_Format(PyExc_TypeError, "Unable to convert %s to pointer-sized value", Py_TYPE(ob)->tp_name);
         return FALSE;
     }
-    *pptr = (void *)SIGNED_CONVERTER(longob);
-    if (*pptr == (void *)-1 && PyErr_Occurred()) {
-        PyErr_Clear();
-        *pptr = (void *)UNSIGNED_CONVERTER(longob);
-        if (*pptr == (void *)-1 && PyErr_Occurred()) {
-            Py_DECREF(longob);
-            PyErr_Format(PyExc_TypeError, "Unable to convert %s to pointer-sized value", Py_TYPE(ob)->tp_name);
-            return FALSE;
-        }
-    }
+    *pptr = PyLong_AsVoidPtr(longob);
     Py_DECREF(longob);
+    if (!*pptr && PyErr_Occurred()) {
+        PyErr_Format(PyExc_TypeError, "Unable to convert %s to pointer-sized value", Py_TYPE(ob)->tp_name);
+        return FALSE;
+    }
     return TRUE;
 }
 

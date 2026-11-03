@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import getopt
 import os
 import platform
@@ -315,7 +313,7 @@ if __name__ == "__main__":
             "*** The following test modules could not be imported ***"
         )
         for mod_name, error in import_failures:
-            desc = "\n".join(traceback.format_exception_only(type(error), error))
+            desc = "\n".join(traceback.format_exception_only(error))
             testResult.stream.write(f"{mod_name}: {desc}")
         testResult.stream.writeln(
             f"*** {len(import_failures)} test(s) could not be run ***"

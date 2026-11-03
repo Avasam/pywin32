@@ -29,10 +29,9 @@ class DDESystemTopic(object.Object):
             # print("Executing", cmd)
             self.app.OnDDECommand(data)
         except:
-            t, v, tb = sys.exc_info()
             # The DDE Execution failed.
             print("Error executing DDE command.")
-            traceback.print_exception(t, v, tb)
+            traceback.print_exception(sys.exception())
             return 0
 
 

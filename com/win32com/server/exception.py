@@ -83,7 +83,7 @@ class COMException(pythoncom.com_error):
 
 def IsCOMException(t=None):
     if t is None:
-        t = sys.exc_info()[0]
+        t = type(sys.exception())
     if not t is type:
         # t is not a class (likely None or a str)
         return False
@@ -92,7 +92,7 @@ def IsCOMException(t=None):
 
 def IsCOMServerException(t=None):
     if t is None:
-        t = sys.exc_info()[0]
+        t = type(sys.exception())
     if not t is type:
         # t is not a class (likely None or a str)
         return False

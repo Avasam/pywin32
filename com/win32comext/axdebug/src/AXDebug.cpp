@@ -55,12 +55,6 @@ generates Windows .hlp files.
 #include "PyIActiveScriptErrorDebug.h"
 #include "PyIEnumDebugPropertyInfo.h"
 
-// Headers needed for the f_trace hacks.
-#if PY_VERSION_HEX < 0x030b0000  // < 3.11
-#include "compile.h"
-#include "frameobject.h"
-#endif
-
 static PyObject *axdebug_Error; /* 'Python level' errors */
 
 BOOL PyAXDebug_PySOURCE_TEXT_ATTR_Length(PyObject *obAttr, ULONG *pLength)
@@ -186,7 +180,6 @@ static PyObject *SetThreadStateTrace(PyObject *self, PyObject *args)
 
     // Loop back over all frames, setting each frame back to our
     // first script block frame with the tracer.
-#if PY_VERSION_HEX >= 0x030b0000  // >= 3.11: PyFrameObject is opaque
     PyFrameObject *frame = state ? PyThreadState_GetFrame(state) : NULL;
     bool bFoundFirstScriptBlock = false;
     while (frame) {
@@ -209,22 +202,6 @@ static PyObject *SetThreadStateTrace(PyObject *self, PyObject *args)
         frame = PyFrame_GetBack(frame);
         Py_DECREF(prev_frame);
     }
-#else  // < 3.11: direct struct access
-    PyFrameObject *frame = state ? state->frame : NULL;
-    bool bFoundFirstScriptBlock = false;
-    while (frame) {
-        if (strncmp(PyBytes_AsString(frame->f_code->co_filename), "<Script ", 8) == 0)
-            bFoundFirstScriptBlock = true;
-        else {
-            if (bFoundFirstScriptBlock)
-                break;
-        }
-        Py_XDECREF(frame->f_trace);
-        frame->f_trace = func;
-        Py_INCREF(func);
-        frame = frame->f_back;
-    }
-#endif
     Py_RETURN_NONE;
 }
 // clang-format on

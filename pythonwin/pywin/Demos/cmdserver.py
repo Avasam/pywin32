@@ -94,10 +94,9 @@ def ServerThread(myout, cmd, title, bCloseOnEnd):
 
     # Unhandled exception of any kind in a thread kills the gui!
     except:
-        t, v, tb = sys.exc_info()
-        print(t, ": ", v)
-        traceback.print_tb(tb)
-        tb = None
+        exc = sys.exception()
+        print(type(exc), ": ", exc)
+        traceback.print_tb(exc.__traceback__)
         print("Thread failed")
 
 

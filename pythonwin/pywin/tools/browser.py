@@ -341,9 +341,8 @@ class DialogShowObject(dialog.Dialog):
         try:
             strval = str(self.object)
         except:
-            t, v, tb = sys.exc_info()
-            strval = f"Exception getting object value\n\n{t}:{v}"
-            tb = None
+            exc = sys.exception()
+            strval = f"Exception getting object value\n\n{type(exc)}:{exc}"
         strval = re.sub(r"\n", "\r\n", strval)
         self.edit.ReplaceSel(strval)
 

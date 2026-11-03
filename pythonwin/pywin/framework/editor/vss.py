@@ -97,8 +97,7 @@ def CheckoutFile(fileName):
     except pythoncom.com_error as exc:
         win32ui.MessageBox(exc.strerror, "Error checking out file")
     except:
-        typ, val, tb = sys.exc_info()
+        val = sys.exception()
         traceback.print_exc()
-        win32ui.MessageBox(f"{typ} - {val}", "Error checking out file")
-        tb = None  # Cleanup a cycle
+        win32ui.MessageBox(f"{type(val)} - {val}", "Error checking out file")
     return ok

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 build_id = "312.1"  # may optionally include a ".{patchno}" suffix.
 
 __doc__ = """This is a distutils setup-script for the pywin32 extensions.
@@ -25,6 +23,7 @@ build_env.md, which is getting out of date but might help getting everything
 required for an official build - see README.md for that process.
 """
 # Originally by Thomas Heller, started in 2000 or so.
+import contextlib
 import logging
 import os
 import platform
@@ -41,7 +40,7 @@ from setuptools import Extension, setup
 from setuptools.command.build import build
 from setuptools.modified import newer_group
 from tempfile import gettempdir
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 # We must import from distutils directly at runtime
 # But this prevents typing issues across Python 3.11-3.12
@@ -49,14 +48,12 @@ if TYPE_CHECKING:
     from setuptools._distutils import ccompiler
     from setuptools._distutils._msvccompiler import MSVCCompiler
     from setuptools._distutils.command.install_data import install_data
-    from setuptools._distutils.compilers.C.cygwin import (  # type: ignore[import-not-found, unused-ignore] # Diff type from types-setuptools on Python 3.9
+    from setuptools._distutils.compilers.C.cygwin import (
         Compiler as CygwinCompiler,
         MinGW32Compiler,
     )
     from setuptools._distutils.compilers.C.errors import CompileError
     from setuptools._distutils.errors import DistutilsExecError
-
-    from typing_extensions import TypeAlias
 else:
     from distutils import ccompiler
     from distutils._msvccompiler import MSVCCompiler
@@ -485,16 +482,14 @@ class my_build_ext(build_ext):
         except (AttributeError, TypeError):
             pass
 
-        cwd = os.getcwd()
         old_env = os.environ.copy()
         os.environ["INCLUDE"] = os.pathsep.join(self.compiler.include_dirs)
         os.environ["LIB"] = os.pathsep.join(self.compiler.library_dirs)
-        os.chdir(scintilla_path)
         try:
-            cmd = [nmake, "/nologo", "/f", makefile] + makeargs
-            self.compiler.spawn(cmd)
+            with contextlib.chdir(scintilla_path):
+                cmd = [nmake, "/nologo", "/f", makefile] + makeargs
+                self.compiler.spawn(cmd)
         finally:
-            os.chdir(cwd)
             os.environ["INCLUDE"] = old_env.get("INCLUDE", "")
             os.environ["LIB"] = old_env.get("LIB", "")
 
@@ -826,12 +821,8 @@ class my_build_ext(build_ext):
                 swig_cmd.extend(["-o", fqtarget, fqsource])
                 logging.info("swigging %s to %s", source, target)
                 out_dir = os.path.dirname(source)
-                cwd = os.getcwd()
-                os.chdir(out_dir)
-                try:
+                with contextlib.chdir(out_dir):
                     self.spawn(swig_cmd)
-                finally:
-                    os.chdir(cwd)
             else:
                 logging.info("skipping swig of %s", source)
 
@@ -912,7 +903,7 @@ class MyCygwinCompiler(BaseCygwinCompiler):
         jobs = _build_jobs()
         if jobs == 1:
             # Let distutils run its own serial `for obj in objects` loop.
-            return super().compile(  # type: ignore[no-any-return, unused-ignore] # Untyped in types-setuptools on Python 3.9
+            return super().compile(
                 sources,
                 output_dir=output_dir,
                 macros=macros,
@@ -997,7 +988,7 @@ class MyCygwinCompiler(BaseCygwinCompiler):
                 # gcc needs '.res' and '.rc' compiled to object files !!!
                 self.spawn([os.environ.get("WINDRES", "windres"), "-i", src, "-o", obj])
             else:  # for other files use the C-compiler
-                if self.detect_language(src) == "c++":  # type: ignore[arg-type, unused-ignore] # Diff type from types-setuptools on Python 3.9
+                if self.detect_language(src) == "c++":  # type: ignore[arg-type, unused-ignore] # Diff type from types-setuptools on Python 3.11
                     compiler_so = self.compiler_so_cxx
                 else:
                     compiler_so = self.compiler_so
@@ -1042,7 +1033,7 @@ class MyMSVCCompiler(MSVCCompiler):
         jobs = _build_jobs()
         if jobs == 1:
             # Let distutils run its own one cl.exe per source, unbatched.
-            return super().compile(sources, **kwargs)  # type: ignore[no-any-return, unused-ignore] # Untyped in types-setuptools on Python 3.9
+            return super().compile(sources, **kwargs)  # type: ignore[no-any-return, unused-ignore] # Untyped in types-setuptools on Python 3.11
 
         # Batch sources into as few cl.exe /MP runs as possible.
         # MSVCCompiler.compile() runs one cl.exe per source, so /MP in
@@ -1087,15 +1078,6 @@ class MyMSVCCompiler(MSVCCompiler):
         if self._pending_compiles is not None and cmd[0] == self.cc:
             self._pending_compiles.append(list(cmd))
             return None
-
-        # setuptools <81 (Python 3.9) has no Compiler.call(), use deprecated spawn()
-        if sys.version_info < (3, 10):
-            return super().spawn(cmd, **kwargs)
-        else:
-            return super().call(cmd, **kwargs)
-
-    if sys.version_info < (3, 10):
-        spawn = call
 
     @staticmethod
     def _batch_compiles(
@@ -2226,8 +2208,6 @@ classifiers = [
     "License :: OSI Approved :: Python Software Foundation License",
     "Development Status :: 5 - Production/Stable",
     "Operating System :: Microsoft :: Windows",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -2245,7 +2225,7 @@ dist = setup(
     long_description_content_type="text/markdown",
     author="Mark Hammond (et al)",
     author_email="mhammond@skippinet.com.au",
-    python_requires=">=3.9",
+    python_requires=">=3.11",
     project_urls={
         # https://docs.pypi.org/project_metadata/#general-url
         "Homepage": "https://github.com/mhammond/pywin32",

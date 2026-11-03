@@ -17,7 +17,7 @@ def a():
         b()
     except:
         # Break into the debugger with the exception information.
-        pywin.debugger.post_mortem(sys.exc_info()[2])
+        pywin.debugger.post_mortem(sys.exception().__traceback__)
         a = 1
         a = 2
         a = 3

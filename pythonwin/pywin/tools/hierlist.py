@@ -1,18 +1,16 @@
-# hierlist
-#
-# IMPORTANT - Please read before using.
+"""IMPORTANT - Please read before using.
 
-# This module exposes an API for a Hierarchical Tree Control.
-# Previously, a custom tree control was included in Pythonwin which
-# has an API very similar to this.
+This module exposes an API for a Hierarchical Tree Control.
+Previously, a custom tree control was included in Pythonwin which
+has an API very similar to this.
 
-# The current control used is the common "Tree Control".  This module exists now
-# to provide an API similar to the old control, but for the new Tree control.
+The current control used is the common "Tree Control".  This module exists now
+to provide an API similar to the old control, but for the new Tree control.
 
-# If you need to use the Tree Control, you may still find this API a reasonable
-# choice.  However, you should investigate using the tree control directly
-# to provide maximum flexibility (but with extra work).
-from __future__ import annotations
+If you need to use the Tree Control, you may still find this API a reasonable
+choice.  However, you should investigate using the tree control directly
+to provide maximum flexibility (but with extra work).
+"""
 
 import commctrl
 import win32api

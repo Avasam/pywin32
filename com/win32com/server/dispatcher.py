@@ -3,8 +3,6 @@
 Please see policy.py for a discussion on dispatchers and policies
 """
 
-from __future__ import annotations
-
 import traceback
 from typing import NoReturn
 

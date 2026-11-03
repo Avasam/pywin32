@@ -479,9 +479,7 @@ class DebuggerWatchWindow(DebuggerListViewWindow):
                 except SyntaxError:
                     val = "Syntax Error"
                 except:
-                    t, v, tb = sys.exc_info()
-                    val = traceback.format_exception_only(t, v)[0].strip()
-                    tb = None  # prevent a cycle.
+                    val = traceback.format_exception_only(sys.exception())[0].strip()
             self.SetItemText(i, 1, val)
 
 
@@ -819,10 +817,7 @@ class Debugger(debugger_parent):
 
     def set_trace(self):
         # Start debugging from _2_ levels up!
-        try:
-            1 + ""
-        except:
-            frame = sys.exc_info()[2].tb_frame.f_back.f_back
+        frame = sys._getframe(2)
         self.reset()
         self.userbotframe = None
         while frame:

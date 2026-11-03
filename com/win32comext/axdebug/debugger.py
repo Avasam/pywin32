@@ -152,10 +152,7 @@ class AXDebugger:
 
     def Break(self):
         # Get the frame we start debugging from - this is the frame 1 level up
-        try:
-            1 + ""
-        except:
-            frame = sys.exc_info()[2].tb_frame.f_back
+        frame = sys._getframe(1)
 
         # Get/create the debugger, and tell it to break.
         self.app.StartDebugSession()

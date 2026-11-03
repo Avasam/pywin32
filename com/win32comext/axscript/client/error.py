@@ -144,11 +144,10 @@ class AXScriptException(COMException):
 
     def _BuildFromOther(self, site: COMScript, value: BaseException | None):
         tb = value.__traceback__ if value else None
-        exc_type = type(value) if value else None
         self.colno = -1
         self.lineno = 0
         if debugging:  # Full traceback if debugging.
-            list = traceback.format_exception(exc_type, value, tb)
+            list = traceback.format_exception(value)
             self.description = ExpandTabs("".join(list))
             return
         # Run down the traceback list, looking for the first "<Script..>"
@@ -196,7 +195,7 @@ class AXScriptException(COMException):
                 desc = value.excepinfo[2]
             bits.append("COM Error: " + desc)
         else:
-            bits.extend(traceback.format_exception_only(exc_type, value))
+            bits.extend(traceback.format_exception_only(value))
 
         self.description = ExpandTabs("".join(bits))
 

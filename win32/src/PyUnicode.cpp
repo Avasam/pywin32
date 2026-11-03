@@ -103,7 +103,6 @@ BOOL PyWinObject_AsChars(PyObject *stringObject, char **pResult, BOOL bNoneOK /*
     }
     // Convert the string if a WIDE string.
     if (PyUnicode_Check(stringObject)) {
-        // PyUnicode_EncodeMBCS was removed in Py 3.11.
         stringObject = tempObject = PyUnicode_AsMBCSString(stringObject);
         if (!stringObject)
             return FALSE;

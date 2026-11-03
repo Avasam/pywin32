@@ -8,8 +8,6 @@ It is not necessary to use these base-classes - but if you don't, you
 must ensure each of the required methods are implemented.
 """
 
-from __future__ import annotations
-
 
 class SimpleExtension:
     "Base class for a simple ISAPI extension"

@@ -31,7 +31,6 @@ e.g. to ignore casts to u_long: simply specify "-i '(u_long)'".
 # - turn C Boolean operators "&& || !" into Python "and or not"
 # - what to do about #if(def)?
 # - what to do about macros with multiple parameters?
-from __future__ import annotations
 
 import ctypes
 import getopt

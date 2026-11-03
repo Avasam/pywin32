@@ -1,7 +1,6 @@
 # tests for win32gui
 import array
 import operator
-import sys
 import unittest
 
 import pywintypes
@@ -80,10 +79,7 @@ class TestEnumWindowsFamily(unittest.TestCase):
 
     def setUp(self):
         self.default_data_set = (None, -1, 0, 1, True, False)
-        if sys.version_info >= (3, 10):
-            self.type_data_set = ("", (), {}, 2.718282)
-        else:
-            self.type_data_set = ("", (), {})
+        self.type_data_set = ("", (), {}, 2.718282)
 
     def test_enumwindows(self):
         win32api.SetLastError(0)

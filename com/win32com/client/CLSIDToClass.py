@@ -17,8 +17,6 @@ This obviously applies to all cooperating objects, not just DAO and
 Access.
 """
 
-from __future__ import annotations
-
 mapCLSIDToClass: dict[str, type] = {}
 
 

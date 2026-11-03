@@ -1,4 +1,4 @@
-target-version = "py39" # Target the oldest supported version
+target-version = "py311" # Target the oldest supported version
 # This file is not UTF-8
 extend-exclude = ["pythonwin/pywin/test/_dbgscript.py"]
 
@@ -8,6 +8,7 @@ line-ending = "cr-lf"
 [lint]
 select = [
   "B028", # no-explicit-stacklevel
+  "B905", # zip-without-explicit-strict
   "C4", # flake8-comprehensions
   "F401", # unused-import
   "F811", # redefined-while-unused
@@ -23,10 +24,10 @@ select = [
   "G", # flake8-logging-format
 
   # Ensure modern type annotation syntax and best practices
-  # Not including those covered by type-checkers or exclusive to Python 3.11+
-  "FA", # flake8-future-annotations
   "F404", # late-future-import
+  "FA", # flake8-future-annotations
   "PYI", # flake8-pyi
+  "SIM117", # multiple-with-statements
 
   # Code modernization (strings, annotations, conditions, ...)
   "UP", # pyupgrade
@@ -57,6 +58,7 @@ extend-ignore = [
   "UP031",
   "UP032",
   # Dropping Python 3.8 support
+  "SIM117",
   "UP005",
   "UP006",
   "UP018",

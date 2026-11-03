@@ -1,6 +1,5 @@
 # Originally contributed by Stefan Schukat as part of this arbitrary-sized
 # arrays patch.
-from __future__ import annotations
 
 import platform
 import unittest

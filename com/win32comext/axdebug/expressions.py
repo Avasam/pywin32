@@ -59,9 +59,7 @@ class Expression(gateways.DebugExpression):
                     self.result = ""
                 self.hresult = 0
             except:
-                l = traceback.format_exception_only(
-                    sys.exc_info()[0], sys.exc_info()[1]
-                )
+                l = traceback.format_exception_only(sys.exception())
                 # l is a list of strings with trailing "\n"
                 self.result = "\n".join(s[:-1] for s in l)
                 self.hresult = winerror.E_FAIL

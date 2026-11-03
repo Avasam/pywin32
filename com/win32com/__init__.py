@@ -1,7 +1,4 @@
-#
-# Initialization for the win32com package
-#
-from __future__ import annotations
+"""Initialization for the win32com package"""
 
 import os
 import sys

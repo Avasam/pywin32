@@ -1,5 +1,4 @@
-# find.py - Find and Replace
-from __future__ import annotations
+"""Find and Replace"""
 
 import win32api
 import win32con

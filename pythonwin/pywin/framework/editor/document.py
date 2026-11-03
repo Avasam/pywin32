@@ -142,7 +142,7 @@ class EditorDocumentBase(ParentEditorDocument):
                 info = None
             states.append(info)
         self.OnOpenDocument(self.GetPathName())
-        for view, info in zip(views, states):
+        for view, info in zip(views, states, strict=True):
             if info is not None:
                 view._EndUserStateChange(info)
         self._DocumentStateChanged()

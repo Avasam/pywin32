@@ -404,7 +404,7 @@ class InteractiveCore:
         if not bufLines:
             return
         terms = (["\n" + sys.ps2] * (len(bufLines) - 1)) + [""]
-        for bufLine, term in zip(bufLines, terms):
+        for bufLine, term in zip(bufLines, terms, strict=True):
             if bufLine.strip():
                 self.write(bufLine + term)
         self.flush()

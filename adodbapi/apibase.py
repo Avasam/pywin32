@@ -551,9 +551,10 @@ class SQLrow:  # a single database row
             return self._getValue(
                 self.rows.columnNames[key.lower()]
             )  # extension row[columnName] designation
-        except (KeyError, TypeError):
-            er, st, tr = sys.exc_info()
-            raise er(f'No such key as "{key!r}" in {self!r}').with_traceback(tr)
+        except (KeyError, TypeError) as e:
+            raise type(e)(f'No such key as "{key!r}" in {self!r}').with_traceback(
+                e.__traceback__
+            )
 
     def __iter__(self):
         return iter(self.__next__())

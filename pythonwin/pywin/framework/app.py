@@ -1,10 +1,9 @@
-# Application stuff.
-# The application is responsible for managing the main frame window.
-#
-# We also grab the FileOpen command, to invoke our Python editor
-"The PythonWin application code. Manages most aspects of MDI, etc"
+"""Application stuff.
+The application is responsible for managing the main frame window.
 
-from __future__ import annotations
+We also grab the FileOpen command, to invoke our Python editor
+The PythonWin application code. Manages most aspects of MDI, etc
+"""
 
 import builtins
 import os
@@ -208,9 +207,10 @@ class CApp(WinApp):
 
                 help.OpenHelpFile(helpFile, helpCmd)
         except:
-            t, v, tb = sys.exc_info()
-            win32ui.MessageBox(f"Internal error in help file processing\r\n{t}: {v}")
-            tb = None  # Prevent a cycle
+            exc = sys.exception()
+            win32ui.MessageBox(
+                f"Internal error in help file processing\r\n{type(exc)}: {exc}"
+            )
 
     def DoLoadModules(self, modules):
         # XXX - this should go, but the debugger uses it :-(

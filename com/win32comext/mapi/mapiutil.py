@@ -1,5 +1,4 @@
-# General utilities for MAPI and MAPI objects.
-from __future__ import annotations
+"""General utilities for MAPI and MAPI objects."""
 
 import pythoncom
 from pywintypes import TimeType

@@ -7,8 +7,6 @@ scoping rules, etc.
 There are classes defined for the engine itself, and for ScriptItems
 """
 
-from __future__ import annotations
-
 import re
 import sys
 from typing import NoReturn
@@ -765,9 +763,10 @@ class COMScript:
             self.debugManager = None
         except:
             traceback.print_exc()
+            exc = sys.exception()
             trace(
                 "*** Debugger Manager could not initialize - {}: {}".format(
-                    sys.exc_info()[0], sys.exc_info()[1]
+                    type(exc), exc
                 )
             )
             self.debugManager = None
@@ -1197,11 +1196,11 @@ class COMScript:
 
     def HandleException(self, codeBlock: AXScriptCodeBlock | None) -> NoReturn:
         """Never returns - raises a ComException"""
-        exc_type, exc_value, *_ = sys.exc_info()
+        exc_value = sys.exception()
         # If a SERVER exception, re-raise it.  If a client side COM error, it is
         # likely to have originated from the script code itself, and therefore
         # needs to be reported like any other exception.
-        if IsCOMServerException(exc_type):
+        if IsCOMServerException(type(exc_value)):
             # Ensure the traceback doesn't cause a cycle.
             raise
         # It could be an error by another script.

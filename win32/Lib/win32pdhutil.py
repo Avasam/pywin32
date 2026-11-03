@@ -18,8 +18,6 @@ Example:
   the easiest way is often to simply use PerfMon to find out the names.
 """
 
-from __future__ import annotations
-
 import time
 
 import win32pdh

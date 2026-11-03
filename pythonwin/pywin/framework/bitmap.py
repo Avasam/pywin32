@@ -1,5 +1,4 @@
 import os
-import sys
 
 import win32api
 import win32con
@@ -159,10 +158,7 @@ def demo():
     import glob
 
     winDir = win32api.GetWindowsDirectory()
-    if sys.version_info >= (3, 10):
-        fileNames = glob.glob("*.bmp", root_dir=winDir)[:2]
-    else:
-        fileNames = glob.glob1(winDir, "*.bmp")[:2]
+    fileNames = glob.glob("*.bmp", root_dir=winDir)[:2]
 
     for fileName in fileNames:
         bitmapTemplate.OpenDocumentFile(os.path.join(winDir, fileName))

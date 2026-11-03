@@ -444,10 +444,7 @@ def main():
     for cat in cats:
         file = os.path.join(gen_dir, cat.dump_file)
         # AutoDuck does not output in UTF-8
-        if sys.version_info >= (3, 10):
-            input = open(file, "r", encoding="locale")
-        else:
-            input = open(file, "r", encoding=None)
+        input = open(file, "r", encoding="locale")
 
         parseTopics(cat, input)
         input.close()
