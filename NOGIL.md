@@ -361,7 +361,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   but the underlying C code retains numerous unprotected shared dicts, GIL-reliant
   lazy-init singletons, and callback-thread races that will trigger data corruption
   under free-threaded Python 3.13t+. The version compatibility posture is disciplined —
-  no unguarded post-3.9 APIs — but 31 deprecated PyErr_Fetch/Restore call sites and
+  no unguarded post-3.11 APIs — but 31 deprecated PyErr_Fetch/Restore call sites and
   ~50 files of deprecated T_* struct members need migration before Python deprecation
   removal. Recommended first action: fix finding 1 (Register.cpp:232) and finding 2
   (PyIPropertyStorage.cpp:451-458) immediately; they are one-line and four-line fixes
@@ -380,7 +380,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   │ Init style     │ Single-phase (PyModule_Create) via PYWIN_MODULE_INIT_PREPARE  │
   │                │ macro                                                         │
   ├────────────────┼───────────────────────────────────────────────────────────────┤
-  │ Python targets │ ≥3.9 (CI: 3.9–3.15 + 3.13t/3.14t/3.15t free-threaded)         │
+  │ Python targets │ ≥3.11 (CI: 3.11–3.15 + 3.13t/3.14t/3.15t free-threaded)       │
   ├────────────────┼───────────────────────────────────────────────────────────────┤
   │ Limited API    │ No                                                            │
   ├────────────────┼───────────────────────────────────────────────────────────────┤
@@ -414,7 +414,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   │ Resource      │ 🟡     │ 3   │ 2        │ GlobalAlloc leak on SetClipboardData │
   │ Lifecycle     │        │     │          │  failure                             │
   ├───────────────┼────────┼─────┼──────────┼──────────────────────────────────────┤
-  │ Module State  │ 🟡     │ 5   │ 5        │ COM singletons (g_obEmpty etc.)      │
+  │ Module State  │ 🟡     │ 4   │ 5        │ COM singletons (g_obEmpty etc.)      │
   │               │        │     │          │ overwritten on reimport              │
   ├───────────────┼────────┼─────┼──────────┼──────────────────────────────────────┤
   │ Type Slots    │ 🔴     │ 4   │ 6        │ PyHANDLE hash/equality inconsistency │
@@ -426,7 +426,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   │ ABI / Private │ 🟡     │ 0   │ 5        │ _PyLong_Sign deprecated in 3.14 (not │
   │  APIs         │        │     │          │  removed)                            │
   ├───────────────┼────────┼─────┼──────────┼──────────────────────────────────────┤
-  │ Version       │ 🟡     │ 0   │ 3        │ 31 PyErr_Fetch/Restore deprecated    │
+  │ Version       │ 🟡     │ 0   │ 2        │ 31 PyErr_Fetch/Restore deprecated    │
   │ Compat        │        │     │          │ sites across 8 files                 │
   ├───────────────┼────────┼─────┼──────────┼──────────────────────────────────────┤
   │ C/Python      │ ⬜     │ —   │ —        │ Not assessed — agent blocked         │
@@ -440,7 +440,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   ---
   Findings by Priority
 
-  Must Fix (FIX) — 35
+  Must Fix (FIX) — 34
 
   Findings are globally numbered. All-builds / non-OOM bugs first; OOM-triggered;
   resource leaks; module state; adjacent-pattern confirmed bugs follow.
@@ -632,13 +632,6 @@ From https://github.com/devdanzin/cext-review-toolkit:
   File:Line: PythonCOM.cpp:2146-2178
   Agents: module-state
   ────────────────────────────────────────
-  #: 27
-  Finding: PyModule_AddObject(module, "com_record", &PyRecord::Type) with no prior
-    Py_INCREF — steals reference from statically-allocated type; attempted dealloc of
-    static storage on module unload
-  File:Line: PythonCOM.cpp:2192
-  Agents: module-state, refcount
-  ────────────────────────────────────────
   #: 28
   Finding: g_obRegisteredVTables = PyDict_New() in initunivgw() with no NULL guard —
     previous dict overwritten on reimport (all registered VTables silently lost);
@@ -705,7 +698,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   Agents: git-history
 
   ---
-  Should Consider (CONSIDER) — 28
+  Should Consider (CONSIDER) — 26
 
   #: 36
   Finding: PyOVERLAPPED holds obState (arbitrary user-attached object) and obhEvent —
@@ -809,11 +802,6 @@ From https://github.com/devdanzin/cext-review-toolkit:
     any subsequent check
   File:Line: odbc.cpp:773-774
   ────────────────────────────────────────
-  #: 52
-  Finding: odbc.cpp:1617-1620 PyModule_AddObject failure path leaks obtypes;
-    PYWIN_MODULE_INIT_RETURN_ERROR does not release it
-  File:Line: odbc.cpp:1617-1620
-  ────────────────────────────────────────
   #: 53
   Finding: odbc.cpp:1174-1244 inputvars reference leaked on error paths in bulk-insert
     loop
@@ -832,7 +820,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   shared
     across all interpreters — second interpreter's pywintypes.error is an object owned
     by the first interpreter's heap
-  File:Line: PyWinTypesmodule.cpp:797-860
+  File:Line: PyWinTypesmodule.cpp:756-819
   ────────────────────────────────────────
   #: 56
   Finding: timermodule.cpp:14 / win32assoc.cpp:99-190 ASSERT_GIL_HELD comments +
@@ -868,19 +856,13 @@ From https://github.com/devdanzin/cext-review-toolkit:
   ────────────────────────────────────────
   #: 61
   Finding: ob_type = &SomeType direct field write pattern (~350 sites) — deprecated in
-    3.9; Py_SET_TYPE is the correct form and is available at pywin32's 3.9 minimum
+    3.9; Py_SET_TYPE is the correct form and is available at pywin32's 3.11 minimum
   File:Line: All C++ type constructors
   ────────────────────────────────────────
   #: 62
   Finding: structmember.h T_* macros deprecated in 3.12; ~50 files affected;
     PyWinTypes.h:18 includes structmember.h globally
   File:Line: PyWinTypes.h:18 + ~50 files
-  ────────────────────────────────────────
-  #: 63
-  Finding: AXDebug.cpp frame struct access guard at >= 0x030b0000 (3.11) is too
-    conservative — PyFrame_GetCode / PyFrame_GetBack have been public since 3.9; the
-    #else struct-access branch can be dropped entirely
-  File:Line: AXDebug.cpp:59-61, 189-230
 
   ---
   Tensions
@@ -977,12 +959,11 @@ From https://github.com/devdanzin/cext-review-toolkit:
   ---
   Strengths
 
-  - CI matrix is excellent: 3.9–3.15 × x86/x64/ARM64 × GIL/free-threaded covers the
+  - CI matrix is excellent: 3.11–3.15 × x86/x64/ARM64 × GIL/free-threaded covers the
   widest supported range in pywin32's history. The free-threaded variants are already
   in CI.
-  - Version guard discipline: Zero unguarded post-3.9 API calls found. Every
-  PyWeakref_GetRef, PyUnstable_Module_SetGIL, and pre-3.11 frame access is correctly
-  conditionalized.
+  - Version guard discipline: Zero unguarded post-3.11 API calls found. Every
+  PyWeakref_GetRef and PyUnstable_Module_SetGIL call is correctly conditionalized.
   - PY_INTERFACE_PRECALL/POSTCALL macro pair: The GIL release/acquire pattern around
   COM calls is consistent and used correctly in most COM dispatch paths.
   - PYWIN_MODULE_INIT_PREPARE macro: Centralizes the PyUnstable_Module_SetGIL call
@@ -1000,12 +981,8 @@ From https://github.com/devdanzin/cext-review-toolkit:
   ---
   Code Removal Opportunities
 
-  With minimum Python ≥3.9:
+  With minimum Python ≥3.11:
 
-  - AXDebug.cpp pre-3.11 branch (#if PY_VERSION_HEX < 0x030b0000): PyFrame_GetCode and
-  PyFrame_GetBack are available since 3.9. Delete the entire #else struct-access block
-  (~15 lines) and the #include "compile.h" / #include "frameobject.h" guards. Net: ~20
-  lines removed.
   - PyErr_Fetch/Restore migration (once pythoncapi-compat is vendored): Each of the 31
   call sites collapses from a 3-variable save/normalize/restore pattern to a 1-variable
   save/restore. Net: ~3 lines saved per site → ~60 lines removed.
@@ -1046,7 +1023,7 @@ From https://github.com/devdanzin/cext-review-toolkit:
   10. Fix findings 23–25 (mmapfilemodule.cpp, win32clipboardmodule.cpp ×2): Add
   Py_DECREF(m_obj) and GlobalFree(handle) / GlobalFree(hMem) on failure paths.
   11. Fix findings 26–30 (module globals): Add if (x == NULL) { x = ...; } idempotency
-  guards; add Py_INCREF(&PyRecord::Type) before PyModule_AddObject.
+  guards.
   12. Fix findings 31–33 (PyComHelpers.cpp:274,381,465): Remove Py_DECREF on borrowed
   dict-get results; replace pwcsName = NULL with CoTaskMemFree(pStat->pwcsName);
   pStat->pwcsName = NULL.
@@ -1083,6 +1060,4 @@ From https://github.com/devdanzin/cext-review-toolkit:
   and COM type hierarchy to tp_alloc/PyObject_Init.
   23. P9 (blocking Win32 calls without GIL release): Systematically audit remaining
   non-Py_BEGIN_ALLOW_THREADS Win32 waits.
-  24. Remove the #if PY_VERSION_HEX < 0x030b0000 block in AXDebug.cpp (20-line cleanup,
-  zero risk at 3.9 min).
 ```
