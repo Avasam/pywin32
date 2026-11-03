@@ -2227,7 +2227,7 @@ PYWIN_MODULE_INIT_FUNC(pythoncom)
         PYWIN_MODULE_INIT_RETURN_ERROR;
 
     // Add the PyRecord type as a module attribute
-    if (PyModule_AddObject(module, "com_record", (PyObject *)&PyRecord::Type) != 0)
+    if (PyModule_AddObjectRef(module, "com_record", (PyObject *)&PyRecord::Type) != 0)
         PYWIN_MODULE_INIT_RETURN_ERROR;
 
     // Setup our sub-modules

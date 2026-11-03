@@ -1626,8 +1626,12 @@ PYWIN_MODULE_INIT_FUNC(odbc)
     char *szDbiNumber = "NUMBER";
     char *szDbiDate = "DATE";
     PyObject *obtypes = Py_BuildValue("(ssss)", szDbiString, szDbiRaw, szDbiNumber, szDbiDate);
-    // Steals a ref to obtypes, so it doesn't need to be DECREF'ed.
-    if (obtypes == NULL || PyModule_AddObject(module, "TYPES", obtypes) == -1)
+    if (obtypes == NULL)
+        PYWIN_MODULE_INIT_RETURN_ERROR;
+    // The module keeps obtypes alive, so the borrowed items below stay valid.
+    int rc = PyModule_AddObjectRef(module, "TYPES", obtypes);
+    Py_DECREF(obtypes);
+    if (rc == -1)
         PYWIN_MODULE_INIT_RETURN_ERROR;
     DbiString = PyTuple_GET_ITEM(obtypes, 0);
     DbiRaw = PyTuple_GET_ITEM(obtypes, 1);

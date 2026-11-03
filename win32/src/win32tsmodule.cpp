@@ -803,8 +803,8 @@ PYWIN_MODULE_INIT_FUNC(win32ts)
     PyModule_AddIntConstant(module, "WTS_CURRENT_SERVER", 0);
     PyModule_AddIntConstant(module, "WTS_CURRENT_SERVER_HANDLE", 0);
     PyModule_AddIntConstant(module, "WTS_CURRENT_SESSION", WTS_CURRENT_SESSION);
-    Py_INCREF(Py_None);  // WTS_CURRENT_SERVER_NAME is defined as NULL
-    PyModule_AddObject(module, "WTS_CURRENT_SERVER_NAME", Py_None);
+    // WTS_CURRENT_SERVER_NAME is defined as NULL
+    PyModule_AddObjectRef(module, "WTS_CURRENT_SERVER_NAME", Py_None);
 
     // Session notification constants
     PyModule_AddIntConstant(module, "NOTIFY_FOR_THIS_SESSION", NOTIFY_FOR_THIS_SESSION);
