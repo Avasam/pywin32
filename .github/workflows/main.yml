@@ -99,6 +99,49 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error
 
+  pypy:
+    name: Build and smoke test PyPy
+    runs-on: windows-2022
+    timeout-minutes: *timeout-minutes
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["pypy3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+          check-latest: true
+
+      - name: Build and install
+        run: pip install . -v
+
+      # Each import runs in a fresh process, and in its own step so a failure names the order that broke.
+      # Importing win32api first makes Windows resolve pywintypesXY.dll while loading win32api.pyd,
+      # before pywintypes.py can load it. That only works if PyPy's extension loader searches the
+      # directories pywin32_bootstrap adds with os.add_dll_directory.
+      - name: Import win32api before pywintypes
+        run: python -c "import win32api; import pywintypes; print(win32api.__file__, pywintypes.__file__)"
+
+      - name: Import pywintypes before win32api
+        run: python -c "import pywintypes; import win32api; print(pywintypes.__file__, win32api.__file__)"
+
+      - name: Use a COM client
+        run: python -c "import win32com.client; d = win32com.client.Dispatch('Scripting.Dictionary'); d.Add('key', 'value'); assert d.Item('key') == 'value'"
+
+      - name: Build wheels
+        run: pip wheel . -v --wheel-dir=dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.python-version }}-x64
+          path: dist/*.whl
+          if-no-files-found: error
+
   # actions/setup-python does not provide prebuilt arm64 Python before 3.11, so we cross-compile.
   cross_compile_arm64:
     name: Cross-compile ARM64
@@ -134,7 +177,7 @@ jobs:
 
   merge:
     runs-on: ubuntu-latest
-    needs: [test, cross_compile_arm64]
+    needs: [test, pypy, cross_compile_arm64]
     steps:
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4

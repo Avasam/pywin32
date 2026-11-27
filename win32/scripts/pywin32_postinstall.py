@@ -705,6 +705,12 @@ def main():
     if not args.quiet:
         print(f"Parsed arguments are: {args}")
 
+    if sys.implementation.name == "pypy":
+        # The system32 DLLs and COM server registration are for host processes that aren't Python,
+        # which can't embed PyPy. Services and Pythonwin.exe aren't built for PyPy.
+        # The copied DLLs would also clash with CPython's, which use the same names.
+        parser.error("The post-install script isn't supported on PyPy.")
+
     if not args.install ^ args.remove:
         parser.error("You need to either choose to -install or -remove!")
 
