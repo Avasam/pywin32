@@ -65,6 +65,20 @@ This should be considered experimental; while knowingly unsafe, no wheels compat
 
 See [NOGIL.md](NOGIL.md) for the blockers to supplying these artifacts.
 
+### PyPy support
+
+pywin32 supports PyPy 3.12 or later, with wheels published for 64-bit PyPy. Older PyPy versions are not supported. This should be considered experimental.
+
+PyPy can't be embedded in a host process that isn't Python (the service control manager, IIS, Excel, `regsvr32`, etc.), so the parts of pywin32 that rely on that aren't available:
+
+* Windows services: `servicemanager` and `pythonservice.exe` aren't built, so `win32serviceutil` can't install or run services.
+* Pythonwin: `Pythonwin.exe` and Scintilla aren't built, so the Pythonwin IDE and editor aren't available.
+* ISAPI: `PyISAPI_loader` isn't built, so the `isapi` package can't be used with IIS.
+* In-process COM servers: Python COM servers are only registered as local (out-of-process) servers, and registering one as in-process only raises an error. COM clients (`win32com.client`) and local COM servers still work.
+* The post-install script isn't registered and will refuse to run.
+
+`pywintypesXX.dll` and `pythoncomXX.dll` have the same names for CPython and PyPy builds of the same Python version. If a CPython install ran the post-install script globally, its copies can be loaded by PyPy instead of PyPy's own.
+
 ### Installing globally
 
 Outside of a virtual environment you might want to install COM objects, services, etc. You can do
